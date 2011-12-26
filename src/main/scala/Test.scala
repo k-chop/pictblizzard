@@ -14,7 +14,7 @@ object Test {
   
   def main(args: Array[String]) = {
     import ScriptOps._
-    import ScriptOps.implicits._
+    import ScriptOps.implicits.string2URI
     
     val text = "backhearts1234456778906[]!?"
     val pros = new Font("ProFontWindows", Font.PLAIN, 9)
@@ -28,7 +28,8 @@ object Test {
       'icon3 -> AreaUnit(Map('point->APoint(100,0))),
       'str -> AreaUnit(Map(
         'rect->ARect(10,30,200,30),
-                       'align->AAlign('x_center, 'y_center),
+                       'align->AAlign('x_center, 'bottom),
+                       'border->ABorder,
                        'font->AFont("Terminus-ja", 'plain, 12))),
       'str2->AreaUnit(Map('rect->ARect(10,60,200,120),
                           'font->AFont("Terminus-ja", 'plain, 12),
@@ -43,7 +44,7 @@ object Test {
     
     val d = new Drawer(valuemap, layout ,NullContext)
     d.draw()
-    d.write("./test.png")
+    d.write("./temp/test.png")
 
     ()
   }  

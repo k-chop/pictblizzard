@@ -41,7 +41,7 @@ class Drawer(valuemap: ValueMap, layout: LayoutUnit, context: Context) {
     }
   }
 
-  def extractStyle(s: Symbol): Int = s match {
+  private[this] def extractStyle(s: Symbol): Int = s match {
     case 'plain => Font.PLAIN
     case 'bold => Font.BOLD
     case 'italic => Font.ITALIC
@@ -64,10 +64,14 @@ class Drawer(valuemap: ValueMap, layout: LayoutUnit, context: Context) {
     println("ok.")
     val (px, py) = findBeginPoint(attrmap)
     g2d.drawImage(strimg, null, px, py)  // 横着すんな
-    g2d.drawRect(px, py, strimg.getWidth, strimg.getHeight)
+
+    attrmap.get('border) map { _ =>
+      g2d.drawRect(px, py, strimg.getWidth, strimg.getHeight)
+    }
+    
   }
 
-  def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = ss.toList match {
+  private[this] def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = ss.toList match {
     case s :: cdr => {
       am find { case(k,v) => k == s } match {
         case Some((k,v)) => Some(v)

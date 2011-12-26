@@ -32,7 +32,8 @@ object ScriptOps {
   case class AYInterval(p: Int) extends Attr
   case class APadding(p: Int) extends Attr
   case class AAlign(xparam: Symbol, yparam: Symbol) extends Attr
-
+  case object ABorder extends Attr
+  
   case class ATile() extends Attr
   case class ABackground() extends Attr
   case class AWindow() extends Attr
