@@ -1,0 +1,40 @@
+package com.github.chuwb.pictbliz
+package test
+
+import org.scalatest.WordSpec
+import org.scalatest.matchers.ShouldMatchers
+
+class AttributedTextSpec extends WordSpec with ShouldMatchers {
+  
+  type AR = AttributeRange
+  
+  "AttributedText" should {
+
+    "parse attributed text collectly" in {
+      val ar = new AttributedText("""one\c[1]two\c[2]three\c[3]four""")
+      ar.string should equal ("onetwothreefour")
+      ar.ranges.length should equal (4)
+
+      val ar2 = new AttributedText("""one\c[1]two\c[2]three\c[3]four\c[2]""")
+      ar2.string should equal ("onetwothreefour")
+      ar2.ranges.length should equal (4)
+
+      val ar3 = new AttributedText("""\c[0]\c[1]\c[0]\c[2]""")
+      ar3.string should equal ("")
+      ar3.ranges.length should equal (0)
+
+      val ar4 = new AttributedText("""\c[1]test""")
+      ar4.string should equal ("test")
+      ar4.ranges.length should equal (1)
+      
+      val ar5 = new AttributedText("""test\c[1]""")
+      ar5.string should equal ("test")
+      ar5.ranges.length should equal (1)
+
+      val ar6 = new AttributedText("""plain""")
+      ar6.string should equal ("plain")
+      ar6.ranges.length should equal (1)
+      
+    }
+  }
+}

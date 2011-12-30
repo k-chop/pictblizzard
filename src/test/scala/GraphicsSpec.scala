@@ -27,7 +27,7 @@ class GraphicsSpec extends WordSpec with ShouldMatchers {
       val str = "あいうえおsdobuaer1235"
       for (i <- 0 to 6) {
         val wi = 160
-        val f = new Font(Font.Monospaced, Font.PLAIN, 8+i)
+        val f = new Font(Font.MONOSPACED, Font.PLAIN, 8+i)
         g2d.setFont(f)
         val frc = g2d.getFontRenderContext
         val v = f.createGlyphVector(frc, str)

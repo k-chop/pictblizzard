@@ -7,13 +7,38 @@ class AttributedText(val raw: String) {
   val (ranges, string) = parse(raw)
   def iter = ranges.iterator
 
-  def parse(source: String): (List[AttributeRange], String) = {
-    // バックスラッシュから始まる特殊文字を元の文字列から消去し、
-    // AttributeRangeに詰めるだけの簡単なお仕事。
-    val acc = mutable.ListBuffer.empty[AttributeRange]
+  private[this] def parse(source: String): (List[AttributeRange], String) = {
 
-    sys.error("undefined")
-    //(acc.toList, source)
+    val acc = mutable.ListBuffer.empty[AttributeRange]
+    val reseter = """\c[0]"""
+    val sb = new StringBuffer()
+    
+    val addedsource = reseter + source + reseter
+    
+    def rec(trimmed: String, start: Int, diff: Int): Unit = {
+      val re = """\\([a-z])\[(\d+)\]([^\\]*)\\""".r
+      val matchResult = re.findFirstMatchIn(trimmed)
+      if (matchResult.isDefined) {
+        val m = matchResult.get
+        val str = m.group(3)
+
+        if (str.length != 0) {
+          val command = m.group(1).head
+          val comindex = m.group(2).head
+          
+          val nextStart = m.start + str.length
+          acc += AttributeRange(m.start, nextStart, comindex)
+          println(trimmed,nextStart)
+          sb.append(str)
+          rec(m.before + str + "\\" + m.after.toString, 0, 0)
+        } else {
+          rec(m.before + str + "\\" + m.after.toString, 0, 0)
+        }
+      }
+    }
+
+    rec(addedsource, 0, 0)
+    (acc.toList, sb.toString)
   }
   
 }
