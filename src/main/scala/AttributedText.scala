@@ -14,7 +14,8 @@ class AttributedText(val raw: String) {
     val sb = new StringBuffer()
     
     val addedsource = reseter + source + reseter
-    
+
+    @scala.annotation.tailrec
     def rec(trimmed: String, start: Int, diff: Int): Unit = {
       val re = """\\([a-z])\[(\d+)\]([^\\]*)\\""".r
       val matchResult = re.findFirstMatchIn(trimmed)
@@ -23,11 +24,11 @@ class AttributedText(val raw: String) {
         val str = m.group(3)
 
         if (str.length != 0) {
-          val command = m.group(1).head
-          val comindex = m.group(2).head
+          val comc = m.group(1).head
+          val comidx = m.group(2).head
           
           val nextStart = m.start + str.length
-          acc += AttributeRange(m.start, nextStart, comindex)
+          acc += AttributeRange(m.start, nextStart, ControlChar.build(comc, comidx))
           println(trimmed,nextStart)
           sb.append(str)
           rec(m.before + str + "\\" + m.after.toString, 0, 0)
