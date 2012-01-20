@@ -12,18 +12,17 @@ class TestSpec extends WordSpec with ShouldMatchers {
   "Ops" should {
     
     import ScriptOps._
+
     val lay = LayoutUnit(
       Map('size -> APoint(320, 60)),
       Map(
       'name->AreaUnit(Map('rect->ARect(5,10,200,13))),
       'icon->AreaUnit(Map('rect->ARect(0,0,32,32))),
       'desc->AreaUnit(Map('rect->ARect(8,25,280,13),
-                                'x_interval-> AXInterval(5))),
+                                'x_interval-> AXInterval(2))),
       'cost->AreaUnit(Map('rect->ARect(280,45,30,15),
                                 'font->AFont("Verdana", 'plain, 10))))
     )
-    
-    println(lay)
 
     val testvalues = Map(
       'name->Str("エターナルドリルクラッシュ"),

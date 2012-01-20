@@ -34,8 +34,8 @@ class StrGraphics(val g2d: Graphics2D,
                   val attrmap: AttrMap)
 {
 
-  //val strAttrib = new AttributedText(_str)
-  val str = _str//strAttrib.string
+  val strAttrib = new AttributedText(_str)
+  val str = strAttrib.string
   
   def getNewlineCode(): Int = {
     val frc = g2d.getFontRenderContext()

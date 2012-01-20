@@ -25,11 +25,10 @@ class AttributedText(val raw: String) {
 
         if (str.length != 0) {
           val comc = m.group(1).head
-          val comidx = m.group(2).head
-          
+          val comidx = m.group(2).head - '0'  // ChartoInt
+
           val nextStart = m.start + str.length
           acc += AttributeRange(m.start, nextStart, ControlChar.build(comc, comidx))
-          println(trimmed,nextStart)
           sb.append(str)
           rec(m.before + str + "\\" + m.after.toString, 0, 0)
         } else {
