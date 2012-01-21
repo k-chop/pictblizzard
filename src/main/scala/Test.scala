@@ -42,7 +42,7 @@ object Test {
       'str -> Str("test"),
       'str2 -> Str("a\nb\ncedf\ngiaasdasd\near"))
     
-    val d = new LayoutedDrawer(layout)
+    val d = new Drawer(layout)
     val result = d.draw(valuemap, NullContext)
     result.write("./temp/test.png")
 

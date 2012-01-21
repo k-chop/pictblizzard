@@ -64,7 +64,12 @@ class StrGraphics(val g2d: Graphics2D,
 
       val hasAutoexp = attrmap.contains('autoexpand)
       val hasRect = attrmap.contains('rect)
-      val ARect(_, _, w1, h1) = attrmap('rect)
+      
+      val (w1, h1) = if (hasRect) {
+        val ARect(_, _, w, h) = attrmap('rect)
+        (w, h)
+      } else (0, 0)
+      
       val Rect2D(w2, h2) = v.getFixedLogicalBounds
 
       if (hasAutoexp || !hasRect) // どちらか大きい方に拡大される

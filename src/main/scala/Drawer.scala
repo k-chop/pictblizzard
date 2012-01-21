@@ -9,7 +9,7 @@ import java.io.{ File }
 
 import ScriptOps._
 
-object Drawable {
+object Drawer {
   val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 13)
 }
 
@@ -81,7 +81,7 @@ class DrawableImage(img: BufferedImage) {
       new Font(name, extractStyle(style), pt.toInt)
     } getOrElse {
       log("フォント設定が見つかりません。デフォルトフォントを使用します。")
-      Drawable.DEFAULT_FONT
+      Drawer.DEFAULT_FONT
     }
 
     val g2d = img.createGraphics
@@ -103,7 +103,7 @@ class DrawableImage(img: BufferedImage) {
   
 }
 
-class LayoutedDrawer(layout: LayoutUnit) {
+class Drawer(layout: LayoutUnit) {
 
   private[this] val APoint(sizeX, sizeY) = layout.env('size)
   private[this] val areamap: AreaMap = layout.areamap
