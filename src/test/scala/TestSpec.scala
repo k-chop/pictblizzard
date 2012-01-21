@@ -19,7 +19,8 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'name->AreaUnit(Map('rect->ARect(5,10,200,13))),
       'icon->AreaUnit(Map('rect->ARect(0,0,32,32))),
       'desc->AreaUnit(Map('rect->ARect(8,25,280,113),
-                                'x_interval-> AXInterval(2))),
+                                'x_interval-> AXInterval(2),
+                                'border->ABorder)),
       'cost->AreaUnit(Map('rect->ARect(280,45,30,15),
                                 'font->AFont("Verdana", 'plain, 10))))
     )
@@ -30,7 +31,9 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'desc->Str("\\c[4]ひたすら\\c[1]ドリル\\c[0]で\\c[5]突き刺す\\c[0]。\n\n\\c[2]相手は死ぬ\\c[0]"),
       'cost->Str("42"))
 
-    (new Drawer(testvalues, lay, NullContext)).draw().write("temp/TestSpec.png")
+    val d = new LayoutedDrawer(lay)
+    val result = d.draw(testvalues, NullContext)
+    result.write("temp/TestSpec.png")
 
     "a" in { val s = 1
       s should be (s) }

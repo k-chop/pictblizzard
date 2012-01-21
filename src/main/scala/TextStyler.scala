@@ -15,8 +15,8 @@ class TextStyler(val origimg: BufferedImage,
 {
 
   def process(): BufferedImage = {
-    extractColorMap
-    println( attrstr.string.split("\n").toList )
+    //println( attrstr.string.split("\n").toList )
+    if (attrmap.contains('border)) bordered(Color.white)
     origimg
   }
   
@@ -31,4 +31,14 @@ class TextStyler(val origimg: BufferedImage,
   // シスグラの影つける
   // シスグラの色つける
   // ふちどりする
+
+  // border
+  // このクラスに置いといたらrectの範囲外に描画することができない…
+  // やっぱPaddingは必要なような気がしてきた
+  def bordered(c: Color) = {
+    val g2d = origimg.createGraphics
+    g2d.setPaint(c)
+    g2d.drawRect(0, 0, origimg.getWidth-1, origimg.getHeight-1)
+  }
+
 }
