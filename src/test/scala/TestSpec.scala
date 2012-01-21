@@ -14,11 +14,11 @@ class TestSpec extends WordSpec with ShouldMatchers {
     import ScriptOps._
 
     val lay = LayoutUnit(
-      Map('size -> APoint(320, 60)),
+      Map('size -> APoint(320, 260)),
       Map(
       'name->AreaUnit(Map('rect->ARect(5,10,200,13))),
       'icon->AreaUnit(Map('rect->ARect(0,0,32,32))),
-      'desc->AreaUnit(Map('rect->ARect(8,25,280,13),
+      'desc->AreaUnit(Map('rect->ARect(8,25,280,113),
                                 'x_interval-> AXInterval(2))),
       'cost->AreaUnit(Map('rect->ARect(280,45,30,15),
                                 'font->AFont("Verdana", 'plain, 10))))
@@ -27,7 +27,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
     val testvalues = Map(
       'name->Str("エターナルドリルクラッシュ"),
       'icon->Icon("icon/icon1.png"),
-      'desc->Str("ひたすらドリルで突き刺す。相手は死ぬ"),
+      'desc->Str("\\c[4]ひたすら\\c[1]ドリル\\c[0]で\\c[5]突き刺す\\c[0]。\n\n\\c[2]相手は死ぬ\\c[0]"),
       'cost->Str("42"))
 
     (new Drawer(testvalues, lay, NullContext)).draw().write("temp/TestSpec.png")

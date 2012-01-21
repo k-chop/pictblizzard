@@ -8,26 +8,26 @@ import java.io.{ File }
 
 import ScriptOps._
 
-/** 
-* TextStyler
-* 
-*   
-*/
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
                   val attrmap: AttrMap,
-                  val attranges: AttributedText)
+                  val attrstr: AttributedText)
 {
 
   def process(): BufferedImage = {
-    sys.error("mada dayo")
+    extractColorMap
+    println( attrstr.string.split("\n").toList )
+    origimg
   }
   
   // 影つける
-  def shadow(c: Color) = {
+  def shadowed(c: Color) = {
     
   }
   // 色つける
+  def colored() = {
+    
+  }
   // シスグラの影つける
   // シスグラの色つける
   // ふちどりする

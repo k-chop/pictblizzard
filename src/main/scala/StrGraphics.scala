@@ -48,8 +48,8 @@ class StrGraphics(val g2d: Graphics2D,
     val v = new WrappedGlyphVector( generateGlyphVector, attrmap, getNewlineCode )
     val processedVector = v.process
     val bufimage = generateImage( processedVector )
-    //val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
-    //styler.process
+    val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
+    styler.process
     bufimage
   }
 
