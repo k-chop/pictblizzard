@@ -45,7 +45,11 @@ class StrGraphics(val g2d: Graphics2D,
   
   def processImage(): BufferedImage = {
     StrGraphics.initGraphics2D(g2d, font)
-    val v = new WrappedGlyphVector( generateGlyphVector, attrmap, getNewlineCode )
+
+    val frc = g2d.getFontRenderContext
+    val lm = font.getLineMetrics(str, frc)
+
+    val v = new WrappedGlyphVector( generateGlyphVector, attrmap, getNewlineCode, lm.getAscent )
     val processedVector = v.process
     val bufimage = generateImage( processedVector )
     val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
@@ -83,9 +87,9 @@ class StrGraphics(val g2d: Graphics2D,
     val buf = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
     val g = buf.createGraphics
     StrGraphics.initGraphics2D(g, font)
-    val frc = g.getFontRenderContext
-    val lm = font.getLineMetrics(str, frc)
-    g.drawGlyphVector(v.self, 0, lm.getAscent)
+    // val frc = g.getFontRenderContext
+    // val lm = font.getLineMetrics(str, frc)
+    g.drawGlyphVector(v.self, 0, v.ascent)
     buf
   }
   

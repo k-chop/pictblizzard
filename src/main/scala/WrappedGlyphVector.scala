@@ -17,7 +17,7 @@ object WrappedGlyphVector {
 
 }
 
-class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int) {
+class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val ascent: Float) {
 
   private[this] val rectAll: ARect =
     attrmap.get('rect) collect {
@@ -215,5 +215,5 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int)
         new Rectangle2D.Double(x1, y1, x2-x1, y2-y1)
     }    
   }
-  
+
 }

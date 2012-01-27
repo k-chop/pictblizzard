@@ -39,9 +39,9 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'cost->Str("42"))
 
     val v3 = Map(
-      'name->Str("インフェルノ・オブ・メサイア"),
+      'name->Str("\\c[1]インフェルノ\\c[0]・\\c[2]オブ\\c[0]・\\c[3]メサイア"),
       'icon->Icon("icon/icon3.png"),
-      'desc->Str("冥界王ダーク・インフェルノを召喚士半径8kmの大地に\n無差別に種を撒き散らしそれはやがて実を結ぶ"),
+      'desc->Str("冥界王ダーク・インフェルノを召喚士半径8kmの大地に\n無差別に\\c[2]種\\c[0]を撒き散らしそれはやがて実を結ぶ"),
       'cost->Str("42"))
     
     val v4 = Map(

@@ -44,7 +44,7 @@ object Test {
     
     val d = new Drawer(layout)
     val result = d.draw(valuemap, NullContext)
-    result.write("./temp/test.png")
+    result.write(Resource.tempdir + "test.png")
 
     ()
   }  

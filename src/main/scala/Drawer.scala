@@ -10,7 +10,24 @@ import java.io.{ File }
 import ScriptOps._
 
 object Drawer {
-  val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 13)
+  val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 12)
+}
+
+class Drawer(layout: LayoutUnit) {
+
+  private[this] val APoint(sizeX, sizeY) = layout.env('size)
+  private[this] val areamap: AreaMap = layout.areamap
+
+  def draw(valuemap: ValueMap, context: Context): DrawableImage = {
+    val img = new DrawableImage(new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB))
+    img.clear(Color.black)
+    areamap foreach {
+      case (name, unit) =>
+        img.drawArea(name, unit, valuemap getOrElse (name, NullValue))
+    }
+    img
+  }
+
 }
 
 class DrawableImage(img: BufferedImage) {
@@ -101,22 +118,5 @@ class DrawableImage(img: BufferedImage) {
   def result = img
   def write(ref: String) = PNGIO.write(img, ref)
   
-}
-
-class Drawer(layout: LayoutUnit) {
-
-  private[this] val APoint(sizeX, sizeY) = layout.env('size)
-  private[this] val areamap: AreaMap = layout.areamap
-
-  def draw(valuemap: ValueMap, context: Context): DrawableImage = {
-    val img = new DrawableImage(new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB))
-    img.clear(Color.black)
-    areamap foreach {
-      case (name, unit) =>
-        img.drawArea(name, unit, valuemap getOrElse (name, NullValue))
-    }
-    img
-  }
-
 }
 

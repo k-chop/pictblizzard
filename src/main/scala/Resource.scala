@@ -10,5 +10,7 @@ object Resource {
   def uri(path: String) = loader.getResource(path).toURI
   def file(path: String) = new File( uri(path) )
   def str(path: String) = loader.getResource(path).getPath.toString
+
+  val tempdir = "./temp/"
   
 }
