@@ -62,7 +62,8 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'desc->Str("1931年に建てられた高さ443m、102階建てのビル。\n相手は死ぬ"),
       'cost->Str("42"))
 
-    val vs = List(v1,v2,v3,v4,v5,v6)
+    //val vs = List(v1,v2,v3,v4,v5,v6)
+    val vs = List(v3)
     
     val d = new Drawer(lay)
     vs.map{

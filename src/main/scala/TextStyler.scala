@@ -21,6 +21,9 @@ class TextStyler(val origimg: BufferedImage,
   
   def process(): BufferedImage = {
     //println( attrstr.string.split("\n").toList )
+    
+    //test
+    colors = new Texture(Resource.uri("textures_fromrtp.png"))
     colored()
 
     if (attrmap.contains('border)) bordered(Color.white)
@@ -43,9 +46,12 @@ class TextStyler(val origimg: BufferedImage,
         case CtrColor(idx) => idx
         case CtrNop => 0
       }
+      
+      // 改行文字みつけたらどうにかするのはこのへん
       val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(begin, end)
 
       val paintTex = colors.getTexture(pw, ph)(texIdx)
+      (new DrawableImage(paintTex)).write(Resource.tempdir + begin + "_" + end + "c.png")
       g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
       
     }
