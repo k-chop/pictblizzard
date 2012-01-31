@@ -20,7 +20,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'icon->AreaUnit(Map('rect->ARect(280,0,32,32))),
       'desc->AreaUnit(Map('point->APoint(8,25),
                                 'x_interval-> AXInterval(2),
-                                'border->ABorder,
+//                                'border->ABorder,
                                 'auto_expand->AAutoExpand)),
       'cost->AreaUnit(Map('rect->ARect(300,2,30,15),
                                 'font->AFont("Verdana", 'plain, 10))))
@@ -33,15 +33,15 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'cost->Str("42"))
 
     val v2 = Map(
-      'name->Str("サマーサンシャインバースト"),
+      'name->Str("\\c[2]サマーサンシャインバースト"),
       'icon->Icon("icon/icon2.png"),
-      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は死ぬ"),
+      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[10]死ぬ"),
       'cost->Str("42"))
 
     val v3 = Map(
       'name->Str("\\c[1]インフェルノ\\c[0]・\\c[2]オブ\\c[0]・\\c[3]メサイア"),
       'icon->Icon("icon/icon3.png"),
-      'desc->Str("冥界王ダーク・インフェルノを召喚士半径8kmの大地に\n無差別に\\c[2]種\\c[0]を撒き散らしそれはやがて実を結ぶ"),
+      'desc->Str("冥界王ダーク・インフェルノを召喚し半径8kmの大地に\n無差別に\\c[2]種\\c[0]を撒き散らしそれはやがて実を結ぶ"),
       'cost->Str("42"))
     
     val v4 = Map(
@@ -63,7 +63,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'cost->Str("42"))
 
     //val vs = List(v1,v2,v3,v4,v5,v6)
-    val vs = List(v3)
+    val vs = List(v2)
     
     val d = new Drawer(lay)
     vs.map{

@@ -20,10 +20,7 @@ class TextStyler(val origimg: BufferedImage,
   var colors: Texturable = TextStyler.default_system_graphics
   
   def process(): BufferedImage = {
-    //println( attrstr.string.split("\n").toList )
-    
-    //test
-    colors = new Texture(Resource.uri("textures6.png"))
+    colors = new Texture(Resource.uri("textures_fromrtp.png")) // 仮
     colored()
 
     if (attrmap.contains('border)) bordered(Color.white)
@@ -46,15 +43,22 @@ class TextStyler(val origimg: BufferedImage,
         case CtrColor(idx) => idx
         case CtrNop => 0
       }
-      
-      // 改行文字みつけたらどうにかするのはこのへん
-      val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(begin, end)
 
-      val paintTex = colors.getTexture(pw, ph)(texIdx)
-//      (new DrawableImage(paintTex)).write(Resource.tempdir + begin + "_" + end + "c.png")
-      g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
-      
+      @scala.annotation.tailrec
+      def drawEachLine(b: Int, l: List[String]): Unit = l match {
+        case Nil => return
+        case head :: rest =>
+          val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length)
+          val paintTex = colors.getTexture(pw, ph)(texIdx)
+          g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
+
+          drawEachLine(b + head.length + 1, rest)
+      }
+      val subs = attrstr.string.substring(begin, end)
+      drawEachLine(begin, subs.split("\n").toList)      
     }
+    
+    g.dispose
     
     // 元画像と合成
     val destPixels = (origimg.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
@@ -71,8 +75,6 @@ class TextStyler(val origimg: BufferedImage,
     }
 
   }
-  // シスグラの影つける
-  // シスグラの色つける
   // ふちどりする
 
   // border
