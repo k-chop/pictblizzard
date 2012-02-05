@@ -54,7 +54,6 @@ class StrGraphics(val g2d: Graphics2D,
     val bufimage = generateImage( processedVector )
     val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
     styler.process
-    bufimage
   }
 
   /** 
