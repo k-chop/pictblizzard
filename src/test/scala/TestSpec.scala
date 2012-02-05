@@ -16,14 +16,15 @@ class TestSpec extends WordSpec with ShouldMatchers {
     val lay = LayoutUnit(
       Map('size -> APoint(320, 60)),
       Map(
-      'name->AreaUnit(Map('rect->ARect(5,10,300,13))),
-      'icon->AreaUnit(Map('rect->ARect(280,0,32,32))),
-      'desc->AreaUnit(Map('point->APoint(8,25),
-                                'x_interval-> AXInterval(2),
-//                                'border->ABorder,
-                                'auto_expand->AAutoExpand)),
-      'cost->AreaUnit(Map('rect->ARect(300,2,30,15),
-                                'font->AFont("Verdana", 'plain, 10))))
+      'name->AreaUnit(Map('rect -> ARect(5,10,300,13))),
+      'icon->AreaUnit(Map('rect -> ARect(280,0,32,32))),
+      'desc->AreaUnit(Map('point -> APoint(8,25),
+                                'interval -> AInterval(3, 0),
+                                'padding -> APadding(5, 5),
+                                'font -> AFont("ＭＳ ゴシック", 'plain, 10)
+                         )),
+      'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
+                                'font -> AFont("Verdana", 'plain, 10))))
     )
 
     val v1 = Map(
