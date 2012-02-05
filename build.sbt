@@ -1,4 +1,4 @@
-name := "picturer"
+name := "pictblizzard"
 
 version := "0.0.1"
 
