@@ -73,7 +73,7 @@ class StrGraphics(val g2d: Graphics2D,
         (w, h)
       } else (0, 0)
       
-      val Rect2D(w2, h2) = v.getFixedLogicalBounds
+      val Rect2D(w2, h2) = v.getFixedWholeLogicalBounds
 
       if (hasAutoexp || !hasRect) // どちらか大きい方に拡大される
         ( max(w1, w2), max(h1, h2) )

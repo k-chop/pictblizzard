@@ -40,7 +40,7 @@ class TextStyler(val origimg: BufferedImage,
       val maskimg = ImageUtils.copy(origimg)
       val targetimg = new BufferedImage(maskimg.getWidth, maskimg.getHeight, BufferedImage.TYPE_INT_ARGB)
       val g = targetimg.createGraphics
-      val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds()
+      val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds
       val paintTex = colors.getTexture(pw, ph)(-1)
       g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
       g.dispose

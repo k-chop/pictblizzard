@@ -34,10 +34,9 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     
     this.newlined()
 
-    call('x_interval, x_interval)
-    call('y_interval, y_interval)
-    call('align,      align     , attrmap.contains('rect))
-    call('padding,    padding   )
+    call('interval, interval)
+    call('align,    align,   attrmap.contains('rect))
+    call('padding,  padding)
 
     this
   }
@@ -60,10 +59,18 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     }
     this
   }
-  
-  private[this] def x_interval(attr: Attr): WrappedGlyphVector = {
-    val AXInterval(p) = attr
 
+  private[this] def interval(attr: Attr): WrappedGlyphVector = {
+    val AInterval(xparam, yparam) = attr
+    if (xparam > 0)
+      x_interval(xparam)
+    if (yparam > 0)
+      y_interval(yparam)
+    this
+  }
+  
+  private[this] def x_interval(p: Int) = {
+    
     for (idx <- 1 until v.getNumGlyphs) {
       if (v.getGlyphCode(idx - 1) != newlineCode) { // 前が改行の場合移動する必要なし
         val rect = v.getGlyphLogicalBounds(idx - 1).getBounds
@@ -72,11 +79,9 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
         v.setGlyphPosition(idx, newpos)
       }
     }
-    this
   }
 
-  private[this] def y_interval(attr: Attr): WrappedGlyphVector = {
-    val AYInterval(p) = attr
+  private[this] def y_interval(p: Int) = {
     var nlcount = 0
     
     for (idx <- 1 until v.getNumGlyphs) {
@@ -86,7 +91,6 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
       val newpos = new Point2D.Double(oldpos.getX, oldpos.getY + (p * nlcount))
       v.setGlyphPosition(idx, newpos)
     }
-    this
   }
   
   private[this] def align(attr: Attr): WrappedGlyphVector = {
@@ -94,14 +98,14 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     
     val ARect(_, _, width, height) = rectAll
 
-    if ( xparam == 'right)
+    if (xparam == 'right)
       alignXRight(width)
-    else if ( xparam == 'x_center)
+    else if (xparam == 'x_center)
       alignXCenter(width)
 
-    if ( yparam == 'bottom)
+    if (yparam == 'bottom)
       alignYBottom(height)
-    else if ( yparam == 'y_center)
+    else if (yparam == 'y_center)
       alignYCenter(height)
     
     this
@@ -178,19 +182,48 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
   /** 
   * 次の改行の位置をさがす。なければ-1を返すよ。Optionにした方がよくね
   */ 
-  private[this] def nextNewline(from: Int): Int = {    
+  private[this] def nextNewline(from: Int): Int = {
     (codes.view drop (from) find { _._2 == newlineCode } getOrElse((-1,0)) )._1
   }
 
-  /*
-   * 指定方向の余白を決める。
-   * 正直いらない気がする。気が向いたら実装
-   */
   private[this] def padding(attr: Attr): WrappedGlyphVector = {
+
+    val APadding(xparam, yparam) = attr
+    
+    def callPaddings(xp: Symbol, yp: Symbol) {
+      if (xparam > 0) x_padding(xp, xparam)
+      if (yparam > 0) y_padding(yp, yparam)
+    }
+
+    if (attrmap.contains('rect) && attrmap.contains('align)) {
+      val AAlign(hori, vert) = attrmap('align)
+      callPaddings(hori, vert)
+    } else if (attrmap.contains('rect)) {
+      callPaddings('left, 'top)
+    } else if (attrmap.contains('point)) {
+      callPaddings('left, 'top)
+    } else sys.error("なんという条件漏れ… : " + attrmap.toString)
+    
     this
   }
-
-  def getFixedLogicalBounds(): Rectangle2D = getFixedLogicalBounds(0, v.getNumGlyphs)
+  
+  private[this] def x_padding(dir: Symbol, p: Int) {
+    val diff = dir match {
+      case 'left => p
+      case 'right => -p
+    }
+    movex(0, v.getNumGlyphs, diff)
+  }
+  
+  private[this] def y_padding(dir: Symbol, p: Int) {
+    val diff = dir match {
+      case 'top => p
+      case 'bottom => -p
+    }
+    movey(0, v.getNumGlyphs, diff)
+  }
+  
+  def getFixedWholeLogicalBounds(): Rectangle2D = getFixedLogicalBounds(0, v.getNumGlyphs)
   
   /** 
   * GlyphVector#getLogicalBoundsはsetGlyphPositionで
