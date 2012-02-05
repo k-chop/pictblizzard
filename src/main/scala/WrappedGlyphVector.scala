@@ -112,7 +112,7 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
   }
 
   private[this] def movex(begin: Int, end: Int, diffx: Double) = {
-    for (idx <- begin to end) {
+    for (idx <- begin until end) {
       val oldpos = v.getGlyphPosition(idx)
       val newpos = new Point2D.Double(oldpos.getX + diffx, oldpos.getY)
       v.setGlyphPosition(idx, newpos)        
@@ -125,12 +125,12 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
       if (nl != -1) {
         val lp = v.getGlyphPosition(nl)
         val diff = width - lp.getX
-        if (diff > 0) movex(lf, nl, diff)
+        if (diff > 0) movex(lf, nl + 1, diff)
         recur(nl + 1, nextNewline(nl + 1))
       } else {
         val lp = v.getGlyphLogicalBounds(v.getNumGlyphs - 1).getBounds
         val diff = width - (lp.getX + lp.getWidth)
-        if (diff > 0) movex(lf, v.getNumGlyphs - 1, diff)        
+        if (diff > 0) movex(lf, v.getNumGlyphs, diff)        
       }
     }
     
@@ -143,12 +143,12 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
       if (nl != -1) {
         val lineRect = getFixedLogicalBounds(lf, nl+1)
         val diff = (w - lineRect.getWidth) / 2
-        if (diff > 0) movex(lf, nl, diff)
+        if (diff > 0) movex(lf, nl + 1, diff)
         recur(nl + 1, nextNewline(nl + 1))
       } else {
         val lineRect = getFixedLogicalBounds(lf, v.getNumGlyphs)
         val diff = (w - lineRect.getWidth) / 2
-        if (diff > 0) movex(lf, v.getNumGlyphs-1, diff)
+        if (diff > 0) movex(lf, v.getNumGlyphs, diff)
       }
     }
     
@@ -156,7 +156,7 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
   }
 
   private[this] def movey(begin: Int, end: Int, diffy: Double) = {
-    for (idx <- begin to end) {
+    for (idx <- begin until end) {
       val oldpos = v.getGlyphPosition(idx)
       val newpos = new Point2D.Double(oldpos.getX, oldpos.getY + diffy)
       v.setGlyphPosition(idx, newpos)        
@@ -168,7 +168,7 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     val gp = v.getGlyphPosition(v.getNumGlyphs - 1)
     val diff = height - (gp.getY + glb.getHeight)
 
-    if (diff > 0) movey(0, v.getNumGlyphs - 1, diff)
+    if (diff > 0) movey(0, v.getNumGlyphs, diff)
   }
 
   private[this] def alignYCenter(height: Int) = {
@@ -176,7 +176,7 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     val fixedRect = getFixedLogicalBounds(0, v.getNumGlyphs)
     val diff = (h - fixedRect.getHeight) / 2
     
-    if (diff > 0) movey(0, v.getNumGlyphs - 1, diff)
+    if (diff > 0) movey(0, v.getNumGlyphs, diff)
   }
   
   /** 
