@@ -54,7 +54,7 @@ class TextStyler(val origimg: BufferedImage,
 
           drawEachLine(b + head.length + 1, rest)
       }
-      val subs = attrstr.string.substring(begin, end)
+      val subs = attrstr.str.substring(begin, end)
       drawEachLine(begin, subs.split("\n").toList)      
     }
     

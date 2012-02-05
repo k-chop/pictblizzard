@@ -2,9 +2,9 @@ package com.github.chuwb.pictbliz
 
 import scala.collection.mutable
 
-class AttributedText(val raw: String) {
+class AttributedText(val rawstr: String) {
 
-  val (ranges, string) = parse(raw)
+  val (ranges, str) = parse(rawstr)
   def iter = ranges.iterator
 
   private[this] def parse(source: String): (List[AttributeRange], String) = {
