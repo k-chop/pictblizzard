@@ -28,9 +28,9 @@ object ScriptOps {
   case class ARect(x: Int, y: Int, w: Int, h: Int) extends Attr
   case object AAutoExpand extends Attr
   case class AFont(name: String, style: Symbol, size: Int, lang: FontLang = Ja) extends Attr
-  case class AXInterval(p: Int) extends Attr
-  case class AYInterval(p: Int) extends Attr
-  case class APadding(p: Int) extends Attr
+  case class AInterval(xparam: Int, yparam: Int) extends Attr
+  case class APadding(xparam: Int, yparam: Int) extends Attr
+  // なぜこれだけx,y別じゃないんだ…… 理由がなければ要統一
   case class AAlign(xparam: Symbol, yparam: Symbol) extends Attr
   case object ABorder extends Attr
   
