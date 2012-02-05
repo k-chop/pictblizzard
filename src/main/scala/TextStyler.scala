@@ -9,7 +9,7 @@ import java.io.{ File }
 import ScriptOps._
 
 object TextStyler {
-  val default_system_graphics: Texturable = SingleColors.default
+  val default_system_graphics: Texturable = SystemGraphics.fromPath(Resource.uri("systemrtp2000.png"))
 }
 
 class TextStyler(val origimg: BufferedImage,
@@ -20,23 +20,40 @@ class TextStyler(val origimg: BufferedImage,
   var colors: Texturable = TextStyler.default_system_graphics
   
   def process(): BufferedImage = {
-    colors = new Texture(Resource.uri("textures_fromrtp.png")) // 仮
-    colored()
+    //colors = new Texture(Resource.uri("textures_fromrtp.png")) 仮
+    val dest = ImageUtils.sameSizeImage(origimg)
+    val s = shadowed()
+    val c = colored()
 
+    val g = dest.createGraphics
+    g.drawImage(s, null, 1, 1) // shadow offset = 1
+    g.drawImage(c, null, 0, 0)
+    g.dispose
+    
     if (attrmap.contains('border)) bordered(Color.white)
-    origimg
+    dest
   }
   
   // 影つける
-  def shadowed(c: Color) = {
-    
+  def shadowed(): BufferedImage = colors match {
+    case s: SystemGraphics => {
+      val maskimg = ImageUtils.copy(origimg)
+      val targetimg = new BufferedImage(maskimg.getWidth, maskimg.getHeight, BufferedImage.TYPE_INT_ARGB)
+      val g = targetimg.createGraphics
+      val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds()
+      val paintTex = colors.getTexture(pw, ph)(-1)
+      g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
+      g.dispose
+      
+      ImageUtils.synthesis(maskimg, targetimg)
+    }
+    case _ => sys.error("not implemented")
   }
   // 色つける
-  def colored() = {
-    import java.awt.image.DataBufferInt
-    
-    val maskimg = new BufferedImage(origimg.getWidth, origimg.getHeight, BufferedImage.TYPE_INT_ARGB)
-    val g = maskimg.createGraphics
+  def colored(): BufferedImage = {
+    val maskimg = ImageUtils.copy(origimg)
+    val targetimg = new BufferedImage(maskimg.getWidth, maskimg.getHeight, BufferedImage.TYPE_INT_ARGB)
+    val g = targetimg.createGraphics
     
     for (AttributeRange(begin, end, ctr) <- attrstr.iter) {
       val texIdx = ctr match {
@@ -56,24 +73,11 @@ class TextStyler(val origimg: BufferedImage,
       }
       val subs = attrstr.str.substring(begin, end)
       drawEachLine(begin, subs.split("\n").toList)      
-    }
-    
+    }    
     g.dispose
-    
-    // 元画像と合成
-    val destPixels = (origimg.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
-    val srcPixels  = (maskimg.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
 
-    for{ // 最適化はあとでやればよし
-      idy <- 0 until origimg.getHeight;
-      dy = idy * origimg.getWidth;
-      idx <- 0 until origimg.getWidth;
-      i = dy + idx
-      if destPixels(i) != 0x00000000
-    } {
-      destPixels(i) = srcPixels(i)
-    }
-
+    ImageUtils.synthesis(maskimg, targetimg)
+    maskimg
   }
   // ふちどりする
 
