@@ -63,7 +63,6 @@ class StrGraphics(val g2d: Graphics2D,
 
     def computeSize(v: WrappedGlyphVector) = {
       import scala.math.{ max }
-      import Extractors.Rect2D
 
       val hasAutoexp = attrmap.contains('autoexpand)
       val hasRect = attrmap.contains('rect)
@@ -73,22 +72,22 @@ class StrGraphics(val g2d: Graphics2D,
         (w, h)
       } else (0, 0)
       
-      val Rect2D(w2, h2) = v.getFixedWholeLogicalBounds
-
+      val Extractors.Rect2DALL(x, y, w2, h2) = v.getFixedWholeLogicalBounds
+      
       if (hasAutoexp || !hasRect) // どちらか大きい方に拡大される
-        ( max(w1, w2), max(h1, h2) )
+        ( max(w1, w2 + x), max(h1, h2 + y + v.ascent.toInt) )
       else if (hasRect) // rectの定義そのまま
         (w1, h1)
       else sys.error("えっ")
     }
 
     val (w, h) = computeSize(v)
+
     val buf = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
     val g = buf.createGraphics
     StrGraphics.initGraphics2D(g, font)
-    // val frc = g.getFontRenderContext
-    // val lm = font.getLineMetrics(str, frc)
     g.drawGlyphVector(v.self, 0, v.ascent)
+    g.dispose
     buf
   }
   
