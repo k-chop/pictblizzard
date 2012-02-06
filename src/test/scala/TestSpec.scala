@@ -21,7 +21,8 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'desc->AreaUnit(Map('point -> APoint(8,25),
                                 'interval -> AInterval(3, 0),
                                 'padding -> APadding(5, 5),
-                                'font -> AFont("ＭＳ ゴシック", 'plain, 10)
+                                'font -> AFont("ＭＳ ゴシック", 'plain, 10),
+                                'window -> AWindow()
                          )),
       'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
