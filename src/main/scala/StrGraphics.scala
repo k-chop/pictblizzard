@@ -83,7 +83,7 @@ class StrGraphics(val g2d: Graphics2D,
 
     val (w, h) = computeSize(v)
 
-    val buf = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+    val buf = ImageUtils.newImage(w, h)
     val g = buf.createGraphics
     StrGraphics.initGraphics2D(g, font)
     g.drawGlyphVector(v.self, 0, v.ascent)

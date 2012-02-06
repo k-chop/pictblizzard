@@ -30,7 +30,6 @@ object ScriptOps {
   case class AFont(name: String, style: Symbol, size: Int, lang: FontLang = Ja) extends Attr
   case class AInterval(xparam: Int, yparam: Int) extends Attr
   case class APadding(xparam: Int, yparam: Int) extends Attr
-  // なぜこれだけx,y別じゃないんだ…… 理由がなければ要統一
   case class AAlign(xparam: Symbol, yparam: Symbol) extends Attr
   case object ABorder extends Attr
   

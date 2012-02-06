@@ -16,7 +16,7 @@ class SingleColors(color: java.awt.Color*) extends Texturable {
   def getTexture(w: Int, h: Int)(idx: Int) = {
     if (color.length <= idx) throw new IndexOutOfBoundsException
 
-    val img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+    val img = ImageUtils.newImage(w, h)
     val g = img.createGraphics
 
     g.setColor(color(idx))

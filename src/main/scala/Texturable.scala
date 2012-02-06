@@ -11,6 +11,6 @@ trait Texturable {
 case object NullTexture extends Texturable {
   
   def getTexture(w: Int, h: Int)(idx: Int = 0) = {
-    new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+    ImageUtils.newImage(w, h)
   }
 }

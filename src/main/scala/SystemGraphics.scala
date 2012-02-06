@@ -11,7 +11,7 @@ object SystemGraphics {
   }
 
   def default: SystemGraphics = {
-    sys.error("undefined")
+    fromPath(Resource.uri("systemrtp2000.png"))
   }
 }
 
@@ -49,7 +49,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
     val tiled = if (unit_h == h) {
       subimg
     } else {
-      var dst = new BufferedImage(unit_w, h, BufferedImage.TYPE_INT_ARGB)
+      var dst = ImageUtils.newImage(unit_w, h)
       val at = new AffineTransform()
       at.scale( 1.0, h.toDouble / unit_h )
       val scaleOp = new AffineTransformOp(at, null /* AffineTransformOp.TYPE_BILINEAR */);
@@ -57,7 +57,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       dst
     }
 
-    val result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+    val result = ImageUtils.newImage(w, h)
     val resg = result.createGraphics
     var i = 0
     while(i <= w) {
@@ -66,6 +66,83 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
     }
     resg.dispose
     result
+  }
+
+  def getSystemWindow(w: Int, h: Int, zoom: Boolean = false): BufferedImage = {
+    // ハードコードしすぎワロエナイ
+
+    if (w < 16 || h < 16) throw new IllegalArgumentException("16x16以上じゃないと無理ですー！ (w: %d, h: %d)" format (w,h))
+    
+    var dest = ImageUtils.newImage(w, h)
+
+    val bg = img.getSubimage(0, 0, 32, 32)
+    if (zoom) {
+      val at = new AffineTransform()
+      at.scale(w / 32.0, h / 32.0)
+      val scaleOp = new AffineTransformOp(at, null)
+      dest = scaleOp.filter(bg, dest)
+    } else {
+      val g = dest.createGraphics
+      
+      @scala.annotation.tailrec
+      def drawTile(x: Int, y: Int) {
+        if (x >= w) {
+          drawTile(0, y + 32)
+        } else if (y >= h) {
+          return
+        } else {
+          g.drawImage(bg, null, x, y)
+          drawTile(x + 32, y)
+        }
+      }
+      drawTile(0, 0)
+      g.dispose
+    }
+
+    val ltp = img.getSubimage(32, 0, 8, 8)
+    val rtp = img.getSubimage(56, 0, 8, 8)
+    val lbp = img.getSubimage(32,24, 8, 8)
+    val rbp = img.getSubimage(56,24, 8, 8)
+    val tp =  img.getSubimage(40, 0,16, 8)
+    val rp =  img.getSubimage(56, 8, 8,16)
+    val lp =  img.getSubimage(32, 8, 8,16)
+    val bp =  img.getSubimage(40,24,16, 8)
+
+    val g = dest.createGraphics
+
+    g.drawImage(ltp, null, 0, 0)
+    g.drawImage(rtp, null, w-8, 0)
+    g.drawImage(lbp, null, 0, h-8)
+    g.drawImage(rbp, null, w-8, h-8)
+    
+    var restx = w - 16
+    var drawx = 8
+    while(restx >= 16) {
+      g.drawImage(tp, null, drawx, 0)
+      g.drawImage(bp, null, drawx, h-8)
+      restx -= 16
+      drawx += 16
+    }
+    if (restx > 0) {
+      g.drawImage(tp.getSubimage(0, 0, restx, 8), null, drawx, 0)
+      g.drawImage(bp.getSubimage(0, 0, restx, 8), null, drawx, h-8)
+    }
+
+    var resty = h - 16
+    var drawy = 8
+    while(resty >= 16) {
+      g.drawImage(lp, null, 0, drawy)
+      g.drawImage(rp, null, w-8, drawy)
+      resty -= 16
+      drawy += 16
+    }
+    if (resty > 0) {
+      g.drawImage(lp.getSubimage(0, 0, 8, resty), null, 0, drawy)
+      g.drawImage(rp.getSubimage(0, 0, 8, resty), null, w-8, drawy)
+    }
+    
+    g.dispose
+    dest
   }
   
 }

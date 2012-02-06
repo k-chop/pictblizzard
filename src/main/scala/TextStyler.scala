@@ -8,19 +8,14 @@ import java.io.{ File }
 
 import ScriptOps._
 
-object TextStyler {
-  val default_system_graphics: Texturable = SystemGraphics.fromPath(Resource.uri("systemrtp2000.png"))
-}
-
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
                   val attrmap: AttrMap,
                   val attrstr: AttributedText)
 {
-  var colors: Texturable = TextStyler.default_system_graphics
+  var colors: Texturable = SystemGraphics.default
   
   def process(): BufferedImage = {
-    //colors = new Texture(Resource.uri("textures_fromrtp.png")) 仮
     val dest = ImageUtils.sameSizeImage(origimg)
     val s = shadowed()
     val c = colored()
@@ -38,7 +33,7 @@ class TextStyler(val origimg: BufferedImage,
   def shadowed(): BufferedImage = colors match {
     case s: SystemGraphics => {
       val maskimg = ImageUtils.copy(origimg)
-      val targetimg = new BufferedImage(maskimg.getWidth, maskimg.getHeight, BufferedImage.TYPE_INT_ARGB)
+      val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
       val g = targetimg.createGraphics
       val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds
       val paintTex = colors.getTexture(pw, ph)(-1)
@@ -52,7 +47,7 @@ class TextStyler(val origimg: BufferedImage,
   // 色つける
   def colored(): BufferedImage = {
     val maskimg = ImageUtils.copy(origimg)
-    val targetimg = new BufferedImage(maskimg.getWidth, maskimg.getHeight, BufferedImage.TYPE_INT_ARGB)
+    val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
     val g = targetimg.createGraphics
     
     for (AttributeRange(begin, end, ctr) <- attrstr.iter) {

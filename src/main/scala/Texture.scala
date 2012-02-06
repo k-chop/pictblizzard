@@ -25,13 +25,13 @@ class Texture(path: java.net.URI) extends Texturable {
     val (bx, by) = Texture.base_xy
     val subimg = img.getSubimage(sx * bx, sy * by, bx, by)
 
-    var tiled = new BufferedImage(bx, h, BufferedImage.TYPE_INT_ARGB)
+    var tiled = ImageUtils.newImage(bx, h)
     val at = new AffineTransform()
     at.scale( 1.0, h.toDouble / by )
     val scaleOp = new AffineTransformOp(at, null /* AffineTransformOp.TYPE_BILINEAR */);
     tiled = scaleOp.filter(subimg, tiled);
 
-    val result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+    val result = ImageUtils.newImage(w, h)
     val resg = result.createGraphics
     var i = 0
     while(i <= w) {

@@ -19,7 +19,7 @@ class Drawer(layout: LayoutUnit) {
   private[this] val areamap: AreaMap = layout.areamap
 
   def draw(valuemap: ValueMap, context: Context): DrawableImage = {
-    val img = new DrawableImage(new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB))
+    val img = new DrawableImage(ImageUtils.newImage(sizeX, sizeY))
     img.clear(Color.black)
     areamap foreach {
       case (name, unit) =>
@@ -54,16 +54,21 @@ class DrawableImage(img: BufferedImage) {
         null // Option(null) => None
     }
 
+    val (fx, fy, exSize) = frontImage map {
+      case ResultImage((x, y), target) => (x, y, (target.getWidth, target.getHeight))
+    } getOrElse((0, 0, (1, 1)))
+    
     val bgkind = findEnableParam(areaunit.attrmap, 'tile, 'background, 'window)
     val bgImage = bgkind map {
-      case t: ATile       => tileImage(t)
-      case t: ABackground => backgroundImage(t)
-      case t: AWindow     => windowImage(t)
+      case t: ATile       => tileImage(exSize, t)
+      case t: ABackground => backgroundImage(exSize, t)
+      case t: AWindow     => windowImage(exSize, t)
     }
 
+    
     val g = img.createGraphics
     bgImage foreach {
-      case ResultImage((x, y), target) => g.drawImage(target, null, x, y)
+      case ResultImage(_, target) => g.drawImage(target, null, fx, fy)
     }
     frontImage foreach {
       case ResultImage((x, y), target) => g.drawImage(target, null, x, y)
@@ -86,11 +91,22 @@ class DrawableImage(img: BufferedImage) {
     findEnableParamRec(am, ss.toList)
   }
 
-  def backgroundImage(attr: Attr): ResultImage = null
+  def backgroundImage(size: (Int, Int), attr: Attr): ResultImage = null
 
-  def tileImage(attr: Attr): ResultImage = null
+  def tileImage(size: (Int, Int), attr: Attr): ResultImage = null
 
-  def windowImage(attr: Attr): ResultImage = null
+  def windowImage(size: (Int, Int), attr: Attr): ResultImage = {
+    // このへんでAttrMap/Context読み取って適切なSystemGraphicsをげっちゅ 今は仮
+    val sysg = SystemGraphics.default
+    val buf = ImageUtils.newImage(size)
+
+    val (sw, sh) = size
+    val syswin = sysg.getSystemWindow(sw, sh)
+    val g = buf.createGraphics
+    g.drawImage(syswin, null, 0, 0)
+    g.dispose
+    ResultImage((0, 0), buf)
+  }
 
   def iconImage(path: java.net.URI, attrmap: AttrMap): ResultImage = {
     val icon: BufferedImage = PNGIO.read(path)

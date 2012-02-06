@@ -8,8 +8,10 @@ import java.io.{ File }
 
 object ImageUtils {
 
+  def newImage(w: Int, h: Int): BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+  def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)
+  
   def pile(src: BufferedImage, targets: BufferedImage*): BufferedImage = {
-
     src
   }
   
