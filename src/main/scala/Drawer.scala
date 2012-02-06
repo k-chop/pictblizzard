@@ -30,29 +30,45 @@ class Drawer(layout: LayoutUnit) {
 
 }
 
+
 class DrawableImage(img: BufferedImage) {
 
+  case class ResultImage(pos: (Int, Int), img: BufferedImage)
+  
   def clear(c: Color) = {
     val g2d = img.createGraphics
     g2d.setPaint(c)
     g2d.fillRect(0, 0, img.getWidth, img.getHeight)
+    g2d.dispose
     this
   }
 
   def drawArea(areaname: Key, areaunit: AreaUnit, target: AValue) = {
 
-    findEnableParam(areaunit.attrmap, 'tile, 'background, 'window) foreach {
-      case t: ATile       => drawBackground(t)
-      case t: ABackground => drawTile(t)
-      case t: AWindow     => drawWindow(t)
+    val frontImage = Option(target) map {
+      case Icon(url) =>
+        iconImage(url, areaunit.attrmap)
+      case Str(s)  =>
+        stringImage(s, areaunit.attrmap)
+      case NullValue =>
+        null // Option(null) => None
     }
-    
-    target match {
-      case Icon(url) => drawIcon(url, areaunit.attrmap)
-      case Str(s)  => drawString(s, areaunit.attrmap)
-      case NullValue => sys.error("found null value in " + areaname)
+
+    val bgkind = findEnableParam(areaunit.attrmap, 'tile, 'background, 'window)
+    val bgImage = bgkind map {
+      case t: ATile       => tileImage(t)
+      case t: ABackground => backgroundImage(t)
+      case t: AWindow     => windowImage(t)
     }
-    
+
+    val g = img.createGraphics
+    bgImage foreach {
+      case ResultImage((x, y), target) => g.drawImage(target, null, x, y)
+    }
+    frontImage foreach {
+      case ResultImage((x, y), target) => g.drawImage(target, null, x, y)
+    }
+    g.dispose
   }
 
   private[this] def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
@@ -70,17 +86,15 @@ class DrawableImage(img: BufferedImage) {
     findEnableParamRec(am, ss.toList)
   }
 
-  def drawBackground(attr: Attr) = { }
+  def backgroundImage(attr: Attr): ResultImage = null
 
-  def drawTile(attr: Attr) = { }
+  def tileImage(attr: Attr): ResultImage = null
 
-  def drawWindow(attr: Attr) = { }
+  def windowImage(attr: Attr): ResultImage = null
 
-  def drawIcon(path: java.net.URI, attrmap: AttrMap) = {
-    val g2d = img.createGraphics
+  def iconImage(path: java.net.URI, attrmap: AttrMap): ResultImage = {
     val icon: BufferedImage = PNGIO.read(path)
-    val (x,y) = findBeginPoint(attrmap)
-    g2d.drawImage(icon, null, x, y)
+    ResultImage(findBeginPoint(attrmap), icon)
   }
 
   private [this] def findBeginPoint(attrmap: AttrMap): (Int, Int) = {
@@ -89,8 +103,8 @@ class DrawableImage(img: BufferedImage) {
       case ARect(x, y, _, _) => (x, y)
     } getOrElse (0, 0)
   }
-    
-  def drawString(str: String, attrmap: AttrMap) = {
+
+  def stringImage(str: String, attrmap: AttrMap): ResultImage = {
     import scala.util.control.Exception._
 
     val font = attrmap.get('font) map { attr =>
@@ -103,8 +117,8 @@ class DrawableImage(img: BufferedImage) {
 
     val g2d = img.createGraphics
     val strimg = new StrGraphics(g2d, str, font, attrmap).processImage()
-    val (px, py) = findBeginPoint(attrmap)
-    g2d.drawImage(strimg, null, px, py)  // 横着すんな
+    g2d.dispose
+    ResultImage(findBeginPoint(attrmap), strimg)
   }
 
   private[this] def extractStyle(s: Symbol): Int = s match {
