@@ -74,12 +74,16 @@ class StrGraphics(val g2d: Graphics2D,
       
       val Extractors.Rect2DALL(x, y, w2, h2) = v.getFixedWholeLogicalBounds
       
-      if (hasAutoexp || !hasRect) // どちらか大きい方に拡大される
-        ( max(w1, w2 + x), max(h1, h2 + y + v.ascent.toInt) )
-      else if (hasRect) // rectの定義そのまま
+      if (hasAutoexp || !hasRect) { // どちらか大きい方に拡大される
+        val (dx, dy) = attrmap.get('padding) collect {
+          case APadding(xp, yp) => (xp*2, yp*2)
+        } getOrElse (x*2, y + v.ascent.toInt)
+        ( max(w1, w2 + dx - 1), max(h1, h2 + dy - 1) )
+        
+      } else if (hasRect) // rectの定義そのまま
         (w1, h1)
       else sys.error("えっ")
-    }
+   	}
 
     val (w, h) = computeSize(v)
 
