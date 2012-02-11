@@ -32,6 +32,7 @@ object ScriptOps {
   case class APadding(xparam: Int, yparam: Int) extends Attr
   case class AAlign(xparam: Symbol, yparam: Symbol) extends Attr
   case object ABorder extends Attr
+  case object ANil extends Attr
   
   case class ATile() extends Attr
   case class ABackground() extends Attr

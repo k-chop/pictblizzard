@@ -37,16 +37,10 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     call('interval, interval)
     call('align,    align,   attrmap.contains('rect))
     call('padding,  padding)
-
-    fix()
     
     this
   }
 
-  def fix() {
-    movey(0, v.getNumGlyphs, -1)
-  }
-  
   def newlined(): WrappedGlyphVector = {
     var lineLeaderIdx = 0
     for (idx <- 1 until v.getNumGlyphs) {

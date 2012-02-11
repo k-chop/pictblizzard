@@ -25,6 +25,12 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       res
   }
   
+  lazy val pltezero: Int = {
+    val res = ImageUtils.PNG.transparentColor(path.getRawPath)
+    println(path+"の透過色は"+"ARGBの順に",res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff,"です.")
+    res
+  }
+  
   private val size_x: Int = 10
   private val size_y: Int = 2
   private val unit_w: Int = 16
@@ -98,15 +104,18 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       drawTile(0, 0)
       g.dispose
     }
-
-    val ltp = img.getSubimage(32, 0, 8, 8)
-    val rtp = img.getSubimage(56, 0, 8, 8)
-    val lbp = img.getSubimage(32,24, 8, 8)
-    val rbp = img.getSubimage(56,24, 8, 8)
-    val tp =  img.getSubimage(40, 0,16, 8)
-    val rp =  img.getSubimage(56, 8, 8,16)
-    val lp =  img.getSubimage(32, 8, 8,16)
-    val bp =  img.getSubimage(40,24,16, 8)
+    
+    val aimg = ImageUtils.indexedColorToARGBImage(img)
+    ImageUtils.enableAlpha(aimg, pltezero)
+    
+    val ltp = aimg.getSubimage(32, 0, 8, 8)
+    val rtp = aimg.getSubimage(56, 0, 8, 8)
+    val lbp = aimg.getSubimage(32,24, 8, 8)
+    val rbp = aimg.getSubimage(56,24, 8, 8)
+    val tp =  aimg.getSubimage(40, 0,16, 8)
+    val rp =  aimg.getSubimage(56, 8, 8,16)
+    val lp =  aimg.getSubimage(32, 8, 8,16)
+    val bp =  aimg.getSubimage(40,24,16, 8)
 
     val g = dest.createGraphics
 

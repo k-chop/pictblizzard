@@ -89,10 +89,8 @@ class TextStyler(val origimg: BufferedImage,
     maskimg
   }
   // ふちどりする
-
-  // border
-  // このクラスに置いといたらrectの範囲外に描画することができない…
-  // やっぱPaddingは必要なような気がしてきた
+  // def hem() = {}
+  
   def bordered(c: Color) = {
     val g2d = origimg.createGraphics
     g2d.setPaint(c)

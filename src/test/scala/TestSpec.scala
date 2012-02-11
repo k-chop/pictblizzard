@@ -18,9 +18,9 @@ class TestSpec extends WordSpec with ShouldMatchers {
       Map(
       'name->AreaUnit(Map('rect -> ARect(5,0,300,13))),
       'icon->AreaUnit(Map('rect -> ARect(280,0,32,32))),
-      'desc->AreaUnit(Map('rect -> ARect(0,13, 320, 80),
+      'desc->AreaUnit(Map('point -> ARect(0, 20, 12, 2),
                                 'interval -> AInterval(0, 3),
-                                'padding -> APadding(7, 9),
+                                'padding -> APadding(8, 10),
                                 'font -> AFont("ＭＳ ゴシック", 'plain, 12),
                                 'window -> AWindow(),
                                 'auto_expand -> AAutoExpand
@@ -38,7 +38,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
     val v2 = Map(
       'name->Str("\\c[2]サマーサンシャインバースト"),
       'icon->Icon("icon/icon2.png"),
-      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[4]死ぬ"),
+      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[4]死ぬ\n\n\\c[0]どう考えても自分も\\c[4]死ぬ"),
       'cost->Str("42")) //
 
     val v3 = Map(
