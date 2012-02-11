@@ -101,7 +101,7 @@ class DrawableImage(img: BufferedImage) {
     val buf = ImageUtils.newImage(size)
 
     val (sw, sh) = size
-    val syswin = sysg.getSystemWindow(sw, sh)
+    val syswin = sysg.getSystemWindow(sw, sh, true)
     val g = buf.createGraphics
     g.drawImage(syswin, null, 0, 0)
     g.dispose
