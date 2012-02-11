@@ -14,15 +14,16 @@ class TestSpec extends WordSpec with ShouldMatchers {
     import ScriptOps._
 
     val lay = LayoutUnit(
-      Map('size -> APoint(320, 60)),
+      Map('size -> APoint(320, 240)),
       Map(
-      'name->AreaUnit(Map('rect -> ARect(5,10,300,13))),
+      'name->AreaUnit(Map('rect -> ARect(5,0,300,13))),
       'icon->AreaUnit(Map('rect -> ARect(280,0,32,32))),
-      'desc->AreaUnit(Map('point -> APoint(8,25),
-                                'interval -> AInterval(3, 0),
-                                'padding -> APadding(5, 5),
-                                'font -> AFont("ＭＳ ゴシック", 'plain, 10),
-                                'window -> AWindow()
+      'desc->AreaUnit(Map('rect -> ARect(0,13, 320, 80),
+                                'interval -> AInterval(0, 3),
+                                'padding -> APadding(7, 9),
+                                'font -> AFont("ＭＳ ゴシック", 'plain, 12),
+                                'window -> AWindow(),
+                                'auto_expand -> AAutoExpand
                          )),
       'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
@@ -37,8 +38,8 @@ class TestSpec extends WordSpec with ShouldMatchers {
     val v2 = Map(
       'name->Str("\\c[2]サマーサンシャインバースト"),
       'icon->Icon("icon/icon2.png"),
-      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[10]死ぬ"),
-      'cost->Str("42"))
+      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[4]死ぬ"),
+      'cost->Str("42")) //
 
     val v3 = Map(
       'name->Str("\\c[1]インフェルノ\\c[0]・\\c[2]オブ\\c[0]・\\c[3]メサイア"),

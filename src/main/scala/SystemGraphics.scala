@@ -52,7 +52,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       var dst = ImageUtils.newImage(unit_w, h)
       val at = new AffineTransform()
       at.scale( 1.0, h.toDouble / unit_h )
-      val scaleOp = new AffineTransformOp(at, null /* AffineTransformOp.TYPE_BILINEAR */);
+      val scaleOp = new AffineTransformOp(at, null: java.awt.RenderingHints /* AffineTransformOp.TYPE_BILINEAR */);
       dst = scaleOp.filter(subimg, dst);
       dst
     }
@@ -79,7 +79,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
     if (zoom) {
       val at = new AffineTransform()
       at.scale(w / 32.0, h / 32.0)
-      val scaleOp = new AffineTransformOp(at, null)
+      val scaleOp = new AffineTransformOp(at, null: java.awt.RenderingHints)
       dest = scaleOp.filter(bg, dest)
     } else {
       val g = dest.createGraphics
