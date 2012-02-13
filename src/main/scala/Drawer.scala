@@ -109,7 +109,7 @@ class DrawableImage(img: BufferedImage) {
   }
 
   def iconImage(path: java.net.URI, attrmap: AttrMap): ResultImage = {
-    val icon: BufferedImage = PNGIO.read(path)
+    val icon: BufferedImage = ext.PNG.read(path)
     ResultImage(findBeginPoint(attrmap), icon)
   }
 
@@ -146,7 +146,7 @@ class DrawableImage(img: BufferedImage) {
   }
   
   def result = img
-  def write(ref: String) = PNGIO.write(img, ref)
+  def write(ref: String) = ext.PNG.write(img, ref)
   
 }
 
