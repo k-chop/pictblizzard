@@ -29,8 +29,9 @@ object ImageUtils {
     dest
   }
   
-  def indexedColorToARGBImage(src: BufferedImage): BufferedImage = {
-    require(src.getType == BufferedImage.TYPE_BYTE_INDEXED, src.getType())
+  def toARGBImage(src: BufferedImage): BufferedImage = {
+    if (src.getType != BufferedImage.TYPE_BYTE_INDEXED)
+      return src
     
     val dest = newImage(src.getWidth, src.getHeight)
     val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferByte].getData

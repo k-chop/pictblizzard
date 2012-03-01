@@ -14,6 +14,12 @@ object PNG {
 
   def read(path: String): BufferedImage = read( (new File(path)).toURI )
   
+  def readAsARGBImage(path: java.net.URI): BufferedImage = 
+    ImageUtils.toARGBImage( read(path) )
+  
+  def readAsARGBImage(path: String): BufferedImage = 
+    readAsARGBImage( (new File(path)).toURI )
+  
   def write(img: BufferedImage, path: String) {
     ImageIO.write(img, "png", new File(path))
   }

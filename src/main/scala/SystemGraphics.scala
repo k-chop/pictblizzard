@@ -18,7 +18,8 @@ object SystemGraphics {
 class SystemGraphics (path: java.net.URI) extends Texturable {
 
   val img: BufferedImage = {
-    val res = javax.imageio.ImageIO.read(new java.io.File(path))
+    val res = ext.PNG.readAsARGBImage(path)
+    
     if (res.getWidth != 160 || res.getHeight != 80) // もっと適切な例外がある気がする
       throw new IllegalArgumentException("システムグラフィックの画像サイズは160 x 80でなければなりません．")
     else
@@ -104,18 +105,17 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       drawTile(0, 0)
       g.dispose
     }
+
+    ImageUtils.enableAlpha(img, pltezero)
     
-    val aimg = ImageUtils.indexedColorToARGBImage(img)
-    ImageUtils.enableAlpha(aimg, pltezero)
-    
-    val ltp = aimg.getSubimage(32, 0, 8, 8)
-    val rtp = aimg.getSubimage(56, 0, 8, 8)
-    val lbp = aimg.getSubimage(32,24, 8, 8)
-    val rbp = aimg.getSubimage(56,24, 8, 8)
-    val tp =  aimg.getSubimage(40, 0,16, 8)
-    val rp =  aimg.getSubimage(56, 8, 8,16)
-    val lp =  aimg.getSubimage(32, 8, 8,16)
-    val bp =  aimg.getSubimage(40,24,16, 8)
+    val ltp = img.getSubimage(32, 0, 8, 8)
+    val rtp = img.getSubimage(56, 0, 8, 8)
+    val lbp = img.getSubimage(32,24, 8, 8)
+    val rbp = img.getSubimage(56,24, 8, 8)
+    val tp =  img.getSubimage(40, 0,16, 8)
+    val rp =  img.getSubimage(56, 8, 8,16)
+    val lp =  img.getSubimage(32, 8, 8,16)
+    val bp =  img.getSubimage(40,24,16, 8)
 
     val g = dest.createGraphics
 
