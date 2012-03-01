@@ -30,8 +30,8 @@ object ImageUtils {
   }
   
   def indexedColorToARGBImage(src: BufferedImage): BufferedImage = {
-    if (src.getType != BufferedImage.TYPE_BYTE_INDEXED)
-      throw new IllegalArgumentException()
+    require(src.getType == BufferedImage.TYPE_BYTE_INDEXED, src.getType())
+    
     val dest = newImage(src.getWidth, src.getHeight)
     val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferByte].getData
     val destPixel = (dest.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
@@ -51,9 +51,9 @@ object ImageUtils {
   }
   
   def synthesis(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
+    require(src.getType == BufferedImage.TYPE_INT_ARGB && target.getType == BufferedImage.TYPE_INT_ARGB,
+        "source & target's image type should be 'TYPE_INT_ARGB'")
 
-    if (src.getType != BufferedImage.TYPE_INT_ARGB || target.getType != BufferedImage.TYPE_INT_ARGB)
-      throw new IllegalArgumentException("source & target's image type should be 'TYPE_INT_ARGB'")
     val srcPixel    = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
     val targetPixel = (target.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
 
