@@ -4,12 +4,12 @@ version := "0.0.1"
 
 organization := "com.github.chuwb"
 
-scalaVersion := "2.9.1"
+scalaVersion := "2.9.2"
 
 //parallelExecution in Test := false
 
 libraryDependencies ++= Seq{
-  "org.scalatest" %% "scalatest" % "1.6.1" % "test"
+  "org.scalatest" %% "scalatest" % "1.8" % "test"
   //"swt" % "jface" % "3.0.1"
 }
 
@@ -36,5 +36,3 @@ traceLevel := 10
 // add SWT to the unmanaged classpath
 //unmanagedJars in Compile += file("/usr/share/java/swt.jar")
 
-
-seq(lsSettings :_*)
