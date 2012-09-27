@@ -12,7 +12,9 @@ object BinaryUtils {
     def DWORD2Long(arr: Array[Byte]): Long = {
       if(arr.length != 4)
         throw new IllegalArgumentException("DWORD2Long accept only Array length 4.")
-      val b = arr.map{ i => if (i < 0) (i+256).toLong else i.toLong }
+      val b = arr map {
+        i => if (i < 0) (i + 256).toLong else i.toLong
+      }
       0L | b(0)<<24 | b(1)<<16 | b(2)<<8 | b(3)
     }
 }

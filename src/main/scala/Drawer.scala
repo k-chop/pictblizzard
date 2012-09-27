@@ -39,7 +39,7 @@ class DrawableImage(img: BufferedImage) {
     val g2d = img.createGraphics
     g2d.setPaint(c)
     g2d.fillRect(0, 0, img.getWidth, img.getHeight)
-    g2d.dispose
+    g2d.dispose()
     this
   }
 

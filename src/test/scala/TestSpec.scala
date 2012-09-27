@@ -50,7 +50,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
     val v4 = Map(
       'name->Str("ヘルズボルケイノシュート"),
       'icon->Icon("icon/icon1.png"),
-      'desc->Str("死の世界から呼び寄せた闇の火弾をマッハ2でぶつける\n相手は死ぬ"),
+      'desc->Str("\\c[1]■■■■■■■■\\c[2]■■■\\c[0]■■■■■\n\\c[4]■■■■\\c[5]てててすすと■■■\\c[0]■■■\n■■■■■■■■■■■■■■■■\n■■■■■■■■■■■■■■■■\n"),
       'cost->Str("42"))
 
     val v5 = Map(
@@ -66,7 +66,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'cost->Str("42"))
 
     //val vs = List(v1,v2,v3,v4,v5,v6)
-    val vs = List(v2)
+    val vs = List(v4)
     
     val d = new Drawer(lay)
     vs.map{

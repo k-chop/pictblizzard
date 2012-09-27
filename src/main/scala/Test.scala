@@ -22,7 +22,7 @@ object Test {
 
     val layout = LayoutUnit(
       Map('size -> APoint(320,240)), //env
-      Map(  //laouts
+      Map(  //layouts
       'icon1 -> AreaUnit(Map('point->APoint(0,0))),
       'icon2 -> AreaUnit(Map('point->APoint(50,0))),
       'icon3 -> AreaUnit(Map('point->APoint(100,0))),

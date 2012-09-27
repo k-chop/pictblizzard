@@ -62,7 +62,7 @@ class TextStyler(val origimg: BufferedImage,
     val maskimg = ImageUtils.copy(origimg)
     val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
     val g = targetimg.createGraphics
-    
+  
     for (AttributeRange(begin, end, ctr) <- attrstr.iter) {
       val texIdx = ctr match {
         case CtrColor(idx) => idx
@@ -81,10 +81,10 @@ class TextStyler(val origimg: BufferedImage,
           drawEachLine(b + head.length + 1, rest)
       }
       val subs = attrstr.str.substring(begin, end)
-      drawEachLine(begin, subs.split("\n").toList)      
+      drawEachLine(begin, subs.split("\n").toList)
     }    
     g.dispose
-
+    
     ImageUtils.synthesis(maskimg, targetimg)
     maskimg
   }
