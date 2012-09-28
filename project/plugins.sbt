@@ -1,5 +1,4 @@
 
-
 resolvers ++= Seq(
   "coda" at "http://repo.codahale.com")
 

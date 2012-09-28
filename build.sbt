@@ -8,8 +8,11 @@ scalaVersion := "2.9.2"
 
 //parallelExecution in Test := false
 
+resolvers ++= Seq("twitter" at "http://maven.twttr.com/")
+
 libraryDependencies ++= Seq{
-  "org.scalatest" %% "scalatest" % "1.8" % "test"
+  "org.scalatest" %% "scalatest" % "latest" % "test"
+  "com.twitter" %% "util-logging" % "latest"
   //"swt" % "jface" % "3.0.1"
 }
 
