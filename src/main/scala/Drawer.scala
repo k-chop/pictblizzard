@@ -45,7 +45,7 @@ class DrawableImage(img: BufferedImage) {
   }
 
   def drawArea(areaname: Key, areaunit: AreaUnit, target: AValue) {
-
+    logger.info("drawing :" + areaname + " ...")
     val frontImage = Option(target) map {
       case Icon(url) =>
         iconImage(url, areaunit.attrmap)
@@ -59,14 +59,13 @@ class DrawableImage(img: BufferedImage) {
       case ResultImage((x, y), target) => (x, y, (target.getWidth, target.getHeight))
     } getOrElse((0, 0, (1, 1)))
     
-    val bgkind = findEnableParam(areaunit.attrmap, 'tile, 'background, 'window)
+    val bgkind = AttrMap.findEnableParam(areaunit.attrmap, 'tile, 'background, 'window)
     val bgImage = bgkind map {
       case t: ATile       => tileImage(exSize, t)
       case t: ABackground => backgroundImage(exSize, t)
       case t: AWindow     => windowImage(exSize, t)
     }
 
-    
     val g = img.createGraphics
     bgImage foreach {
       case ResultImage(_, target) => g.drawImage(target, null, fx, fy)
@@ -77,19 +76,11 @@ class DrawableImage(img: BufferedImage) {
     g.dispose()
   }
 
-  private[this] def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
-    
-    @scala.annotation.tailrec
-    def findEnableParamRec(am: AttrMap, sl: List[Symbol]): Option[Attr] = sl match {
-      case s :: cdr => {
-        am find { case(k,v) => k == s } match {
-          case Some((k,v)) => Some(v)
-          case None => findEnableParamRec(am, cdr)
-        }
-      }
-      case Nil => None
-    }
-    findEnableParamRec(am, ss.toList)
+  def findBeginPoint(attrmap: AttrMap): (Int, Int) = {
+    AttrMap.findEnableParam(attrmap, 'point, 'rect) map {
+      case APoint(x, y)      => (x, y)
+      case ARect(x, y, _, _) => (x, y)
+    } getOrElse (0, 0)
   }
 
   def backgroundImage(size: (Int, Int), attr: Attr): ResultImage = null
@@ -114,13 +105,6 @@ class DrawableImage(img: BufferedImage) {
     ResultImage(findBeginPoint(attrmap), icon)
   }
 
-  private [this] def findBeginPoint(attrmap: AttrMap): (Int, Int) = {
-    findEnableParam(attrmap, 'point, 'rect) map {
-      case APoint(x, y)      => (x, y)
-      case ARect(x, y, _, _) => (x, y)
-    } getOrElse (0, 0)
-  }
-
   def stringImage(str: String, attrmap: AttrMap): ResultImage = {
     import scala.util.control.Exception._
 
@@ -128,7 +112,7 @@ class DrawableImage(img: BufferedImage) {
       val AFont(name, style, pt, _) = attr
       new Font(name, extractStyle(style), pt.toInt)
     } getOrElse {
-      log("フォント設定が見つかりません。デフォルトフォントを使用します。")
+      logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
       Drawer.DEFAULT_FONT
     }
 
@@ -143,7 +127,7 @@ class DrawableImage(img: BufferedImage) {
     case 'bold => Font.BOLD
     case 'italic => Font.ITALIC
     case 'bolditalic => Font.BOLD | Font.ITALIC
-    case n => log("不明なフォントスタイル: "+n); Font.PLAIN
+    case n => logger.warning("不明なフォントスタイルです: "+n+"\nデフォルトのスタイルを使用します."); Font.PLAIN
   }
   
   def result = img

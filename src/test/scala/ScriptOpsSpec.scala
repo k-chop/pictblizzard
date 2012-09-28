@@ -3,7 +3,7 @@ package test
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.chuwb.pictbliz.ScriptOps.{Attr, ANil, AreaUnit, AreaMap}
+import com.github.chuwb.pictbliz.ScriptOps.{ANil, AreaUnit, AreaMap}
 import collection.immutable.IntMap
 
 class ScriptOpsSpec extends WordSpec with ShouldMatchers {
@@ -30,9 +30,6 @@ class ScriptOpsSpec extends WordSpec with ShouldMatchers {
 
       val res = AreaMap.fromSeq(kvA, kvB, kvC)
       ans.idmap should be (res.idmap)
-/*      (ans.self.forall { case (k,v) =>
-        res.self(k) == v
-      }) should be (true) */
       isSame(ans.self, res.self) should be (true)
     }
 

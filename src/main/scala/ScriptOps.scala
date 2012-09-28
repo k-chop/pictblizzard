@@ -18,6 +18,26 @@ object ScriptOps {
   type AttrMap = Map[Key, Attr]
   type ValueMap = Map[Key, AValue]
 
+  object AttrMap {
+    def empty() = Map.empty[Key, Attr]
+
+    def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
+      @scala.annotation.tailrec
+      def findEnableParamRec(am: AttrMap, sl: List[Symbol]): Option[Attr] = sl match {
+        case s :: cdr => {
+          am find { case(k,v) => k == s } match {
+            case Some((k,v)) => Some(v)
+            case None => findEnableParamRec(am, cdr)
+          }
+        }
+        case Nil => None
+      }
+      findEnableParamRec(am, ss.toList)
+    }
+
+  }
+
+
   object AreaMap {
     def empty() = {
       ScriptOps.AreaMap(IntMap(), Map(), 0)
@@ -64,7 +84,10 @@ object ScriptOps {
   case class Str(s: String) extends AValue
   case class Icon(uri: java.net.URI) extends AValue
   case object NullValue extends AValue
-  
+
+  object LayoutUnit {
+    def empty() = LayoutUnit.apply(AttrMap.empty(), AreaMap.empty())
+  }
   case class LayoutUnit(env: AttrMap, areamap: AreaMap) 
   case class AreaUnit(attrmap: AttrMap) {
 

@@ -10,11 +10,11 @@ scalaVersion := "2.9.2"
 
 resolvers ++= Seq("twitter" at "http://maven.twttr.com/")
 
-libraryDependencies ++= Seq{
-  "org.scalatest" %% "scalatest" % "latest" % "test"
-  "com.twitter" %% "util-logging" % "latest"
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "1.8" % "test",
+  "com.twitter" % "util-logging" % "5.3.12"
   //"swt" % "jface" % "3.0.1"
-}
+)
 
 // reduce the maximum number of errors shown by the Scala compiler
 maxErrors := 20

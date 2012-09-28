@@ -1,8 +1,13 @@
 package com.github.chuwb.pictbliz
 
+import com.twitter.logging.config._
+import com.twitter.logging.Logger
 
 object `package` {
 
-  def log(str: String) = println(str)
-  
+  lazy val logger: Logger = {
+    val ret = Logger.get("GLOBAL")
+    ret.setLevel(Level.INFO)
+    ret
+  }
 }

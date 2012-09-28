@@ -1,25 +1,24 @@
-package com.github.chuwb.pictbliz
-package test
+package com.github.chuwb.pictbliz.test
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import scala.collection.mutable.Stack
+import com.github.chuwb.pictbliz.{DrawableImage, Drawer}
+import com.github.chuwb.pictbliz.ScriptOps._
 
 class DrawerSpec extends WordSpec with ShouldMatchers {
-  import ScriptOps._
-  
-  // "method findBeginPoint" should {
-    
-  //   "find begin point collectly" in {
-  //     val drawer = new Drawer(FileUnit(Map(),LayoutUnit((1,1),Map())), NullContext)
-  //     val a = Map("point"->Attr(Seq(Const("0"),Const("1"))))
-  //     val b = Map("rect"->Attr(Seq(Const("7"),Const("9"),Const("9"),Const("11"))))
-  //     //val c = AttrMap("point"->Seq(Const("3"),Const("0")), "rect"->Seq(Const("7"),Const("9"),Const("9"),Const("11")))
-  //     assert(drawer.findBeginPoint(a) == (0, 1))
-  //     assert(drawer.findBeginPoint(b) == (7, 9))
-  //     //Drawer.findBeginPoint(c) must be === (0, 1)
-  //   }
-    
-  // }
-  
+
+  "DrawableImage" should {
+      "find begin point collectly with method findBeginPoint" in {
+      //val drawer = new Drawer(LayoutUnit.empty())
+      val dimg = new DrawableImage(null)
+      val a = Map('point -> APoint(0, 1))
+      val b = Map('rect -> ARect(7, 9, 9, 11))
+
+      dimg.findBeginPoint(a) should be (0, 1)
+      dimg.findBeginPoint(b) should be (7, 9)
+
+    }
+
+  }
+
 }
