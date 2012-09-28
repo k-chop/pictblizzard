@@ -1,9 +1,8 @@
-package com.github.chuwb.pictbliz
-package test
+package com.github.chuwb.pictbliz.test
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import scala.collection.mutable.Stack
+import com.github.chuwb.pictbliz._
 
 class TestSpec extends WordSpec with ShouldMatchers {
 
@@ -14,6 +13,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
     import ScriptOps._
 
     val fontsetting = 'font -> AFont("ＭＳ ゴシック", 'plain, 12)
+    val repo = LayoutRepository.empty()
 
     val lay = LayoutUnit(
       Map('size -> APoint(320, 240)),
@@ -26,12 +26,15 @@ class TestSpec extends WordSpec with ShouldMatchers {
                                 'interval -> AInterval(0, 3),
                                 'padding -> APadding(8, 10),
                                 fontsetting,
-                                'window -> AWindow(),
-                                'auto_expand -> AAutoExpand
+                                'window -> AWindow("system6.png"),
+                                'auto_expand -> AAutoExpand,
+                                'front_color -> ASystemGraphics("system6.png")
                          )),
       'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
     )
+
+    repo.add('normalwindow, lay)
 
     val v1 = Map(
       'name->Str("エターナルフォースブリザード"),
@@ -84,16 +87,5 @@ class TestSpec extends WordSpec with ShouldMatchers {
     "be excute" in { val s = 1
       s should be (s) }
   }
-
-  
-  // "stack" should {
-  //   val stack = new Stack[Int]
-  //   "be empty" in {
-  //     stack should be ('empty)
-  //   }
-  //   "complain when popped" in {
-  //     evaluating { stack.pop() } should produce [NoSuchElementException]
-  //   }
-  // }
 
 }
