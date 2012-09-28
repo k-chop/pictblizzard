@@ -1,11 +1,7 @@
 package com.github.chuwb.pictbliz
 
-import javax.swing._
+import collection.immutable.TreeMap
 import java.awt._
-import java.awt.font._
-import java.awt.image._
-import javax.imageio._
-import java.io._
 
 object Test {
 
@@ -22,7 +18,7 @@ object Test {
 
     val layout = LayoutUnit(
       Map('size -> APoint(320,240)), //env
-      Map(  //layouts
+      AreaMap.fromSeq(  //layouts
       'icon1 -> AreaUnit(Map('point->APoint(0,0))),
       'icon2 -> AreaUnit(Map('point->APoint(50,0))),
       'icon3 -> AreaUnit(Map('point->APoint(100,0))),

@@ -1,5 +1,6 @@
 package com.github.chuwb.pictbliz
 
+import ext.PNG
 import javax.swing
 import java.awt.{ Font, Color, Graphics2D }
 import java.awt.font._
@@ -43,7 +44,7 @@ class DrawableImage(img: BufferedImage) {
     this
   }
 
-  def drawArea(areaname: Key, areaunit: AreaUnit, target: AValue) = {
+  def drawArea(areaname: Key, areaunit: AreaUnit, target: AValue) {
 
     val frontImage = Option(target) map {
       case Icon(url) =>
@@ -73,7 +74,7 @@ class DrawableImage(img: BufferedImage) {
     frontImage foreach {
       case ResultImage((x, y), target) => g.drawImage(target, null, x, y)
     }
-    g.dispose
+    g.dispose()
   }
 
   private[this] def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
@@ -104,7 +105,7 @@ class DrawableImage(img: BufferedImage) {
     val syswin = sysg.getSystemWindow(sw, sh, zoom=true)
     val g = buf.createGraphics
     g.drawImage(syswin, null, 0, 0)
-    g.dispose
+    g.dispose()
     ResultImage((0, 0), buf)
   }
 
@@ -133,7 +134,7 @@ class DrawableImage(img: BufferedImage) {
 
     val g2d = img.createGraphics
     val strimg = new StrGraphics(g2d, str, font, attrmap).processImage()
-    g2d.dispose
+    g2d.dispose()
     ResultImage(findBeginPoint(attrmap), strimg)
   }
 
@@ -146,7 +147,9 @@ class DrawableImage(img: BufferedImage) {
   }
   
   def result = img
-  def write(ref: String) = ext.PNG.write(img, ref)
+  def write(ref: String) {
+    ext.PNG.write(img, ref)
+  }
   
 }
 

@@ -1,5 +1,6 @@
 package com.github.chuwb.pictbliz
 
+import ext.PNG
 import java.awt.{ Font, Color, Graphics2D }
 import java.awt.image.{ BufferedImage, AffineTransformOp }
 import java.awt.geom.{ AffineTransform }
@@ -60,8 +61,8 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       val at = new AffineTransform()
       at.scale( 1.0, h.toDouble / unit_h )
       //val scaleOp = new AffineTransformOp(at, null: java.awt.RenderingHints);
-      val scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-      dst = scaleOp.filter(subimg, dst);
+      val scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
+      dst = scaleOp.filter(subimg, dst)
       dst
     }
 
@@ -72,7 +73,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       resg.drawImage(tiled, null, i, 0)
       i += unit_w
     }
-    resg.dispose
+    resg.dispose()
     result
   }
 
@@ -104,7 +105,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
         }
       }
       drawTile(0, 0)
-      g.dispose
+      g.dispose()
     }
 
     ImageUtils.enableAlpha(img, pltezero)
@@ -151,7 +152,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
       g.drawImage(rp.getSubimage(0, 0, 8, resty), null, w-8, drawy)
     }
     
-    g.dispose
+    g.dispose()
     dest
   }
   

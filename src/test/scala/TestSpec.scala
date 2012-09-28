@@ -15,7 +15,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
 
     val lay = LayoutUnit(
       Map('size -> APoint(320, 240)),
-      Map(
+      AreaMap.fromSeq(
       'name->AreaUnit(Map('rect -> ARect(5,0,300,13))),
       'icon->AreaUnit(Map('rect -> ARect(280,0,32,32))),
       'desc->AreaUnit(Map('point -> ARect(0, 20, 12, 2),
