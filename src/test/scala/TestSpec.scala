@@ -9,19 +9,23 @@ class TestSpec extends WordSpec with ShouldMatchers {
 
   import ScriptOps.implicits.string2URI
   
-  "Ops" should {
+  "image output test" should {
     
     import ScriptOps._
+
+    val fontsetting = 'font -> AFont("ＭＳ ゴシック", 'plain, 12)
 
     val lay = LayoutUnit(
       Map('size -> APoint(320, 240)),
       AreaMap.fromSeq(
-      'name->AreaUnit(Map('rect -> ARect(5,0,300,13))),
-      'icon->AreaUnit(Map('rect -> ARect(280,0,32,32))),
+      'name->AreaUnit(Map('rect -> ARect(5,0,300,13),
+                                fontsetting)),
+      'icon->AreaUnit(Map('rect -> ARect(280,0,32,32),
+                                fontsetting)),
       'desc->AreaUnit(Map('point -> ARect(0, 20, 12, 2),
                                 'interval -> AInterval(0, 3),
                                 'padding -> APadding(8, 10),
-                                'font -> AFont("ＭＳ ゴシック", 'plain, 12),
+                                fontsetting,
                                 'window -> AWindow(),
                                 'auto_expand -> AAutoExpand
                          )),
@@ -50,7 +54,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
     val v4 = Map(
       'name->Str("ヘルズボルケイノシュート"),
       'icon->Icon("icon/icon1.png"),
-      'desc->Str("\\c[1]■■■■■■■■\\c[2]■■■\\c[0]■■■■■\n\\c[4]■■■■\\c[5]てててすすと■■■\\c[0]■■■\n■■■■■■■■■■■■■■■■\n■■■■■■■■■■■■■■■■\n"),
+      'desc->Str("\\c[6]死の世界\\c[0]から呼び寄せた\\c[8]闇\\c[0]の\\c[2]火弾\\c[0]を\nマッハ2でぶつける\n相手は\\c[4]死ぬ"),
       'cost->Str("42"))
 
     val v5 = Map(
@@ -65,8 +69,8 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'desc->Str("1931年に建てられた高さ443m、102階建てのビル。\n相手は死ぬ"),
       'cost->Str("42"))
 
-    //val vs = List(v1,v2,v3,v4,v5,v6)
-    val vs = List(v4)
+    val vs = List(v1,v2,v3,v4,v5,v6)
+    //val vs = List(v4)
     
     val d = new Drawer(lay)
     vs.map{
@@ -77,7 +81,7 @@ class TestSpec extends WordSpec with ShouldMatchers {
       res.write("temp/skill0%d.png" format idx)
     }
     
-    "a" in { val s = 1
+    "be excute" in { val s = 1
       s should be (s) }
   }
 
