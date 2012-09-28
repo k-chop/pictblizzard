@@ -13,7 +13,16 @@ class TextStyler(val origimg: BufferedImage,
                   val attrmap: AttrMap,
                   val attrstr: AttributedText)
 {
-  var colors: Texturable = SystemGraphics.default
+  var colors: Texturable = {
+    AttrMap.findParam(attrmap, 'front_color) match {
+      case Some(ASystemGraphics(path: String)) =>
+        SystemGraphics.fromPath(path)
+      case Some(ASingleColors(xs: Array[String])) =>
+        new SingleColors(xs)
+      case None =>
+        SystemGraphics.default
+    }
+  }
   var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)];
   val debug = attrmap.contains('debug)
   
@@ -25,7 +34,7 @@ class TextStyler(val origimg: BufferedImage,
     val g = dest.createGraphics
     g.drawImage(s, null, 1, 1) // shadow offset = 1
     g.drawImage(c, null, 0, 0)
-    g.dispose
+    g.dispose()
     
     if (attrmap.contains('border)) bordered(Color.white)
 
@@ -49,9 +58,9 @@ class TextStyler(val origimg: BufferedImage,
       val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
       val g = targetimg.createGraphics
       val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds
-      val paintTex = colors.getTexture(pw, ph)(-1)
+      val paintTex = colors.getTexture(pw, ph)(20)
       g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
-      g.dispose
+      g.dispose()
       
       ImageUtils.synthesis(maskimg, targetimg)
     }
@@ -83,7 +92,7 @@ class TextStyler(val origimg: BufferedImage,
       val subs = attrstr.str.substring(begin, end)
       drawEachLine(begin, subs.split("\n").toList)
     }    
-    g.dispose
+    g.dispose()
     
     ImageUtils.synthesis(maskimg, targetimg)
     maskimg

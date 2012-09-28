@@ -11,10 +11,13 @@ object SingleColors {
 
 }
 
-class SingleColors(_color: java.awt.Color*) extends Texturable {
-
-  val color = _color.toArray
+class SingleColors(val color: Array[Color]) extends Texturable {
   def length = color.length
+
+  def this(_color: Color*) = this(_color.toArray)
+  def this(colornames: Array[String]) = {
+    this( colornames map ColorUtils.toColor )
+  }
 
   def getTexture(w: Int, h: Int)(idx: Int) = {
     if (length <= idx) throw new IndexOutOfBoundsException

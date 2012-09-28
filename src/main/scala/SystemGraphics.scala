@@ -10,6 +10,9 @@ object SystemGraphics {
   def fromPath(path: java.net.URI): SystemGraphics = {
     new SystemGraphics(path)
   }
+  def fromPath(path: String): SystemGraphics = {
+    new SystemGraphics(Resource.uri(path))
+  }
 
   def default: SystemGraphics = {
     fromPath(Resource.uri("systemrtp2000.png"))
@@ -31,7 +34,9 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
   
   lazy val pltezero: Int = {
     val res = ext.PNG.transparentColor(path.getRawPath)
-    logger.info(path+"\nこのファイルの透過色は"+"ARGBの順に",res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff,"です.")
+    logger.info(
+      "%s\nこのファイルの透過色は, ARGBの順に%d,%d,%d,%dです." format (path,res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff)
+    )
     res
   }
   

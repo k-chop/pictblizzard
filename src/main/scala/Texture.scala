@@ -17,8 +17,12 @@ class Texture(path: java.net.URI) extends Texturable {
 
   val size_x: Int = img.getWidth / Texture.base_x
   val size_y: Int = img.getHeight / Texture.base_y
-    
+
+  def length = size_x * size_y
+
   def getTexture(w: Int, h: Int)(idx: Int = 0): BufferedImage = {
+    if (idx < length)
+      logger.error("ファイル[%s]のテクスチャNo指定可能範囲は%dですが, %dが指定されました." format (path.toString, length, idx))
 
     val sx = idx % size_x
     val sy = idx / size_x // size_x > 1をどっかで保証すれ
@@ -28,8 +32,8 @@ class Texture(path: java.net.URI) extends Texturable {
     var tiled = ImageUtils.newImage(bx, h)
     val at = new AffineTransform()
     at.scale( 1.0, h.toDouble / by )
-    val scaleOp = new AffineTransformOp(at, null /* AffineTransformOp.TYPE_BILINEAR */);
-    tiled = scaleOp.filter(subimg, tiled);
+    val scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
+    tiled = scaleOp.filter(subimg, tiled)
 
     val result = ImageUtils.newImage(w, h)
     val resg = result.createGraphics
@@ -38,7 +42,7 @@ class Texture(path: java.net.URI) extends Texturable {
       resg.drawImage(tiled, null, i, 0)
       i += bx
     }
-    resg.dispose
+    resg.dispose()
     result
   }
 }

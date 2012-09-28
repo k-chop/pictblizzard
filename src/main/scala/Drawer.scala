@@ -58,12 +58,12 @@ class DrawableImage(img: BufferedImage) {
     val (fx, fy, exSize) = frontImage map {
       case ResultImage((x, y), target) => (x, y, (target.getWidth, target.getHeight))
     } getOrElse((0, 0, (1, 1)))
-    
+
     val bgkind = AttrMap.findParam(areaunit.attrmap, 'tile, 'background, 'window)
     val bgImage = bgkind map {
       case t: ATile       => tileImage(exSize, t)
       case t: ABackground => backgroundImage(exSize, t)
-      case t: AWindow     => windowImage(exSize, t)
+      case t: AWindow  => windowImage(exSize, t)
     }
 
     val g = img.createGraphics
@@ -88,8 +88,13 @@ class DrawableImage(img: BufferedImage) {
   def tileImage(size: (Int, Int), attr: Attr): ResultImage = null
 
   def windowImage(size: (Int, Int), attr: Attr): ResultImage = {
-    // このへんでAttrMap/Context読み取って適切なSystemGraphicsをげっちゅ 今は仮
-    val sysg = SystemGraphics.default
+    val sysg = attr match {
+      case AWindow(path) =>
+        SystemGraphics.fromPath(path)
+      case _ =>
+        SystemGraphics.default
+    }
+
     val buf = ImageUtils.newImage(size)
 
     val (sw, sh) = size
