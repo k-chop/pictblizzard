@@ -94,20 +94,40 @@ object ScriptOps {
 
   }
 
+  // attr_name
+  // class difinition
+
+  // point
   case class APoint(x: Int, y: Int) extends Attr
+  // rect
   case class ARect(x: Int, y: Int, w: Int, h: Int) extends Attr
+  // auto_expand
   case object AAutoExpand extends Attr
+  // font
   case class AFont(name: String, style: Symbol, size: Int, lang: FontLang = Ja) extends Attr
+  // interval
   case class AInterval(xparam: Int, yparam: Int) extends Attr
+  // padding
   case class APadding(xparam: Int, yparam: Int) extends Attr
+  // align
   case class AAlign(xparam: Symbol, yparam: Symbol) extends Attr
+  // border
   case object ABorder extends Attr
+  // nil
   case object ANil extends Attr
-  case object ASystemGraphics extends Attr
-  
+  // front_color or back_color
+  case class ASystemGraphics(path: String) extends Attr
+  // front_color or back_color
+  case class ASingleColors(colors: Array[String]) extends Attr {
+    def this(strs: String*) = {
+      this(strs.toArray)
+    }
+  }
+
+
   case class ATile() extends Attr
   case class ABackground() extends Attr
-  case class AWindow() extends Attr
+  case class AWindow(systemGraphicsPath: String) extends Attr
   
   sealed trait FontLang
   case object Ja extends FontLang
