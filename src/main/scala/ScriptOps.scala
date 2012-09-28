@@ -21,7 +21,7 @@ object ScriptOps {
   object AttrMap {
     def empty() = Map.empty[Key, Attr]
 
-    def findEnableParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
+    def findParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
       @scala.annotation.tailrec
       def findEnableParamRec(am: AttrMap, sl: List[Symbol]): Option[Attr] = sl match {
         case s :: cdr => {
@@ -103,6 +103,7 @@ object ScriptOps {
   case class AAlign(xparam: Symbol, yparam: Symbol) extends Attr
   case object ABorder extends Attr
   case object ANil extends Attr
+  case object ASystemGraphics extends Attr
   
   case class ATile() extends Attr
   case class ABackground() extends Attr

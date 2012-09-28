@@ -59,7 +59,7 @@ class DrawableImage(img: BufferedImage) {
       case ResultImage((x, y), target) => (x, y, (target.getWidth, target.getHeight))
     } getOrElse((0, 0, (1, 1)))
     
-    val bgkind = AttrMap.findEnableParam(areaunit.attrmap, 'tile, 'background, 'window)
+    val bgkind = AttrMap.findParam(areaunit.attrmap, 'tile, 'background, 'window)
     val bgImage = bgkind map {
       case t: ATile       => tileImage(exSize, t)
       case t: ABackground => backgroundImage(exSize, t)
@@ -77,7 +77,7 @@ class DrawableImage(img: BufferedImage) {
   }
 
   def findBeginPoint(attrmap: AttrMap): (Int, Int) = {
-    AttrMap.findEnableParam(attrmap, 'point, 'rect) map {
+    AttrMap.findParam(attrmap, 'point, 'rect) map {
       case APoint(x, y)      => (x, y)
       case ARect(x, y, _, _) => (x, y)
     } getOrElse (0, 0)
