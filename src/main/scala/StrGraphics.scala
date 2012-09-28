@@ -37,8 +37,8 @@ class StrGraphics(val g2d: Graphics2D,
   val strAttrib = new AttributedText(_str)
   val str = strAttrib.str
   
-  def getNewlineCode(): Int = {
-    val frc = g2d.getFontRenderContext()
+  def getNewlineCode: Int = {
+    val frc = g2d.getFontRenderContext
     val v = font.createGlyphVector(frc, "\n")
     v.getGlyphCode(0)
   }
@@ -49,11 +49,11 @@ class StrGraphics(val g2d: Graphics2D,
     val frc = g2d.getFontRenderContext
     val lm = font.getLineMetrics(str, frc)
 
-    val v = new WrappedGlyphVector( generateGlyphVector, attrmap, getNewlineCode, lm.getAscent )
-    val processedVector = v.process
+    val v = new WrappedGlyphVector( generateGlyphVector(), attrmap, getNewlineCode, lm.getAscent )
+    val processedVector = v.process()
     val bufimage = generateImage( processedVector )
     val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
-    styler.process
+    styler.process()
   }
 
   /** 
@@ -62,7 +62,7 @@ class StrGraphics(val g2d: Graphics2D,
   def generateImage(v: WrappedGlyphVector): BufferedImage = {
 
     def computeSize(v: WrappedGlyphVector) = {
-      import scala.math.{ max }
+      import scala.math.max
 
       val hasAutoexp = attrmap.contains('autoexpand)
       val hasRect = attrmap.contains('rect)
@@ -91,12 +91,12 @@ class StrGraphics(val g2d: Graphics2D,
     val g = buf.createGraphics
     StrGraphics.initGraphics2D(g, font)
     g.drawGlyphVector(v.self, 0, v.ascent)
-    g.dispose
+    g.dispose()
     buf
   }
   
   def generateGlyphVector(): GlyphVector = {
-    val frc = g2d.getFontRenderContext()
+    val frc = g2d.getFontRenderContext
     font.createGlyphVector(frc, str)
   }
 

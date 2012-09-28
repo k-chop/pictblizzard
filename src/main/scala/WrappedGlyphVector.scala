@@ -223,7 +223,7 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
     movey(0, v.getNumGlyphs, diff)
   }
   
-  def getFixedWholeLogicalBounds(): Rectangle2D = getFixedLogicalBounds(0, v.getNumGlyphs)
+  def getFixedWholeLogicalBounds: Rectangle2D = getFixedLogicalBounds(0, v.getNumGlyphs)
   
   /** 
   * GlyphVector#getLogicalBoundsはsetGlyphPositionで
