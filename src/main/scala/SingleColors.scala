@@ -11,10 +11,13 @@ object SingleColors {
 
 }
 
-class SingleColors(color: java.awt.Color*) extends Texturable {
+class SingleColors(_color: java.awt.Color*) extends Texturable {
+
+  val color = _color.toArray
+  def length = color.length
 
   def getTexture(w: Int, h: Int)(idx: Int) = {
-    if (color.length <= idx) throw new IndexOutOfBoundsException
+    if (length <= idx) throw new IndexOutOfBoundsException
 
     val img = ImageUtils.newImage(w, h)
     val g = img.createGraphics
