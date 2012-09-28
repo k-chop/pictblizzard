@@ -19,6 +19,9 @@ object ScriptOps {
   type ValueMap = Map[Key, AValue]
 
   object AreaMap {
+    def empty() = {
+      ScriptOps.AreaMap(IntMap(), Map(), 0)
+    }
     def fromSeq(kvs: (Key, AreaUnit)*) = {
       val _accId = mutable.HashMap.empty[Int, Key]
       val _self = mutable.HashMap.empty[Key, AreaUnit]
@@ -39,7 +42,7 @@ object ScriptOps {
      * IDが埋まっていたらどうしよう
      */
     def addWithId(kv: (Key, AreaUnit), id: Int): AreaMap = {
-
+      sys.error("not implemented")
     }
     /*
      * 頭から空きを探して挿入
@@ -49,7 +52,7 @@ object ScriptOps {
       while (idmap.contains(chkId))
         chkId += 1
 
-      AreaMap(idmap + (chkId -> kv._1), self + kv, chkId)
+      AreaMap(idmap + (chkId -> kv._1), self + kv, chkId + 1)
     }
     def foreach(f: (Key, AreaUnit) => Unit) {
       idmap foreach ( kv => f(kv._2, self(kv._2)) )
