@@ -16,7 +16,7 @@ class SingleColors(val color: Array[Color]) extends Texturable {
 
   def this(_color: Color*) = this(_color.toArray)
   def this(colornames: Array[String]) = {
-    this( colornames map ColorUtils.toColor )
+    this( colornames map { s => UColor.code(s).self } )
   }
 
   def getTexture(w: Int, h: Int)(idx: Int) = {

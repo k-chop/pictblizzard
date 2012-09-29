@@ -83,5 +83,32 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
       assert(isSame(res(1), ans(1)) === true)
     }
 
+    "return empty Array with valuemap has no key('id')" in {
+      val vmap = new ValueExpander(Map(
+        "name" -> ExStr("${test}"),
+        "test" -> ExStr("${hoge}"),
+        "hoge" -> ExStr("fuga")
+      ))
+      val res = vmap.expand()
+      val ans = Array()
+      ans should have length (0)
+      res should have length (0)
+    }
+
+    "expand ExStr(no more expand)" in {
+      val vmap = new ValueExpander(Map(
+        "id" -> ExRange(1 to 1 toArray),
+        "name" -> ExStr("${test}"),
+        "test" -> ExStr("${hoge}"),
+        "hoge" -> ExStr("fuga")
+      ))
+      val res = vmap.expand()
+      val ans = Array(
+        Map(
+
+        )
+      )
+    }
+
   }
 }
