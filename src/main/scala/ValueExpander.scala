@@ -50,21 +50,38 @@ class ValueExpander(exs: ExValueMap) {
     acc.toArray
   }
 
-  def expandWithId(id: Int, k: Key, exv: ExValue): AValue = {
+  def expandWithId(id: Int, k: Key, exv: ExValue, zerofillDigit: Int = 0): AValue = {
+    import ScriptOps.implicits.string2URI
+
     cache.get(KV(id, k)) getOrElse {
       exv match {
         case ExStr(str) =>
           val ret = Str(extractSubStrs(id, str))
           cache.+=((KV(id, k), ret))
           ret
-        case ExRange(_) => Str(id.toString)
+        case ExRange(_) =>
+          if (zerofillDigit == 0) {
+            Str(id.toString)
+          } else {
+            val ids = new mutable.StringBuilder(id.toString)
+            var a: Int = zerofillDigit - ids.length
+            while(a != 0) {
+              ids.insert(0, "0")
+              a -= 1
+            }
+            Str(ids.toString())
+          }
         case ExCSV(path, col) =>
           Str(getCVSData(path)(id)(col))
+        case ExIcon(str, zfD) =>
+          val ret = Icon(extractSubStrs(id, str, zfD))
+          cache += ((KV(id, k), ret))
+          ret
       }
     }
   }
 
-  def extractSubStrs(id: Int, _str: String): String = {
+  def extractSubStrs(id: Int, _str: String, zerofillDigit: Int = 0): String = {
     var str = _str
     val reg = """\$\{(\w+)\}""".r
     reg.findAllIn(str).matchData foreach { m =>
@@ -72,7 +89,7 @@ class ValueExpander(exs: ExValueMap) {
       val replaceTo = exs(name) match {
         //case v: ExValue if name == "id" => id.toString
         case v: ExValue =>
-          expandWithId(id, Symbol(name), v) match {
+          expandWithId(id, Symbol(name), v, zerofillDigit) match {
             // other case
             case Str(s) => s
           }

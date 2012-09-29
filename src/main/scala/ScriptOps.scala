@@ -88,6 +88,7 @@ object ScriptOps {
   case object NullValue extends AValue with ExValue
   sealed trait ExValue extends AnyValue
   case class ExStr(s: String) extends ExValue
+  case class ExIcon(s: String, zerofillDigit: Int = 0) extends ExValue
   case class ExRange(seq: Array[Int]) extends ExValue
   case class ExCSV(csvpath: String, column: Int) extends ExValue
   //case class ExDatabase() extends ExValue

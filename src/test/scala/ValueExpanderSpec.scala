@@ -3,7 +3,11 @@ package com.github.chuwb.pictbliz.test
 import com.github.chuwb.pictbliz._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.chuwb.pictbliz.ScriptOps.{ExCSV, ExRange, Str, ExStr}
+import com.github.chuwb.pictbliz.ScriptOps._
+import com.github.chuwb.pictbliz.ScriptOps.ExRange
+import com.github.chuwb.pictbliz.ScriptOps.ExStr
+import com.github.chuwb.pictbliz.ScriptOps.Str
+import com.github.chuwb.pictbliz.ScriptOps.ExCSV
 
 class ValueExpanderSpec extends WordSpec with ShouldMatchers {
 
@@ -109,6 +113,49 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'name -> Str("fuga"),
           'test -> Str("fuga"),
           'hoge -> Str("fuga")
+        )
+      )
+      assert(isSame(res(0), ans(0)) === true)
+    }
+
+    "expand ExIcon(no zerofill)" in {
+      import ScriptOps.implicits.string2URI
+      val vmap = new ValueExpander(Map(
+        "id" -> ExRange(1 to 2 toArray),
+        "icon" -> ExIcon("icon/icon${id}.png")
+      ))
+      val res = vmap.expand()
+      val ans = Array(
+        Map(
+          'id -> Str("1"),
+          'icon -> Icon("icon/icon1.png")
+        ),
+        Map(
+          'id -> Str("2"),
+          'icon -> Icon("icon/icon2.png")
+        )
+      )
+      assert(isSame(res(0), ans(0)) === true)
+      assert(isSame(res(1), ans(1)) === true)
+    }
+
+    "expand ExIcon(with zerofill)" in {
+      import ScriptOps.implicits.string2URI
+      val vmap = new ValueExpander(Map(
+        "id" -> ExRange(1 to 1 toArray),
+        "icon1" -> ExIcon("icon/icon${id}${ext}", zerofillDigit = 1),
+        "icon2" -> ExIcon("icon/icon${id}${ext}", zerofillDigit = 2),
+        "icon3" -> ExIcon("icon/icon${id}${ext}", zerofillDigit = 3),
+        "ext" -> Str(".png")
+      ))
+      val res = vmap.expand()
+      val ans = Array(
+        Map(
+          'id -> Str("1"),
+          'icon1 -> Icon("icon/icon1.png"),
+          'icon2 -> Icon("icon/icon01.png"),
+          'icon3 -> Icon("icon/icon001.png"),
+          'ext -> Str(".png")
         )
       )
       assert(isSame(res(0), ans(0)) === true)
