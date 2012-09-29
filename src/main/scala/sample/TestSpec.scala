@@ -1,15 +1,17 @@
-package com.github.chuwb.pictbliz.test
+package com.github.chuwb.pictbliz.sample
 
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
 import com.github.chuwb.pictbliz._
 
-class TestSpec extends WordSpec with ShouldMatchers {
+class TestSpec {
 
   import ScriptOps.implicits.string2URI
   
-  "image output test" should {
-    
+  def run() {
+    testReuseLayout()
+    testOldSpec()
+  }
+
+  def testReuseLayout() {
     import ScriptOps._
 
     val fontsetting = 'font -> AFont("ＭＳ ゴシック", 'plain, 12)
@@ -72,20 +74,54 @@ class TestSpec extends WordSpec with ShouldMatchers {
       'desc->Str("1931年に建てられた高さ443m、102階建てのビル。\n相手は死ぬ"),
       'cost->Str("42"))
 
-    val vs = List(v1,v2,v3,v4,v5,v6)
+    val vs: List[ValueMap] = List(v1,v2,v3,v4,v5,v6)
     //val vs = List(v4)
-    
+
+    val ex1: ExValueMap = Map(
+
+    )
+
+    //val expanded1: Array[ValueMap] = ValueExpander.expand(ex1)
+
     val d = new Drawer(lay)
-    vs.map{
+    (vs).map{
       d.draw(_, NullContext)
-    }.zip{
-      0 to vs.length
-    }.foreach { case (res, idx) =>
+    }.zipWithIndex.foreach { case (res, idx) =>
       res.write("temp/skill0%d.png" format idx)
     }
-    
-    "be excute" in { val s = 1
-      s should be (s) }
   }
+
+  def testOldSpec() {
+    import ScriptOps._
+    import ScriptOps.implicits.string2URI
+
+    val layout = LayoutUnit(
+      Map('size -> APoint(320,240)), //env
+      AreaMap.fromSeq(  //layouts
+        'icon1 -> AreaUnit(Map('point->APoint(0,0))),
+        'icon2 -> AreaUnit(Map('point->APoint(50,0))),
+        'icon3 -> AreaUnit(Map('point->APoint(100,0))),
+        'str -> AreaUnit(Map(
+          'rect->ARect(10,30,200,30),
+          'align->AAlign('x_center, 'bottom),
+          'border->ABorder,
+          'font->AFont("Terminus-ja", 'plain, 12))),
+        'str2->AreaUnit(Map('rect->ARect(10,60,200,120),
+          'font->AFont("Terminus-ja", 'plain, 12),
+          'align->AAlign('x_center, 'y_center)))
+      ))
+
+    val valuemap = Map(
+      'icon1 -> Icon("icon/icon1.png"),
+      'icon2 -> Icon("icon/icon2.png"),
+      'icon3 -> Icon("icon/icon3.png"),
+      'str -> Str("test"),
+      'str2 -> Str("a\nb\ncedf\ngiaasdasd\near"))
+
+    val d = new Drawer(layout)
+    val result = d.draw(valuemap, NullContext)
+    result.write(Resource.tempdir + "test.png")
+  }
+
 
 }
