@@ -21,8 +21,11 @@ class Texture(path: java.net.URI) extends Texturable {
   def length = size_x * size_y
 
   def getTexture(w: Int, h: Int)(idx: Int = 0): BufferedImage = {
-    if (idx < length)
-      logger.error("ファイル[%s]のテクスチャNo指定可能範囲は%dですが, %dが指定されました." format (path.toString, length, idx))
+    if (idx < length) {
+      val msg = "ファイル[%s]のテクスチャNo指定可能範囲は%dですが, %dが指定されました." format (path.toString, length, idx)
+      logger.error(msg)
+      throw new IllegalArgumentException(msg)
+    }
 
     val sx = idx % size_x
     val sy = idx / size_x // size_x > 1をどっかで保証すれ

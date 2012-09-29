@@ -65,7 +65,7 @@ class ValueExpander(exs: ExValueMap) {
           } else {
             val ids = new mutable.StringBuilder(id.toString)
             var a: Int = zerofillDigit - ids.length
-            while(a != 0) {
+            while(0 < a) {
               ids.insert(0, "0")
               a -= 1
             }
