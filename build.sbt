@@ -12,7 +12,8 @@ resolvers ++= Seq("twitter" at "http://maven.twttr.com/")
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.8" % "test",
-  "com.twitter" % "util-logging" % "5.3.12"
+  "com.twitter" % "util-logging" % "5.3.12",
+  "net.sf.opencsv" % "opencsv" % "2.0"
   //"swt" % "jface" % "3.0.1"
 )
 

@@ -1,5 +1,4 @@
-package com.github.chuwb.pictbliz
-package test
+package com.github.chuwb.pictbliz.test
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -19,12 +18,6 @@ class ScriptOpsSpec extends WordSpec with ShouldMatchers {
       Map(kvA, kvB, kvC),
       3
     )
-
-    def isSame[A, B](a: Map[A, B], b: Map[A, B]) = {
-      val forElem = a forall { kv => b(kv._1) == kv._2 }
-      val forSize = a.size == b.size
-      forElem && forSize
-    }
 
     "create valid AreaMap from fromSeq()" in {
 

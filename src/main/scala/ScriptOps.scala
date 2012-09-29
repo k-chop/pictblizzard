@@ -17,6 +17,7 @@ object ScriptOps {
   
   type AttrMap = Map[Key, Attr]
   type ValueMap = Map[Key, AValue]
+  type ExValueMap = Map[String, AnyValue]
 
   object AttrMap {
     def empty() = Map.empty[Key, Attr]
@@ -79,11 +80,17 @@ object ScriptOps {
     }
   }
 //  type AreaMap = TreeMap[Key, AreaUnit]
-  
-  sealed trait AValue
+
+  trait AnyValue
+  sealed trait AValue extends AnyValue
   case class Str(s: String) extends AValue
   case class Icon(uri: java.net.URI) extends AValue
-  case object NullValue extends AValue
+  case object NullValue extends AValue with ExValue
+  sealed trait ExValue extends AnyValue
+  case class ExStr(s: String) extends ExValue
+  case class ExRange(seq: Array[Int]) extends ExValue
+  case class ExCSV(csvpath: String, column: Int) extends ExValue
+  //case class ExDatabase() extends ExValue
 
   object LayoutUnit {
     def empty() = LayoutUnit.apply(AttrMap.empty(), AreaMap.empty())
