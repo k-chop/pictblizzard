@@ -77,6 +77,8 @@ class ValueExpander(exs: ExValueMap) {
           val ret = Icon(extractSubStrs(id, str, zfD))
           cache += ((KV(id, k), ret))
           ret
+        case NullValue =>
+          NullValue
       }
     }
   }
