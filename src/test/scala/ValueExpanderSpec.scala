@@ -105,9 +105,13 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
       val res = vmap.expand()
       val ans = Array(
         Map(
-
+          'id -> Str("1"),
+          'name -> Str("fuga"),
+          'test -> Str("fuga"),
+          'hoge -> Str("fuga")
         )
       )
+      assert(isSame(res(0), ans(0)) === true)
     }
 
   }
