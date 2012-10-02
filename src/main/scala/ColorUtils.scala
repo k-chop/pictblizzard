@@ -1,4 +1,4 @@
-package com.github.chuwb.pictbliz
+package com.github.whelmaze.pictbliz
 
 import java.awt
 

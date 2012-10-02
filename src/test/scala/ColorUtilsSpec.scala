@@ -1,6 +1,6 @@
-package com.github.chuwb.pictbliz.test
+package com.github.whelmaze.pictbliz.test
 
-import com.github.chuwb.pictbliz._
+import com.github.whelmaze.pictbliz._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 

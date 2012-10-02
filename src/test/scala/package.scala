@@ -1,4 +1,4 @@
-package com.github.chuwb.pictbliz.test
+package com.github.whelmaze.pictbliz.test
 
 object `package` {
 

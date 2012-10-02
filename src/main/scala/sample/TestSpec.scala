@@ -1,6 +1,6 @@
-package com.github.chuwb.pictbliz.sample
+package com.github.whelmaze.pictbliz.sample
 
-import com.github.chuwb.pictbliz._
+import com.github.whelmaze.pictbliz._
 
 class TestSpec {
 

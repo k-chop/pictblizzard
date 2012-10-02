@@ -1,11 +1,11 @@
-package com.github.chuwb.pictbliz.ext
+package com.github.whelmaze.pictbliz.ext
 
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import java.io.File
-import com.github.chuwb.pictbliz.{BinaryUtils, ImageUtils}
+import com.github.whelmaze.pictbliz.{BinaryUtils, ImageUtils}
 
 object PNG {
   

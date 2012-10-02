@@ -1,9 +1,9 @@
-package com.github.chuwb.pictbliz.test
+package com.github.whelmaze.pictbliz.test
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.chuwb.pictbliz.{DrawableImage, Drawer}
-import com.github.chuwb.pictbliz.ScriptOps._
+import com.github.whelmaze.pictbliz.{DrawableImage, Drawer}
+import com.github.whelmaze.pictbliz.ScriptOps._
 
 class DrawerSpec extends WordSpec with ShouldMatchers {
 

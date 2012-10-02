@@ -1,6 +1,6 @@
-package com.github.chuwb.pictbliz
+package com.github.whelmaze.pictbliz
 
-import com.github.chuwb.pictbliz.ScriptOps.LayoutUnit
+import com.github.whelmaze.pictbliz.ScriptOps.LayoutUnit
 import collection.mutable
 
 object LayoutRepository {

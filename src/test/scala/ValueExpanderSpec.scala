@@ -1,13 +1,13 @@
-package com.github.chuwb.pictbliz.test
+package com.github.whelmaze.pictbliz.test
 
-import com.github.chuwb.pictbliz._
+import com.github.whelmaze.pictbliz._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.chuwb.pictbliz.ScriptOps._
-import com.github.chuwb.pictbliz.ScriptOps.ExRange
-import com.github.chuwb.pictbliz.ScriptOps.ExStr
-import com.github.chuwb.pictbliz.ScriptOps.Str
-import com.github.chuwb.pictbliz.ScriptOps.ExCSV
+import com.github.whelmaze.pictbliz.ScriptOps._
+import com.github.whelmaze.pictbliz.ScriptOps.ExRange
+import com.github.whelmaze.pictbliz.ScriptOps.ExStr
+import com.github.whelmaze.pictbliz.ScriptOps.Str
+import com.github.whelmaze.pictbliz.ScriptOps.ExCSV
 
 class ValueExpanderSpec extends WordSpec with ShouldMatchers {
 

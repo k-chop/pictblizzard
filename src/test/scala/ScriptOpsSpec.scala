@@ -1,8 +1,8 @@
-package com.github.chuwb.pictbliz.test
+package com.github.whelmaze.pictbliz.test
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.chuwb.pictbliz.ScriptOps.{ANil, AreaUnit, AreaMap}
+import com.github.whelmaze.pictbliz.ScriptOps.{ANil, AreaUnit, AreaMap}
 import collection.immutable.IntMap
 
 class ScriptOpsSpec extends WordSpec with ShouldMatchers {
