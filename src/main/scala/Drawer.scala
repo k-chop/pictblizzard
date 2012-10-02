@@ -1,14 +1,10 @@
 package com.github.whelmaze.pictbliz
 
-import ext.PNG
-import javax.swing
-import java.awt.{ Font, Color, Graphics2D }
-import java.awt.font._
-import java.awt.image.{ BufferedImage }
-import javax.imageio.{ ImageIO }
-import java.io.{ File }
+import java.awt.{ Font, Color }
+import java.awt.image.BufferedImage
 
-import ScriptOps._
+import scriptops._
+import scriptops.Attrs._
 
 object Drawer {
   val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 12)
@@ -111,7 +107,6 @@ class DrawableImage(img: BufferedImage) {
   }
 
   def stringImage(str: String, attrmap: AttrMap): ResultImage = {
-    import scala.util.control.Exception._
 
     val font = attrmap.get('font) map { attr =>
       val AFont(name, style, pt, _) = attr

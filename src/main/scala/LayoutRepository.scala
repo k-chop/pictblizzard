@@ -1,7 +1,8 @@
 package com.github.whelmaze.pictbliz
 
-import com.github.whelmaze.pictbliz.ScriptOps.LayoutUnit
 import collection.mutable
+
+import scriptops.Attrs._
 
 object LayoutRepository {
   def empty() = new LayoutRepository(Map())

@@ -1,7 +1,6 @@
 package com.github.whelmaze.pictbliz
 
-import java.awt.{ Font, Color, Graphics2D }
-import java.awt.image.{ BufferedImage }
+import java.awt.image.BufferedImage
 
 trait Texturable {
   def length: Int

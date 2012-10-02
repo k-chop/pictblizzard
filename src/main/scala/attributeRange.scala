@@ -1,7 +1,5 @@
 package com.github.whelmaze.pictbliz
 
-import ScriptOps._
-
 object ControlChar {
 
   def build(c: Char, idx: Int): ControlChar = c match {

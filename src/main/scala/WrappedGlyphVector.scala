@@ -1,13 +1,9 @@
 package com.github.whelmaze.pictbliz
 
-import java.awt.{ Font, Color, Graphics2D }
-import java.awt.image.{ BufferedImage }
-import javax.imageio.{ ImageIO }
-import java.io.{ File }
-import java.awt.font.{ GlyphVector }
+import java.awt.font.GlyphVector
 import java.awt.geom.{ Point2D, Rectangle2D }
 
-import ScriptOps._
+import scriptops.Attrs._
 
 object WrappedGlyphVector {
   

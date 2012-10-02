@@ -1,6 +1,5 @@
 package com.github.whelmaze.pictbliz
 
-
 object Extractors {
 
   import java.awt.geom.Rectangle2D

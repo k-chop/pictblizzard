@@ -3,11 +3,8 @@ package com.github.whelmaze.pictbliz.test
 import com.github.whelmaze.pictbliz._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.whelmaze.pictbliz.ScriptOps._
-import com.github.whelmaze.pictbliz.ScriptOps.ExRange
-import com.github.whelmaze.pictbliz.ScriptOps.ExStr
-import com.github.whelmaze.pictbliz.ScriptOps.Str
-import com.github.whelmaze.pictbliz.ScriptOps.ExCSV
+
+import scriptops.Attrs._
 
 class ValueExpanderSpec extends WordSpec with ShouldMatchers {
 
@@ -119,7 +116,7 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
     }
 
     "expand ExIcon(no zerofill)" in {
-      import ScriptOps.implicits.string2URI
+      import scriptops.implicits.string2URI
       val vmap = new ValueExpander(Map(
         "id" -> ExRange(1 to 2 toArray),
         "icon" -> ExIcon("icon/icon${id}.png")
@@ -140,7 +137,7 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
     }
 
     "expand ExIcon(with zerofill)" in {
-      import ScriptOps.implicits.string2URI
+      import scriptops.implicits.string2URI
       val vmap = new ValueExpander(Map(
         "id" -> ExRange(1 to 1 toArray),
         "icon1" -> ExIcon("icon/icon${id}${ext}", zerofillDigit = 1),

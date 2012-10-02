@@ -1,10 +1,12 @@
 package com.github.whelmaze.pictbliz.sample
 
 import com.github.whelmaze.pictbliz._
+import scriptops.Attrs._
+import scriptops._
 
 class TestSpec {
 
-  import ScriptOps.implicits.string2URI
+  import scriptops.implicits.string2URI
   
   def run() {
     testReuseLayout()
@@ -12,7 +14,6 @@ class TestSpec {
   }
 
   def testReuseLayout() {
-    import ScriptOps._
 
     val fontsetting = 'font -> AFont("ＭＳ ゴシック", 'plain, 12)
     val repo = LayoutRepository.empty()
@@ -92,8 +93,6 @@ class TestSpec {
   }
 
   def testOldSpec() {
-    import ScriptOps._
-    import ScriptOps.implicits.string2URI
 
     val layout = LayoutUnit(
       Map('size -> APoint(320,240)), //env

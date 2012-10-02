@@ -1,12 +1,10 @@
 package com.github.whelmaze.pictbliz
 
 import java.awt.{ Font, Color, Graphics2D }
-import java.awt.font.{ GlyphVector }
-import java.awt.image.{ BufferedImage }
-import javax.imageio.{ ImageIO }
-import java.io.{ File }
+import java.awt.font.GlyphVector
+import java.awt.image.BufferedImage
 
-import ScriptOps._
+import scriptops.Attrs._
 
 object StrGraphics {
   
@@ -71,7 +69,7 @@ class StrGraphics(val g2d: Graphics2D,
         val ARect(_, _, w, h) = attrmap('rect)
         (w, h)
       } else (0, 0)
-      
+
       val Extractors.Rect2DALL(x, y, w2, h2) = v.getFixedWholeLogicalBounds
       
       if (hasAutoexp || !hasRect) { // どちらか大きい方に拡大される

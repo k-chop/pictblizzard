@@ -1,12 +1,10 @@
 package com.github.whelmaze.pictbliz
 
-import java.awt.{ Font, Color, Graphics2D }
-import java.awt.font.{ GlyphVector }
-import java.awt.image.{ BufferedImage }
-import javax.imageio.{ ImageIO }
-import java.io.{ File }
+import java.awt.Color
+import java.awt.image.BufferedImage
 
-import ScriptOps._
+import scriptops._
+import scriptops.Attrs._
 
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
@@ -23,7 +21,7 @@ class TextStyler(val origimg: BufferedImage,
         SystemGraphics.default
     }
   }
-  var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)];
+  var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
   val debug = attrmap.contains('debug)
   
   def process(): BufferedImage = {
@@ -100,10 +98,11 @@ class TextStyler(val origimg: BufferedImage,
   // ふちどりする
   // def hem() = {}
   
-  def bordered(c: Color) = {
+  def bordered(c: Color): BufferedImage = {
     val g2d = origimg.createGraphics
     g2d.setPaint(c)
     g2d.drawRect(0, 0, origimg.getWidth-1, origimg.getHeight-1)
+    origimg
   }
 
   

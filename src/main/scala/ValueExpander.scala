@@ -1,10 +1,11 @@
 package com.github.whelmaze.pictbliz
 
 import collection.mutable
-import ScriptOps._
 import collection.immutable.HashMap
 import au.com.bytecode.opencsv.CSVReader
 import java.io.FileReader
+
+import scriptops.Attrs._
 
 class ValueExpander(exs: ExValueMap) {
   case class KV(id: Int, k: Key)
@@ -51,7 +52,7 @@ class ValueExpander(exs: ExValueMap) {
   }
 
   def expandWithId(id: Int, k: Key, exv: ExValue, zerofillDigit: Int = 0): AValue = {
-    import ScriptOps.implicits.string2URI
+    import scriptops.implicits.string2URI
 
     cache.get(KV(id, k)) getOrElse {
       exv match {
@@ -94,10 +95,14 @@ class ValueExpander(exs: ExValueMap) {
           expandWithId(id, Symbol(name), v, zerofillDigit) match {
             // other case
             case Str(s) => s
+            case Icon(p) => p.toString
+            case NullValue => ""
           }
         case v: AValue => v match {
           // other case
           case Str(s) => s
+          case Icon(p) => p.toString
+          case NullValue => ""
         }
       }
       str = str.replace(m.matched, replaceTo)

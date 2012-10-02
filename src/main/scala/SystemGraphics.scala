@@ -1,7 +1,5 @@
 package com.github.whelmaze.pictbliz
 
-import ext.PNG
-import java.awt.{ Font, Color, Graphics2D }
 import java.awt.image.{ BufferedImage, AffineTransformOp }
 import java.awt.geom.AffineTransform
 

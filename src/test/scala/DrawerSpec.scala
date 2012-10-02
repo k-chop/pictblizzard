@@ -3,7 +3,7 @@ package com.github.whelmaze.pictbliz.test
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.github.whelmaze.pictbliz.{DrawableImage, Drawer}
-import com.github.whelmaze.pictbliz.ScriptOps._
+import com.github.whelmaze.pictbliz.scriptops.Attrs._
 
 class DrawerSpec extends WordSpec with ShouldMatchers {
 

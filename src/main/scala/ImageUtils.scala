@@ -36,7 +36,7 @@ object ImageUtils {
     val dest = newImage(src.getWidth, src.getHeight)
     val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferByte].getData
     val destPixel = (dest.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
-    val cm = src.getColorModel()
+    val cm = src.getColorModel
     for (i <- 0 until srcPixel.length) {
       destPixel(i) = (0xff000000|0x00ffffff&(cm.getRGB(srcPixel(i)))) 
     }
@@ -59,9 +59,9 @@ object ImageUtils {
     val targetPixel = (target.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
 
     for {
-      idy <- 0 until src.getHeight;
-      dy = idy * src.getWidth;
-      idx <- 0 until src.getWidth;
+      idy <- 0 until src.getHeight
+      dy = idy * src.getWidth
+      idx <- 0 until src.getWidth
       i = dy + idx
       if srcPixel(i) == maskcolor
     } {
