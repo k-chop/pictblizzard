@@ -13,7 +13,7 @@ object WrappedGlyphVector {
 
 }
 
-class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val ascent: Float) {
+class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val ascent: Float) {
 
   private[this] val rectAll: ARect =
     attrmap.get('rect) collect {
@@ -25,8 +25,9 @@ class WrappedGlyphVector(val v: GlyphVector, attrmap: AttrMap, newlineCode: Int,
   def self = v
 
   def process(): WrappedGlyphVector = {
-    def call(pname: Symbol, f: Attr => WrappedGlyphVector, guard: => Boolean = true) =
+    def call(pname: Symbol, f: Attr => WrappedGlyphVector, guard: => Boolean = true) {
       if (guard) attrmap.get(pname) foreach { f }
+    }
     
     this.newlined()
 
