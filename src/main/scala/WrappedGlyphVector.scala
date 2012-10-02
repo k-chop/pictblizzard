@@ -50,7 +50,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     this
   }
 
-  private[this] def interval(attr: Attr): WrappedGlyphVector = {
+  private def interval(attr: Attr): WrappedGlyphVector = {
     val AInterval(xparam, yparam) = attr
     if (xparam > 0)
       x_interval(xparam)
@@ -59,7 +59,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     this
   }
   
-  private[this] def x_interval(p: Int) = {
+  private def x_interval(p: Int) = {
     
     for (idx <- 1 until v.getNumGlyphs) {
       if (v.getGlyphCode(idx - 1) != newlineCode) { // 前が改行の場合移動する必要なし
@@ -71,7 +71,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     }
   }
 
-  private[this] def y_interval(p: Int) = {
+  private def y_interval(p: Int) = {
     var nlcount = 0
     
     for (idx <- 1 until v.getNumGlyphs) {
@@ -83,7 +83,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     }
   }
   
-  private[this] def align(attr: Attr): WrappedGlyphVector = {
+  private def align(attr: Attr): WrappedGlyphVector = {
     val AAlign(xparam, yparam) = attr
     
     val ARect(_, _, width, height) = rectAll
@@ -101,7 +101,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     this
   }
 
-  private[this] def movex(begin: Int, end: Int, diffx: Double) = {
+  private def movex(begin: Int, end: Int, diffx: Double) = {
     for (idx <- begin until end) {
       val oldpos = v.getGlyphPosition(idx)
       val newpos = new Point2D.Double(oldpos.getX + diffx, oldpos.getY)
@@ -109,7 +109,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     }
   }
   
-  private[this] def alignXRight(width: Int) = {
+  private def alignXRight(width: Int) = {
     
     def recur(lf: Int, nl: Int) {
       if (nl != -1) {
@@ -127,7 +127,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     recur(0, nextNewline(0))
   }
 
-  private[this] def alignXCenter(width: Int) = {
+  private def alignXCenter(width: Int) = {
     val ARect(_, _, w, h) = rectAll
     def recur(lf: Int, nl: Int) {
       if (nl != -1) {
@@ -145,7 +145,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     recur(0, nextNewline(0))
   }
 
-  private[this] def movey(begin: Int, end: Int, diffy: Double) = {
+  private def movey(begin: Int, end: Int, diffy: Double) = {
     for (idx <- begin until end) {
       val oldpos = v.getGlyphPosition(idx)
       val newpos = new Point2D.Double(oldpos.getX, oldpos.getY + diffy)
@@ -153,7 +153,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     }
   }
   
-  private[this] def alignYBottom(height: Int) = {
+  private def alignYBottom(height: Int) = {
     val glb = v.getGlyphLogicalBounds(v.getNumGlyphs - 1).getBounds
     val gp = v.getGlyphPosition(v.getNumGlyphs - 1)
     val diff = height - (gp.getY + glb.getHeight)
@@ -161,7 +161,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     if (diff > 0) movey(0, v.getNumGlyphs, diff)
   }
 
-  private[this] def alignYCenter(height: Int) = {
+  private def alignYCenter(height: Int) = {
     val ARect(_, _, _, h) = rectAll
     val fixedRect = getFixedLogicalBounds(0, v.getNumGlyphs)
     val diff = (h - fixedRect.getHeight) / 2
@@ -172,11 +172,11 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   /** 
   * 次の改行の位置をさがす。なければ-1を返すよ。Optionにした方がよくね
   */ 
-  private[this] def nextNewline(from: Int): Int = {
+  private def nextNewline(from: Int): Int = {
     (codes.view drop (from) find { _._2 == newlineCode } getOrElse((-1,0)) )._1
   }
 
-  private[this] def padding(attr: Attr): WrappedGlyphVector = {
+  private def padding(attr: Attr): WrappedGlyphVector = {
 
     val APadding(xparam, yparam) = attr
     
@@ -197,7 +197,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     this
   }
   
-  private[this] def x_padding(dir: Symbol, p: Int) {
+  private def x_padding(dir: Symbol, p: Int) {
     val diff = dir match {
       case 'left => p
       case 'right => -p
@@ -205,7 +205,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     movex(0, v.getNumGlyphs, diff)
   }
   
-  private[this] def y_padding(dir: Symbol, p: Int) {
+  private def y_padding(dir: Symbol, p: Int) {
     val diff = dir match {
       case 'top => p
       case 'bottom => -p

@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage
 import scriptops.Attrs._
 
 object StrGraphics {
-  
+
     def initGraphics2D(g: Graphics2D, font: Font) {
     import java.awt.RenderingHints._
     // アンチエイリアス。設定によって変更可能にするかも。その場合AttrMapを読んで変える。
@@ -18,7 +18,7 @@ object StrGraphics {
     g.setColor(Color.white)
     g.setFont(font)
   }
-  
+
 }
 
 /** 
@@ -34,24 +34,30 @@ class StrGraphics(val g2d: Graphics2D,
 
   val strAttrib = new AttributedText(_str)
   val str = strAttrib.str
-  
+
   def getNewlineCode: Int = {
     val frc = g2d.getFontRenderContext
     val v = font.createGlyphVector(frc, "\n")
     v.getGlyphCode(0)
   }
-  
-  def processImage(): BufferedImage = {
-    StrGraphics.initGraphics2D(g2d, font)
 
+  def getWrappedGlyphVector: WrappedGlyphVector = {
+    StrGraphics.initGraphics2D(g2d, font)
     val frc = g2d.getFontRenderContext
     val lm = font.getLineMetrics(str, frc)
+    new WrappedGlyphVector(generateGlyphVector(), attrmap, getNewlineCode, lm.getAscent)
+  }
 
-    val v = new WrappedGlyphVector( generateGlyphVector(), attrmap, getNewlineCode, lm.getAscent )
+  def processImage(): BufferedImage = {
+    val v = getWrappedGlyphVector
     val processedVector = v.process()
     val bufimage = generateImage( processedVector )
     val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
     styler.process()
+  }
+
+  def dispose() {
+    g2d.dispose()
   }
 
   /** 

@@ -1,17 +1,10 @@
 package com.github.whelmaze.pictbliz
 
-import java.awt.{ Font, Color, Graphics2D }
-import java.awt.font.{ GlyphVector }
-import java.awt.image.{ BufferedImage }
-import javax.imageio.{ ImageIO }
-import java.io.{ File }
-import java.nio.ByteBuffer
-import java.io.FileInputStream
-import java.nio.channels.FileChannel
-import java.awt.image.DataBufferInt
-import java.awt.image.DataBufferByte
+import java.awt.image.{BufferedImage, DataBufferInt, DataBufferByte}
 
 object ImageUtils {
+
+
 
   def newImage(w: Int, h: Int): BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)

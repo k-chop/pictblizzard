@@ -107,22 +107,26 @@ class DrawableImage(img: BufferedImage) {
   }
 
   def stringImage(str: String, attrmap: AttrMap): ResultImage = {
+    val strgraphics = getStrGraphics(str, attrmap)
+    val result = strgraphics.processImage()
+    strgraphics.dispose()
+    ResultImage(findBeginPoint(attrmap), result)
+  }
 
+  def getStrGraphics(str: String, attrmap: AttrMap): StrGraphics = {
     val font = attrmap.get('font) map { attr =>
       val AFont(name, style, pt, _) = attr
-      new Font(name, extractStyle(style), pt.toInt)
+      new Font(name, extractStyle(style), pt)
     } getOrElse {
       logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
       Drawer.DEFAULT_FONT
     }
 
     val g2d = img.createGraphics
-    val strimg = new StrGraphics(g2d, str, font, attrmap).processImage()
-    g2d.dispose()
-    ResultImage(findBeginPoint(attrmap), strimg)
+    new StrGraphics(g2d, str, font, attrmap)
   }
 
-  private[this] def extractStyle(s: Symbol): Int = s match {
+  private def extractStyle(s: Symbol): Int = s match {
     case 'plain => Font.PLAIN
     case 'bold => Font.BOLD
     case 'italic => Font.ITALIC
