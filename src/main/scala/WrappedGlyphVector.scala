@@ -5,13 +5,6 @@ import java.awt.geom.{ Point2D, Rectangle2D }
 
 import scriptops.Attrs._
 
-object WrappedGlyphVector {
-  
-  object implicits {
-    implicit def wrapped2rawGlyphVector(v: WrappedGlyphVector) = v.self
-  }
-
-}
 
 class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val ascent: Float) {
 
