@@ -2,6 +2,7 @@ package com.github.whelmaze.pictbliz
 
 import java.awt.font.GlyphVector
 import java.awt.geom.{ Point2D, Rectangle2D }
+import scala.math.{ max, min }
 
 import scriptops.Attrs._
 
@@ -222,21 +223,20 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   * 実装がひどい、これもうちょっとどうにかする
   */ 
   def getFixedLogicalBounds(begin: Int, end: Int): Rectangle2D = {
-    import scala.math.{ max, min }
-    val init = (Double.MaxValue, Double.MaxValue,
-                Double.MinValue, Double.MinValue)
-    
-    (begin until end map { idx: Int =>
-      val rect = v.getGlyphLogicalBounds(idx).getBounds
-      (rect.getX, rect.getY, rect.getX + rect.getWidth, rect.getY + rect.getHeight)
-    }).foldLeft(init){ case ((oa,ob,oc,od),(na,nb,nc,nd)) =>
-      (min(oa,na), min(ob,nb), max(oc,nc), max(od,nd))
-    } match {
-      case `init` =>
-        new Rectangle2D.Double(0, 0, 1, 1) // minimum
-      case (x1, y1, x2, y2) =>
-        new Rectangle2D.Double(x1, y1, x2-x1, y2-y1)
-    }    
+    require(begin < end, "begin(%d) must less than end(%d)" format (begin, end))
+
+    var idx = begin
+    var (lx, ly, rx, ry) = (Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)
+    while(idx < end) {
+      val r = v.getGlyphLogicalBounds(idx).getBounds
+      lx = min(lx, r.getX)
+      ly = min(ly, r.getY)
+      rx = max(rx, r.getX + r.getWidth)
+      ry = max(ry, r.getY + r.getHeight)
+      idx += 1
+    }
+    new Rectangle2D.Double(lx, ly, rx-lx, ry-ly)
+
   }
 
 }
