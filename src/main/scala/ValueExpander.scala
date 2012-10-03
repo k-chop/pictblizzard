@@ -8,10 +8,13 @@ import java.io.FileReader
 import scriptops.Attrs._
 
 class ValueExpander(exs: ExValueMap) {
+
   case class KV(id: Int, k: Key)
-  //val cache = new mutable.MapBuilder[KV, AValue, HashMap[KV, AValue]](new HashMap[KV, AValue])
+
   val cache = new mutable.WeakHashMap[KV, AValue]
+
   val cvsCache = new mutable.WeakHashMap[String, Array[Array[String]]]
+
   def getCVSData(path: String): Array[Array[String]] = {
     val aas = if (cvsCache.contains(path))  {
       cvsCache(path)
@@ -58,7 +61,7 @@ class ValueExpander(exs: ExValueMap) {
       exv match {
         case ExStr(str) =>
           val ret = Str(extractSubStrs(id, str))
-          cache.+=((KV(id, k), ret))
+          cache += (KV(id, k) -> ret)
           ret
         case ExRange(_) =>
           if (zerofillDigit == 0) {
@@ -73,10 +76,12 @@ class ValueExpander(exs: ExValueMap) {
             Str(ids.toString())
           }
         case ExCSV(path, col) =>
-          Str(getCVSData(path)(id)(col))
+          val ret = Str(getCVSData(path)(id)(col))
+          cache += (KV(id, k) -> ret)
+          ret
         case ExIcon(str, zfD) =>
           val ret = Icon(extractSubStrs(id, str, zfD))
-          cache += ((KV(id, k), ret))
+          cache += (KV(id, k) -> ret)
           ret
         case NullValue =>
           NullValue

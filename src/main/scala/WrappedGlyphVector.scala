@@ -220,8 +220,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   * GlyphVector#getLogicalBoundsはsetGlyphPositionで
   * Glyphの位置を動かした後だと正しい位置を返してくれないので自前で計算する。
   * [begin, end)間のすべてのGlyphを完全に含む矩形を返す。
-  * 実装がひどい、これもうちょっとどうにかする
-  */ 
+  */
   def getFixedLogicalBounds(begin: Int, end: Int): Rectangle2D = {
     require(begin < end, "begin(%d) must less than end(%d)" format (begin, end))
 
@@ -236,7 +235,6 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
       idx += 1
     }
     new Rectangle2D.Double(lx, ly, rx-lx, ry-ly)
-
   }
 
 }
