@@ -30,6 +30,7 @@ class Drawer(layout: LayoutUnit) {
 
 class DrawableImage(img: BufferedImage) {
 
+  // 描画位置と描画するImageを持つ
   case class ResultImage(pos: (Int, Int), img: BufferedImage)
   
   def clear(c: Color) = {
@@ -45,6 +46,8 @@ class DrawableImage(img: BufferedImage) {
     val frontImage = Option(target) map {
       case Icon(url) =>
         iconImage(url, areaunit.attrmap)
+      case FaceGraphic(uri, no) =>
+        faceImage(uri, no, areaunit.attrmap)
       case Str(s)  =>
         stringImage(s, areaunit.attrmap)
       case NullValue =>
@@ -52,7 +55,7 @@ class DrawableImage(img: BufferedImage) {
     }
 
     val (fx, fy, exSize) = frontImage map {
-      case ResultImage((x, y), target) => (x, y, (target.getWidth, target.getHeight))
+      case ResultImage((x, y), tgt) => (x, y, (tgt.getWidth, tgt.getHeight))
     } getOrElse((0, 0, (1, 1)))
 
     val bgkind = AttrMap.findParam(areaunit.attrmap, 'tile, 'background, 'window)
@@ -64,10 +67,10 @@ class DrawableImage(img: BufferedImage) {
 
     val g = img.createGraphics
     bgImage foreach {
-      case ResultImage(_, target) => g.drawImage(target, null, fx, fy)
+      case ResultImage(_, tgt) => g.drawImage(tgt, null, fx, fy)
     }
     frontImage foreach {
-      case ResultImage((x, y), target) => g.drawImage(target, null, x, y)
+      case ResultImage((x, y), tgt) => g.drawImage(tgt, null, x, y)
     }
     g.dispose()
   }
@@ -79,9 +82,9 @@ class DrawableImage(img: BufferedImage) {
     } getOrElse (0, 0)
   }
 
-  def backgroundImage(size: (Int, Int), attr: Attr): ResultImage = null
+  def backgroundImage(size: (Int, Int), attr: Attr): ResultImage = sys.error("not implemented")
 
-  def tileImage(size: (Int, Int), attr: Attr): ResultImage = null
+  def tileImage(size: (Int, Int), attr: Attr): ResultImage = sys.error("not implemented")
 
   def windowImage(size: (Int, Int), attr: Attr): ResultImage = {
     val sysg = attr match {
@@ -104,6 +107,10 @@ class DrawableImage(img: BufferedImage) {
   def iconImage(path: java.net.URI, attrmap: AttrMap): ResultImage = {
     val icon: BufferedImage = ext.PNG.read(path)
     ResultImage(findBeginPoint(attrmap), icon)
+  }
+
+  def faceImage(path: java.net.URI, no: Int, attrmap: AttrMap): ResultImage = {
+    sys.error("not implemented")
   }
 
   def stringImage(str: String, attrmap: AttrMap): ResultImage = {

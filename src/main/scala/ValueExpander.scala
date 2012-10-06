@@ -90,6 +90,12 @@ class ValueExpander(exs: ExValueMap) {
   }
 
   def extractSubStrs(id: Int, _str: String, zerofillDigit: Int = 0): String = {
+    val pf: PartialFunction[AValue, String] = {
+      case Str(s) => s
+      case Icon(p) => p.toString
+      case FaceGraphic(p, n) => p.toString + ":" + n.toString
+      case NullValue => ""
+    }
     var str = _str
     val reg = """\$\{(\w+)\}""".r
     reg.findAllIn(str).matchData foreach { m =>
@@ -97,18 +103,9 @@ class ValueExpander(exs: ExValueMap) {
       val replaceTo = exs(name) match {
         //case v: ExValue if name == "id" => id.toString
         case v: ExValue =>
-          expandWithId(id, Symbol(name), v, zerofillDigit) match {
-            // other case
-            case Str(s) => s
-            case Icon(p) => p.toString
-            case NullValue => ""
-          }
-        case v: AValue => v match {
-          // other case
-          case Str(s) => s
-          case Icon(p) => p.toString
-          case NullValue => ""
-        }
+          pf( expandWithId(id, Symbol(name), v, zerofillDigit) )
+        case v: AValue =>
+          pf (v)
       }
       str = str.replace(m.matched, replaceTo)
     }

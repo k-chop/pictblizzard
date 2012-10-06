@@ -1,7 +1,7 @@
 package com.github.whelmaze.pictbliz.scriptops
 
-import collection.immutable.IntMap
-import collection.mutable
+
+import java.net.URI
 
 object Values {
 
@@ -22,7 +22,9 @@ object Attrs {
 
   case class Str(s: String) extends AValue
 
-  case class Icon(uri: java.net.URI) extends AValue
+  case class Icon(uri: URI) extends AValue
+
+  case class FaceGraphic(uri: URI, no: Int) extends AValue
 
   case object NullValue extends AValue with ExValue
 
@@ -48,7 +50,7 @@ object Attrs {
   }
 
   // attr_name
-  // class difinition
+  // class definition
 
   // point
   case class APoint(x: Int, y: Int) extends Attr
