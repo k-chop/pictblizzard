@@ -169,10 +169,10 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     
     if (diff > 0) movey(0, v.getNumGlyphs, diff)
   }
-  
-  /** 
+
+  /**
   * 次の改行の位置をさがす。なければ-1を返すよ。Optionにした方がよくね
-  */ 
+  */
   private def nextNewline(from: Int): Int = {
     (codes.view drop (from) find { _._2 == newlineCode } getOrElse((-1,0)) )._1
   }
@@ -222,7 +222,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   * [begin, end)間のすべてのGlyphを完全に含む矩形を返す。
   */
   def getFixedLogicalBounds(begin: Int, end: Int): Rectangle2D = {
-    require(begin < end, "begin(%d) must less than end(%d)" format (begin, end))
+    require(begin < end, "begin(%d) must be less than end(%d)" format (begin, end))
 
     var idx = begin
     var (lx, ly, rx, ry) = (Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)
