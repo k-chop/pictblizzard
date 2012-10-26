@@ -8,7 +8,9 @@ scalaVersion := "2.9.2"
 
 //parallelExecution in Test := false
 
-resolvers ++= Seq("twitter" at "http://maven.twttr.com/")
+resolvers ++= Seq("twitter" at "http://maven.twttr.com/",
+                  //"Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+                  "Sonatype OSS releases" at "https://oss.sonatype.org/content/repositories/releases")
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.8" % "test",
