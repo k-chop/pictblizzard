@@ -8,7 +8,9 @@ import scriptops.Attrs._
 
 object StrGraphics {
 
-    def initGraphics2D(g: Graphics2D, font: Font) {
+  val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 12)
+
+  def initGraphics2D(g: Graphics2D, font: Font) {
     import java.awt.RenderingHints._
     // アンチエイリアス。設定によって変更可能にするかも。その場合AttrMapを読んで変える。
     // VALUE_TEXT_ANTIALIAS_GASP = ビットマップがあるならアンチなしでそれ使う。
@@ -19,18 +21,35 @@ object StrGraphics {
     g.setFont(font)
   }
 
+  def build(str: String, attrmap: AttrMap): StrGraphics = {
+    def extractStyle(s: Symbol): Int = s match {
+      case 'plain => Font.PLAIN
+      case 'bold => Font.BOLD
+      case 'italic => Font.ITALIC
+      case 'bolditalic => Font.BOLD | Font.ITALIC
+      case n => logger.warning("不明なフォントスタイルです: "+n+"\nデフォルトのスタイルを使用します."); Font.PLAIN
+    }
+
+    val font = attrmap.get('font) map { attr =>
+      val AFont(name, style, pt, _) = attr
+      new Font(name, extractStyle(style), pt)
+    } getOrElse {
+      logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
+      DEFAULT_FONT
+    }
+
+    new StrGraphics(str, font, attrmap)
+  }
+
+
 }
 
-/** 
-* StrGraphics
-* 
-* 渡されるGraphics2DはFontRenderContext構築のためのものなので描画はしない
-*/
-class StrGraphics(val g2d: Graphics2D,
-                  _str: String,
+class StrGraphics(_str: String,
                   val font: Font,
                   val attrmap: AttrMap)
 {
+  val g2d = ImageUtils.newImage(1, 1).createGraphics
+  StrGraphics.initGraphics2D(g2d, font)
 
   val strAttrib = new AttributedText(_str)
   val str = strAttrib.str

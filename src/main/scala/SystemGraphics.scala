@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform
 
 object SystemGraphics {
 
+  // 見つからなかった場合どこに責任負わせんの
   def fromPath(path: java.net.URI): SystemGraphics = {
     new SystemGraphics(path)
   }
