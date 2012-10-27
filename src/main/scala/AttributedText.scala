@@ -16,7 +16,7 @@ class AttributedText(val rawstr: String) {
     val addedsource = reseter + source + reseter
 
     @scala.annotation.tailrec
-    def rec(trimmed: String, start: Int, diff: Int): Unit = {
+    def rec(trimmed: String, start: Int, diff: Int) {
       val re = """\\([a-z])\[(\d+)\]([^\\]*)\\""".r
       val matchResult = re.findFirstMatchIn(trimmed)
       if (matchResult.isDefined) {

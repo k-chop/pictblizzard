@@ -18,7 +18,7 @@ object Attrs {
 
   trait AnyValue
 
-  sealed trait AValue extends AnyValue
+  sealed trait AValue extends AnyValue with Drawable
 
   case class Str(s: String) extends AValue
 
@@ -83,17 +83,18 @@ object Attrs {
   case class ASystemGraphics(path: String) extends Attr
 
   // front_color or back_color
-  case class ASingleColors(colors: Array[String]) extends Attr {
-    def this(strs: String*) = {
-      this(strs.toArray)
-    }
-  }
+  case class ASingleColors(colors: Array[String]) extends Attr
 
-  case class ATile() extends Attr
+  // size
+  case class ASize(w: Int, h: Int) extends Attr
 
-  case class ABackground() extends Attr
+  sealed trait Drawable
 
-  case class AWindow(systemGraphicsPath: String) extends Attr
+  case class ATile() extends Attr with Drawable
+
+  case class ABackground() extends Attr with Drawable
+
+  case class AWindow(systemGraphicsPath: String) extends Attr with Drawable
 
 
   sealed trait FontLang

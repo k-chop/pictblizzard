@@ -29,8 +29,7 @@ class WrappedGlyphVectorSpec extends WordSpec with ShouldMatchers with BeforeAnd
   )
 
   def testWrappedGlyphVector(f: WrappedGlyphVector => Unit) {
-    val img = new DrawableImage(ImageUtils.newImage(320, 240))
-    val strG = img.getStrGraphics(alphabets, amap)
+    val strG = StrGraphics.build(alphabets, amap)
     val wgv = strG.getWrappedGlyphVector
     f(wgv)
     strG.dispose()

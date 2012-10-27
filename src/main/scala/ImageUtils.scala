@@ -30,7 +30,7 @@ object ImageUtils {
     val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferByte].getData
     val destPixel = (dest.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
     val cm = src.getColorModel
-    for (i <- 0 until srcPixel.length) {
+    (0 until srcPixel.length) foreach { i =>
       destPixel(i) = (0xff000000|0x00ffffff&(cm.getRGB(srcPixel(i)))) 
     }
     dest
@@ -39,8 +39,10 @@ object ImageUtils {
   def enableAlpha(src: BufferedImage, transColor: Int): BufferedImage = {
     val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
 
-    for (i <- 0 until srcPixel.length if srcPixel(i) == transColor)
-      srcPixel(i) = 0x0
+    (0 until srcPixel.length) foreach { i =>
+      if (srcPixel(i) == transColor)
+        srcPixel(i) = 0x0
+    }
     src
   }
   
