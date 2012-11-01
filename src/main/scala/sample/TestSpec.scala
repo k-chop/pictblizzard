@@ -9,9 +9,9 @@ class TestSpec {
 
   val strdef = Map('interval -> AInterval(0, 3),
                    'padding -> APadding(8, 10))
-  val msgo = strdef + ('font -> AFont("ＭＳ ゴシック", 'plain, 12))
-  val meiryo = strdef + ('font -> AFont("MS UI Gothic", 'bold, 12))
-
+  def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain) = {
+    strdef + ('font -> AFont(font, style, size))
+  }
 
 
   def run() {
@@ -28,10 +28,10 @@ class TestSpec {
       "itemno" -> ExCSV(path, 0),
       "name" -> ExCSV(path, 1),
       "win" -> ExStr(""),
-      "t_price" -> ExCSV(path, 2),
+      "t_price" -> ExCSV(path, 2), "t_desc" -> ExCSV(path, 3), "t_kind" -> ExCSV(path, 4), "t_atk" -> ExCSV(path, 6), "t_hit" -> ExCSV(path, 15),
       "price" -> ExStr("${t_price} \\c[4]G\\c[0]"),
-      "t_desc" -> ExCSV(path, 3),
       "desc" -> ExStr("\\c[2]${t_desc}\\c[0]"),
+      "misc" -> ExStr("攻撃${t_atk}, 命中率:${t_hit}, ${t_kind}武器"),
       "filename" -> ExStr("${itemno}-${name}.png")
     )).expand()
     val layout = LayoutUnit(
@@ -43,13 +43,18 @@ class TestSpec {
           'front_color -> ASystemGraphics("system6.png"))),
         'name -> AreaUnit(Map(
           'point -> APoint(0, 0)
-        ) ++ meiryo),
+        ) ++ stdstyle(style='bold)),
         'price -> AreaUnit(Map(
-          'point -> APoint(160, 0)
-        ) ++ msgo),
+          'rect -> ARect(160, 0, 150, 30),
+          'align -> AAlign('right, 'top)
+        ) ++ stdstyle()),
         'desc -> AreaUnit(Map(
-          'point -> APoint(10, 20)
-        ) ++ msgo)
+          'point -> APoint(10, 18)
+        ) ++ stdstyle()),
+        'misc -> AreaUnit(Map(
+          'rect -> ARect(10, 40, 310, 40),
+          'align -> AAlign('right, 'bottom)
+        ) ++ stdstyle(size=12))
       )
     )
     val d = new Drawer(layout)
@@ -95,14 +100,14 @@ class TestSpec {
       Map('size -> ASize(320, 240)),
       AreaMap.fromSeq(
       'name->AreaUnit(Map('rect -> ARect(5,0,300,13)
-                                ) ++ msgo),
+                                ) ++ stdstyle()),
       'icon->AreaUnit(Map('rect -> ARect(280,0,32,32)
-                                ) ++ msgo),
+                                ) ++ stdstyle()),
       'desc->AreaUnit(Map('point -> ARect(0, 20, 12, 2),
                                 'window -> AWindow("system6.png"),
                                 'auto_expand -> AAutoExpand,
                                 'front_color -> ASystemGraphics("system6.png")
-                         ) ++ msgo),
+                         ) ++ stdstyle()),
       'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
     )
