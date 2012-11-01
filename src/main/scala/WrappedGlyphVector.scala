@@ -201,6 +201,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     val diff = dir match {
       case 'left => p
       case 'right => -p
+      case 'x_center => 0
     }
     movex(0, v.getNumGlyphs, diff)
   }
@@ -209,6 +210,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     val diff = dir match {
       case 'top => p
       case 'bottom => -p
+      case 'y_center => 0
     }
     movey(0, v.getNumGlyphs, diff)
   }
