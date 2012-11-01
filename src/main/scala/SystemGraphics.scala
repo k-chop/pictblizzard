@@ -33,7 +33,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
   
   lazy val pltezero: Int = {
     val res = ext.PNG.transparentColor(path.getRawPath)
-    logger.info(
+    logger.trace(
       "%s\nこのファイルの透過色は, ARGBの順に%d,%d,%d,%dです." format (path,res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff)
     )
     res

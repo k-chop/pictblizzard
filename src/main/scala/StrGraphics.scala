@@ -34,7 +34,7 @@ object StrGraphics {
       val AFont(name, style, pt, _) = attr
       new Font(name, extractStyle(style), pt)
     } getOrElse {
-      logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
+      //logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
       DEFAULT_FONT
     }
 

@@ -5,13 +5,61 @@ import scriptops.Attrs._
 import scriptops._
 
 class TestSpec {
-
   import scriptops.implicits.string2URI
-  
+
+  val strdef = Map('interval -> AInterval(0, 3),
+                   'padding -> APadding(8, 10))
+  val msgo = strdef + ('font -> AFont("ＭＳ ゴシック", 'plain, 12))
+  val meiryo = strdef + ('font -> AFont("MS UI Gothic", 'bold, 12))
+
+
+
   def run() {
     testReuseLayout()
     testOldSpec()
     face()
+    csvRead()
+  }
+
+  def csvRead() {
+    val path = "item.csv"
+    val vmap: Array[ValueMap] = new ValueExpander(Map(
+      "id" -> ExRange(0 to 76 toArray),
+      "itemno" -> ExCSV(path, 0),
+      "name" -> ExCSV(path, 1),
+      "win" -> ExStr(""),
+      "t_price" -> ExCSV(path, 2),
+      "price" -> ExStr("${t_price} \\c[4]G\\c[0]"),
+      "t_desc" -> ExCSV(path, 3),
+      "desc" -> ExStr("\\c[2]${t_desc}\\c[0]"),
+      "filename" -> ExStr("${itemno}-${name}.png")
+    )).expand()
+    val layout = LayoutUnit(
+      Map('size -> ASize(320, 80)),
+      AreaMap.fromSeq(
+        'win -> AreaUnit(Map(
+          'rect -> ARect(0, 0, 320, 80),
+          'window -> AWindow("system6.png"),
+          'front_color -> ASystemGraphics("system6.png"))),
+        'name -> AreaUnit(Map(
+          'point -> APoint(0, 0)
+        ) ++ meiryo),
+        'price -> AreaUnit(Map(
+          'point -> APoint(160, 0)
+        ) ++ msgo),
+        'desc -> AreaUnit(Map(
+          'point -> APoint(10, 20)
+        ) ++ msgo)
+      )
+    )
+    val d = new Drawer(layout)
+    vmap map { vm =>
+      (d.draw(vm, NullContext), vm('filename))
+    } foreach {
+      case (res, Str(s)) =>
+        res.write(Resource.tempdir + "items/" + s)
+      case _ =>
+    }
   }
 
   def face() {
@@ -41,24 +89,20 @@ class TestSpec {
 
   def testReuseLayout() {
 
-    val fontsetting = 'font -> AFont("ＭＳ ゴシック", 'plain, 12)
     val repo = LayoutRepository.empty()
 
     val lay = LayoutUnit(
       Map('size -> ASize(320, 240)),
       AreaMap.fromSeq(
-      'name->AreaUnit(Map('rect -> ARect(5,0,300,13),
-                                fontsetting)),
-      'icon->AreaUnit(Map('rect -> ARect(280,0,32,32),
-                                fontsetting)),
+      'name->AreaUnit(Map('rect -> ARect(5,0,300,13)
+                                ) ++ msgo),
+      'icon->AreaUnit(Map('rect -> ARect(280,0,32,32)
+                                ) ++ msgo),
       'desc->AreaUnit(Map('point -> ARect(0, 20, 12, 2),
-                                'interval -> AInterval(0, 3),
-                                'padding -> APadding(8, 10),
-                                fontsetting,
                                 'window -> AWindow("system6.png"),
                                 'auto_expand -> AAutoExpand,
                                 'front_color -> ASystemGraphics("system6.png")
-                         )),
+                         ) ++ msgo),
       'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
     )

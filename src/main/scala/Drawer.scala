@@ -34,7 +34,7 @@ class DrawableImage(img: BufferedImage) {
   }
 
   def drawArea(areaname: Key, areaunit: AreaUnit, target: AValue) {
-    logger.info("drawing :" + areaname + " ...")
+    logger.trace("drawing :" + areaname + " ...")
     val frontImage = ImageBuilder.build(target, areaunit.attrmap)
 
     val (fx, fy, exSize) = frontImage map {
