@@ -26,7 +26,10 @@ object ImageBuilders {
 
   implicit val FaceGraphicBuilder = new Buildable[FaceGraphic] {
     def build(self: FaceGraphic, attrmap: AttrMap) = {
-      sys.error("not implemented")
+      val image = ext.PNG.read(self.uri)
+      val n = self.no
+      val res = image.getSubimage((n%4)*48, (n/4)*48, 48, 48)  // 2000用ってことで決め打ち
+      ResultImage(findBeginPoint(attrmap), res)
     }
   }
 

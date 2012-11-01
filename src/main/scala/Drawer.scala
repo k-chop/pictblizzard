@@ -8,7 +8,7 @@ import scriptops.Attrs._
 
 class Drawer(layout: LayoutUnit) {
 
-  private[this] val APoint(sizeX, sizeY) = layout.env('size)
+  private[this] val ASize(sizeX, sizeY) = layout.env('size)
   private[this] val areamap: AreaMap = layout.areamap
 
   def draw(valuemap: ValueMap, context: Context): DrawableImage = {

@@ -11,6 +11,32 @@ class TestSpec {
   def run() {
     testReuseLayout()
     testOldSpec()
+    face()
+  }
+
+  def face() {
+    val layout = LayoutUnit(
+      Map('size -> ASize(320, 240)),
+      AreaMap.fromSeq(
+        'a -> AreaUnit(Map('point -> APoint(0, 0))),
+        'b -> AreaUnit(Map('point -> APoint(50, 0))),
+        'c -> AreaUnit(Map('point -> APoint(100, 0))),
+        'd -> AreaUnit(Map('point -> APoint(0, 50))),
+        'e -> AreaUnit(Map('point -> APoint(50, 50))),
+        'f -> AreaUnit(Map('point -> APoint(100, 50)))
+      )
+    )
+    val rs = Resource.uri("ds1.png")
+    val vm = Map(
+      'a -> FaceGraphic(rs, 0),
+      'b -> FaceGraphic(rs, 1),
+      'c -> FaceGraphic(rs, 2),
+      'd -> FaceGraphic(rs, 3),
+      'e -> FaceGraphic(rs, 4),
+      'f -> FaceGraphic(rs, 5)
+    )
+    val d = new Drawer(layout)
+    d.draw(vm, NullContext).write(Resource.tempdir + "facetest.png")
   }
 
   def testReuseLayout() {
@@ -19,7 +45,7 @@ class TestSpec {
     val repo = LayoutRepository.empty()
 
     val lay = LayoutUnit(
-      Map('size -> APoint(320, 240)),
+      Map('size -> ASize(320, 240)),
       AreaMap.fromSeq(
       'name->AreaUnit(Map('rect -> ARect(5,0,300,13),
                                 fontsetting)),
@@ -88,14 +114,14 @@ class TestSpec {
     (vs).map{
       d.draw(_, NullContext)
     }.zipWithIndex.foreach { case (res, idx) =>
-      res.write("temp/skill0%d.png" format idx)
+      res.write(Resource.tempdir + "skill0%d.png" format idx)
     }
   }
 
   def testOldSpec() {
 
     val layout = LayoutUnit(
-      Map('size -> APoint(320,240)), //env
+      Map('size -> ASize(320,240)), //env
       AreaMap.fromSeq(  //layouts
         'icon1 -> AreaUnit(Map('point->APoint(0,0))),
         'icon2 -> AreaUnit(Map('point->APoint(50,0))),
