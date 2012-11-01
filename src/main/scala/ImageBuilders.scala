@@ -8,7 +8,7 @@ import scriptops.Attrs.AttrMap
 
 object ImageBuilders {
 
-  implicit object StrBuilder extends Buildable[Str] {
+  implicit val StrBuilder = new Buildable[Str] {
     def build(self: Str, attrmap: AttrMap) = {
       val strgraphics = StrGraphics.build(self.s, attrmap)
       val result = strgraphics.processImage()
@@ -17,20 +17,20 @@ object ImageBuilders {
     }
   }
 
-  implicit object IconBuilder extends Buildable[Icon] {
+  implicit val IconBuilder = new Buildable[Icon] {
     def build(self: Icon, attrmap: AttrMap): ResultImage = {
       val icon: BufferedImage = ext.PNG.read(self.uri)
       ResultImage(findBeginPoint(attrmap), icon)
     }
   }
 
-  implicit object FaceGraphicBuilder extends Buildable[FaceGraphic] {
+  implicit val FaceGraphicBuilder = new Buildable[FaceGraphic] {
     def build(self: FaceGraphic, attrmap: AttrMap): ResultImage = {
       sys.error("not implemented")
     }
   }
 
-  implicit object WindowBuilder extends Buildable[AWindow] {
+  implicit val WindowBuilder = new Buildable[AWindow] {
     def build(self: AWindow, attrmap: AttrMap): ResultImage = {
       val sysg = SystemGraphics.fromPath(self.systemGraphicsPath)
       val ASize(w, h) = attrmap('size)
@@ -44,13 +44,13 @@ object ImageBuilders {
     }
   }
 
-  implicit object TileBuilder extends Buildable[ATile] {
+  implicit val TileBuilder = new Buildable[ATile] {
     def build(self: ATile, attrmap: AttrMap): ResultImage = {
       sys.error("not implemented")
     }
   }
 
-  implicit object BackgroundBuilder extends Buildable[ABackground] {
+  implicit val BackgroundBuilder = new Buildable[ABackground] {
     def build(self: ABackground, attrmap: AttrMap): ResultImage = {
       sys.error("not implemented")
     }
