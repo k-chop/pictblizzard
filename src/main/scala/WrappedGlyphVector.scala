@@ -221,10 +221,15 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   * [begin, end)間のすべてのGlyphを完全に含む矩形を返す。
   */
   def getFixedLogicalBounds(begin: Int, end: Int): Rectangle2D = {
-    require(begin < end, "begin(%d) must be less than end(%d)" format (begin, end))
+    require(begin <= end, "begin(%d) must be equal or less than end(%d)" format (begin, end))
+    require(
+      0 <= begin && end <= v.getNumGlyphs,
+      "0 <= begin(%d) && end(%d) < %d(numGlyphs)" format (begin, end, v.getNumGlyphs)
+    )
 
     var idx = begin
-    var (lx, ly, rx, ry) = (Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)
+    val init = (Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)
+    var (lx, ly, rx, ry) = init
     while(idx < end) {
       val r = v.getGlyphLogicalBounds(idx).getBounds
       lx = min(lx, r.getX)
@@ -233,7 +238,10 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
       ry = max(ry, r.getY + r.getHeight)
       idx += 1
     }
-    new Rectangle2D.Double(lx, ly, rx-lx, ry-ly)
+    if ((lx, ly, rx, ry) == init)
+      new Rectangle2D.Double(0, 0, 1, 1)
+    else
+      new Rectangle2D.Double(lx, ly, rx-lx, ry-ly)
   }
 
 }
