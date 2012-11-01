@@ -25,7 +25,7 @@ maxErrors := 20
 // increase the time between polling for file changes when using continuous execution
 pollInterval := 1000
 
-scalacOptions += "-deprecation"
+scalacOptions ++= Seq("-deprecation", "-unchecked")
 
 // set the prompt (for this build) to include the project id.
 //shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
