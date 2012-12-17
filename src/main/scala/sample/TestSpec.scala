@@ -9,8 +9,8 @@ class TestSpec {
 
   val strdef = Map('interval -> AInterval(0, 3),
                    'padding -> APadding(8, 10))
-  def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain) = {
-    strdef + ('font -> AFont(font, style, size))
+  def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false) = {
+    (if (inWin) strdef else Map.empty[Key, Attr]) + ('font -> AFont(font, style, size))
   }
 
 
@@ -107,7 +107,7 @@ class TestSpec {
                                 'window -> AWindow("system6.png"),
                                 'auto_expand -> AAutoExpand,
                                 'front_color -> ASystemGraphics("system6.png")
-                         ) ++ stdstyle()),
+                         ) ++ stdstyle(inWin = true)),
       'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
     )
