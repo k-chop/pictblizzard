@@ -4,12 +4,12 @@ version := "0.0.1"
 
 organization := "com.github.chuwb"
 
-scalaVersion := "2.9.2"
+scalaVersion := "2.10.0"
 
 //parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "1.8" % "test",
+  "org.scalatest" %% "scalatest" % "1.9.1" % "test",
   "com.twitter" % "util-logging" % "5.3.12",
   "net.sf.opencsv" % "opencsv" % "2.0"
   //"swt" % "jface" % "3.0.1"
