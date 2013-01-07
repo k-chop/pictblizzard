@@ -3,3 +3,8 @@ boot
 temp
 memo.org
 textures_fromrtp.png
+.cache
+.classpath
+.idea
+.idea_modules
+.settings
