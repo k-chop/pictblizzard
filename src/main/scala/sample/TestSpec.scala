@@ -82,12 +82,12 @@ class TestSpec {
     )
     val rs = Resource.uri("ds1.png")
     val vm = Map(
-      'a -> FaceGraphic(rs, 0),
-      'b -> FaceGraphic(rs, 1),
-      'c -> FaceGraphic(rs, 2),
-      'd -> FaceGraphic(rs, 3),
-      'e -> FaceGraphic(rs, 4),
-      'f -> FaceGraphic(rs, 5)
+      'a -> FaceGraphic(rs, 0, transparent = false),
+      'b -> FaceGraphic(rs, 1, transparent = false),
+      'c -> FaceGraphic(rs, 2, transparent = false),
+      'd -> FaceGraphic(rs, 3, transparent = false),
+      'e -> FaceGraphic(rs, 4, transparent = false),
+      'f -> FaceGraphic(rs, 5, transparent = false)
     )
     val d = new Drawer(layout)
     d.draw(vm, NullContext).write(Resource.tempdir + "facetest.png")

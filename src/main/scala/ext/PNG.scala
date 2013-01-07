@@ -8,16 +8,28 @@ import java.io.File
 import com.github.whelmaze.pictbliz.{BinaryUtils, ImageUtils}
 
 object PNG {
-  
-  def read(path: java.net.URI): BufferedImage = ImageIO.read(new File(path))
 
-  def read(path: String): BufferedImage = read( (new File(path)).toURI )
-  
-  def readAsARGBImage(path: java.net.URI): BufferedImage = 
-    ImageUtils.toARGBImage( read(path) )
+  def read(file: File): BufferedImage = ImageIO.read(file)
+
+  def read(path: java.net.URI): BufferedImage = read(new File(path))
+
+  def read(path: String): BufferedImage = read(new File(path))
+
+  def readWithTransparent(path: java.net.URI): BufferedImage = {
+    val f = new File(path)
+    val transp = transparentColor(f)
+    val buf = readAsARGBImage(f)
+    ImageUtils.enableAlpha(buf, transp)
+  }
+
+  def readAsARGBImage(path: java.net.URI): BufferedImage =
+    readAsARGBImage(new File(path))
   
   def readAsARGBImage(path: String): BufferedImage = 
-    readAsARGBImage( (new File(path)).toURI )
+    readAsARGBImage(new File(path))
+
+  def readAsARGBImage(file: File): BufferedImage =
+    ImageUtils.toARGBImage( read(file) )
   
   def write(img: BufferedImage, path: String) {
     ImageIO.write(img, "png", new File(path))
@@ -28,8 +40,8 @@ object PNG {
   private[this] val DWORD = new Array[Byte](4)
   private[this] val QWORD = new Array[Byte](8)
 
-  def transparentColor(ref: String): Int = {
-    val cnl = new FileInputStream(ref).getChannel
+  def transparentColor(path: File): Int = {
+    val cnl = new FileInputStream(path).getChannel
     try {
       val map = cnl.map(FileChannel.MapMode.READ_ONLY, 0, cnl.size())
       map.order(java.nio.ByteOrder.LITTLE_ENDIAN)
@@ -59,5 +71,7 @@ object PNG {
     }
 
   }
+
+  def transparentColor(path: String): Int = transparentColor(new File(path))
 
 }

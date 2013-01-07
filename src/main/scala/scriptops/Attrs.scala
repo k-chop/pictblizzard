@@ -24,7 +24,7 @@ object Attrs {
 
   case class Icon(uri: URI) extends AValue
 
-  case class FaceGraphic(uri: URI, no: Int) extends AValue
+  case class FaceGraphic(uri: URI, no: Int, transparent: Boolean) extends AValue
 
   case object NullValue extends AValue with ExValue
 

@@ -17,7 +17,7 @@ class TextStyler(val origimg: BufferedImage,
         SystemGraphics.fromPath(path)
       case Some(ASingleColors(xs: Array[String])) =>
         new SingleColors(xs)
-      case None =>
+      case _ =>
         SystemGraphics.default
     }
   }

@@ -93,7 +93,7 @@ class ValueExpander(exs: ExValueMap) {
     val pf: PartialFunction[AValue, String] = {
       case Str(s) => s
       case Icon(p) => p.toString
-      case FaceGraphic(p, n) => p.toString + ":" + n.toString
+      case FaceGraphic(p, n, t) => p.toString + ":" + n.toString
       case NullValue => ""
     }
     var str = _str
