@@ -33,6 +33,17 @@ object ImageBuilders {
     }
   }
 
+  implicit val CharaGraphicBuilder = new Buildable[CharaGraphic] {
+    def build(self: CharaGraphic, attrmap: AttrMap) = {
+      import self.prop._
+      val image = ext.PNG.readWithTransparent(self.uri)
+      val (bx, by) = ((no%4)*72, (no/4)*128)
+      val (sx, sy) = (act*24, dir*32)
+      val res = image.getSubimage(bx+sx, by+sy, 24, 32)
+      ResultImage(findBeginPoint(attrmap), res)
+    }
+  }
+
   implicit val WindowBuilder = new Buildable[AWindow] {
     def build(self: AWindow, attrmap: AttrMap) = {
       val sysg = SystemGraphics.fromPath(self.systemGraphicsPath)
@@ -85,6 +96,7 @@ object ImageBuilder {
       case s: Str => buildImpl(s, m)
       case i: Icon => buildImpl(i, m)
       case f: FaceGraphic => buildImpl(f, m)
+      case c: CharaGraphic => buildImpl(c, m)
       case b: ABackground => buildImpl(b, m)
       case t: ATile => buildImpl(t, m)
       case w: AWindow => buildImpl(w, m)

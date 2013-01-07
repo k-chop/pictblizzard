@@ -18,8 +18,9 @@ class TestSpec {
   def run() {
     testReuseLayout()
     testOldSpec()
-    face()
+    faceSpec()
     csvRead()
+    charaSpec()
   }
 
   def csvRead() {
@@ -68,7 +69,7 @@ class TestSpec {
     }
   }
 
-  def face() {
+  def faceSpec() {
     val layout = LayoutUnit(
       Map('size -> ASize(320, 240)),
       AreaMap.fromSeq(
@@ -92,6 +93,26 @@ class TestSpec {
     val d = new Drawer(layout)
     d.draw(vm, NullContext).write(Resource.tempdir + "facetest.png")
   }
+
+  def charaSpec() {
+    @inline def r(i: Int) = scala.util.Random.nextInt(i)
+
+    val layout = LayoutUnit(
+      Map('size -> ASize(320, 240)),
+      AreaMap.fromSeq(
+        (for(c <- 1 to 200) yield {
+          (Symbol(c.toString): Key) -> AreaUnit(Map('point -> APoint(r(320), r(240))))
+        }): _*
+      )
+    )
+    val rs = Resource.uri("sl1.png")
+    val vm = (for(c <- 1 to 200) yield {
+      (Symbol(c.toString): Key) -> CharaGraphic(rs, CharaProperty(r(8), r(4), r(3)))
+    }).toMap
+    val d = new Drawer(layout)
+    d.draw(vm, NullContext).write(Resource.tempdir + "charatest.png")
+  }
+
 
   def testReuseLayout() {
 
