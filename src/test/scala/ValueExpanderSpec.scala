@@ -3,6 +3,7 @@ package com.github.whelmaze.pictbliz.test
 import com.github.whelmaze.pictbliz._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
+import scala.language.postfixOps
 
 import scriptops.Attrs._
 

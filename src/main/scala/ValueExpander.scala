@@ -30,15 +30,15 @@ class ValueExpander(exs: ExValueMap) {
     val range: Array[Int] = exs.get("id") match {
       case Some(ExRange(ids)) =>
         ids
-      case None =>
-        logger.error("idが見つからないのでExValueMapを展開できません.空のArrayを返します.", exs)
+      case _ =>
+        logger.error(s"idが見つからないのでExValueMapを展開できません.空のArrayを返します.\n$exs")
         Array()
     }
 
     val m = new mutable.MapBuilder[Key, AValue, HashMap[Key, AValue]](new HashMap[Key, AValue])
     range.foreach { id =>
       m += ('id -> Str(id.toString))
-      exs withFilter (_ != "id") foreach { kv =>
+      exs withFilter (_._1 != "id") foreach { kv =>
         kv match {
           case (k, v: ExValue) =>
             m += (Symbol(k) -> expandWithId(id, Symbol(k), v))

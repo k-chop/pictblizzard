@@ -3,6 +3,7 @@ package com.github.whelmaze.pictbliz.sample
 import com.github.whelmaze.pictbliz._
 import scriptops.Attrs._
 import scriptops._
+import scala.language.postfixOps
 
 class TestSpec {
   import scriptops.implicits.string2URI

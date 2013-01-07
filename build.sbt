@@ -10,8 +10,10 @@ scalaVersion := "2.10.0"
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-  "com.twitter" % "util-logging" % "5.3.12",
-  "net.sf.opencsv" % "opencsv" % "2.0"
+  "net.sf.opencsv" % "opencsv" % "2.0",
+  "org.clapper" %% "grizzled-slf4j" % "1.0.1",
+  "org.slf4j" % "slf4j-api" % "1.7.1",
+  "ch.qos.logback" % "logback-classic" % "1.0.7"
   //"swt" % "jface" % "3.0.1"
 )
 

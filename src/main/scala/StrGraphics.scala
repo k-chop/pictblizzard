@@ -27,7 +27,7 @@ object StrGraphics {
       case 'bold => Font.BOLD
       case 'italic => Font.ITALIC
       case 'bolditalic => Font.BOLD | Font.ITALIC
-      case n => logger.warning("不明なフォントスタイルです: "+n+"\nデフォルトのスタイルを使用します."); Font.PLAIN
+      case n => logger.warn("不明なフォントスタイルです: "+n+"\nデフォルトのスタイルを使用します."); Font.PLAIN
     }
 
     val font = attrmap.get('font) map { attr =>
