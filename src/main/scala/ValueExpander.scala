@@ -11,11 +11,11 @@ class ValueExpander(exs: ExValueMap) {
 
   case class KV(id: Int, k: Key)
 
-  val checker = new mutable.HashSet[Key]
+  private[this] val checker = new mutable.HashSet[Key]
 
-  val cache = new mutable.WeakHashMap[KV, AValue]
+  private[this] val cache = new mutable.WeakHashMap[KV, AValue]
 
-  val cvsCache = new mutable.WeakHashMap[String, Array[Array[String]]]
+  private[this] val cvsCache = new mutable.WeakHashMap[String, Array[Array[String]]]
 
   def getCVSData(path: String): Array[Array[String]] = {
     val aas = if (cvsCache.contains(path))  {
@@ -29,13 +29,6 @@ class ValueExpander(exs: ExValueMap) {
 
   def expand(): Array[ValueMap] = {
     val acc = mutable.ArrayBuffer.empty[ValueMap]
-    val range: Array[Int] = exs.get("id") match {
-      case Some(ExRange(ids)) =>
-        ids
-      case _ =>
-        logger.error(s"idが見つからないのでExValueMapを展開できません.空のArrayを返します.\n$exs")
-        Array.empty[Int]
-    }
 
     iterator.foreach( acc += _ )
 
@@ -60,10 +53,10 @@ class ValueExpander(exs: ExValueMap) {
   def apply(id: Int): ValueMap = expandAt(id)
 
   def expandAt(id: Int): ValueMap = {
-    checker.clear()
     val m = new mutable.MapBuilder[Key, AValue, HashMap[Key, AValue]](new HashMap[Key, AValue])
     m += ('id -> Str(id.toString))
     exs withFilter (_._1 != "id") foreach { kv =>
+      checker.clear()
       kv match {
         case (k, v: ExValue) =>
           m += (Symbol(k) -> expandWithId(id, Symbol(k), v))
