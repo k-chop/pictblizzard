@@ -23,7 +23,10 @@ class SystemGraphics (path: java.net.URI) extends Texturable {
   def length = 21
 
   val img: BufferedImage = {
-    val res = ext.PNG.readAsARGBImage(path)
+    import ext.PNG.refconvert._
+    import ext.PNG.autobuild._
+
+    val res = ext.PNG.read(path).asARGB
     
     if (res.getWidth != 160 || res.getHeight != 80) // もっと適切な例外がある気がする
       throw new IllegalArgumentException("システムグラフィックの画像サイズは160 x 80でなければなりません．")

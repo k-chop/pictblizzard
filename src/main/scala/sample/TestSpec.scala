@@ -14,13 +14,15 @@ class TestSpec {
     (if (inWin) strdef else Map.empty[Key, Attr]) + ('font -> AFont(font, style, size))
   }
 
+  @inline def r(i: Int) = scala.util.Random.nextInt(i)
 
   def run() {
     testReuseLayout()
     testOldSpec()
-    faceSpec()
     csvRead()
+    faceSpec()
     charaSpec()
+    battleSpec()
   }
 
   def csvRead() {
@@ -95,8 +97,6 @@ class TestSpec {
   }
 
   def charaSpec() {
-    @inline def r(i: Int) = scala.util.Random.nextInt(i)
-
     val layout = LayoutUnit(
       Map('size -> ASize(320, 240)),
       AreaMap.fromSeq(
@@ -111,6 +111,23 @@ class TestSpec {
     }).toMap
     val d = new Drawer(layout)
     d.draw(vm, NullContext).write(Resource.tempdir + "charatest.png")
+  }
+
+  def battleSpec() {
+    val layout = LayoutUnit(
+      Map('size -> ASize(320, 240)),
+      AreaMap.fromSeq(
+        (for(c <- 1 to 20) yield {
+          (Symbol(c.toString): Key) -> AreaUnit(Map('point -> APoint(r(320), r(240))))
+        }): _*
+      )
+    )
+    val rs = Resource.uri("bs1.png")
+    val vm = (for(c <- 1 to 20) yield {
+      (Symbol(c.toString): Key) -> BattleGraphic(rs, r(15), transparent = true)
+    }).toMap
+    val d = new Drawer(layout)
+    d.draw(vm, NullContext).write(Resource.tempdir + "battletest.png")
   }
 
 

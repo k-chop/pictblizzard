@@ -7,30 +7,55 @@ import javax.imageio.ImageIO
 import java.io.File
 import com.github.whelmaze.pictbliz.{BinaryUtils, ImageUtils}
 
-object PNG {
+import scala.language.implicitConversions
 
-  def read(file: File): BufferedImage = ImageIO.read(file)
+class BufferedImageBuilder(ref: File) {
+  private[this] var _argb = false
+  private[this] var _transparent = false
 
-  def read(path: java.net.URI): BufferedImage = read(new File(path))
-
-  def read(path: String): BufferedImage = read(new File(path))
-
-  def readWithTransparent(path: java.net.URI): BufferedImage = {
-    val f = new File(path)
-    val transp = transparentColor(f)
-    val buf = readAsARGBImage(f)
-    ImageUtils.enableAlpha(buf, transp)
+  def build: BufferedImage = {
+    var image = ImageIO.read(ref)
+    if (_argb) image = ImageUtils.toARGBImage(image)
+    if (_transparent) {
+      val transp = PNG.transparentColor(ref)
+      image = ImageUtils.enableAlpha(image, transp)
+    }
+    image
   }
 
-  def readAsARGBImage(path: java.net.URI): BufferedImage =
-    readAsARGBImage(new File(path))
-  
-  def readAsARGBImage(path: String): BufferedImage = 
-    readAsARGBImage(new File(path))
+  def asARGB = {
+    _argb = true
+    this
+  }
 
-  def readAsARGBImage(file: File): BufferedImage =
-    ImageUtils.toARGBImage( read(file) )
-  
+  def transparent(b: Boolean) = {
+    if (b) _argb = true
+    _transparent = b
+
+    this
+  }
+
+  def refresh = {
+    _argb = false
+    _transparent = false
+    this
+  }
+}
+
+object PNG {
+
+  object refconvert {
+    implicit def uri2File(uri: java.net.URI) = new File(uri)
+    implicit def str2File(str: String) = new File(str)
+  }
+
+  object autobuild {
+    implicit def builder2image(b: BufferedImageBuilder) = b.build
+  }
+
+  //def read(file: File): BufferedImage = ImageIO.read(file)
+  def read(file: File): BufferedImageBuilder = new BufferedImageBuilder(file)
+
   def write(img: BufferedImage, path: String) {
     ImageIO.write(img, "png", new File(path))
   }

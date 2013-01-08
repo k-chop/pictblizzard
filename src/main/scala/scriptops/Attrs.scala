@@ -29,6 +29,8 @@ object Attrs {
   case class CharaGraphic(uri: URI, prop: CharaProperty, transparent: Boolean = true) extends AValue
   case class CharaProperty(no: Int, dir: Int, act: Int)
 
+  case class BattleGraphic(uri: URI, no: Int, transparent: Boolean = true) extends AValue
+
   case object NullValue extends AValue with ExValue
 
   sealed trait ExValue extends AnyValue

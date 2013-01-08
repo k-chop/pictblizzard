@@ -7,6 +7,9 @@ import scriptops.Attrs.AttrMap
 
 
 object ImageBuilders {
+  import ext.PNG
+  import PNG.refconvert._
+  import PNG.autobuild._
 
   implicit val StrBuilder = new Buildable[Str] {
     def build(self: Str, attrmap: AttrMap) = {
@@ -19,16 +22,25 @@ object ImageBuilders {
 
   implicit val IconBuilder = new Buildable[Icon] {
     def build(self: Icon, attrmap: AttrMap) = {
-      val icon: BufferedImage = ext.PNG.read(self.uri)
+      val icon: BufferedImage = PNG.read(self.uri)
       ResultImage(findBeginPoint(attrmap), icon)
     }
   }
 
   implicit val FaceGraphicBuilder = new Buildable[FaceGraphic] {
     def build(self: FaceGraphic, attrmap: AttrMap) = {
-      val image = ext.PNG.readWithTransparent(self.uri)
+      val image = PNG.read(self.uri).transparent(self.transparent)
       val n = self.no
       val res = image.getSubimage((n%4)*48, (n/4)*48, 48, 48)  // 2000用ってことで決め打ち
+      ResultImage(findBeginPoint(attrmap), res)
+    }
+  }
+
+  implicit val BattleGraphicBuilder = new Buildable[BattleGraphic] {
+    def build(self: BattleGraphic, attrmap: AttrMap) = {
+      import self._
+      val image = PNG.read(uri).transparent(transparent)
+      val res = image.getSubimage(no%4*96, no/4*96, 96, 96)
       ResultImage(findBeginPoint(attrmap), res)
     }
   }
@@ -36,7 +48,7 @@ object ImageBuilders {
   implicit val CharaGraphicBuilder = new Buildable[CharaGraphic] {
     def build(self: CharaGraphic, attrmap: AttrMap) = {
       import self.prop._
-      val image = ext.PNG.readWithTransparent(self.uri)
+      val image = PNG.read(self.uri).transparent(self.transparent)
       val (bx, by) = ((no%4)*72, (no/4)*128)
       val (sx, sy) = (act*24, dir*32)
       val res = image.getSubimage(bx+sx, by+sy, 24, 32)
@@ -59,15 +71,11 @@ object ImageBuilders {
   }
 
   implicit val TileBuilder = new Buildable[ATile] {
-    def build(self: ATile, attrmap: AttrMap) = {
-      sys.error("not implemented")
-    }
+    def build(self: ATile, attrmap: AttrMap) = ???
   }
 
   implicit val BackgroundBuilder = new Buildable[ABackground] {
-    def build(self: ABackground, attrmap: AttrMap) = {
-      sys.error("not implemented")
-    }
+    def build(self: ABackground, attrmap: AttrMap) = ???
   }
 
   //util
@@ -77,6 +85,7 @@ object ImageBuilders {
       case ARect(x, y, _, _) => (x, y)
     } getOrElse (0, 0)
   }
+
 }
 
 trait Buildable[T <: Drawable] {
@@ -86,6 +95,7 @@ trait Buildable[T <: Drawable] {
 // 描画位置と描画するImageを持つ
 case class ResultImage(pos: (Int, Int), img: BufferedImage)
 
+// hidoi
 object ImageBuilder {
   import ImageBuilders._
 
@@ -97,6 +107,7 @@ object ImageBuilder {
       case i: Icon => buildImpl(i, m)
       case f: FaceGraphic => buildImpl(f, m)
       case c: CharaGraphic => buildImpl(c, m)
+      case a: BattleGraphic => buildImpl(a, m)
       case b: ABackground => buildImpl(b, m)
       case t: ATile => buildImpl(t, m)
       case w: AWindow => buildImpl(w, m)
