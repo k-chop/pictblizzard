@@ -3,6 +3,7 @@ package com.github.whelmaze.pictbliz.test
 import com.github.whelmaze.pictbliz._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
+import scriptops.implicits.string2URI
 import scala.language.postfixOps
 
 import scriptops.Attrs._
@@ -117,7 +118,6 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
     }
 
     "expand ExIcon(no zerofill)" in {
-      import scriptops.implicits.string2URI
       val vmap = new ValueExpander(Map(
         "id" -> ExRange(1 to 2 toArray),
         "icon" -> ExIcon("icon/icon${id}.png")
@@ -138,7 +138,6 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
     }
 
     "expand ExIcon(with zerofill)" in {
-      import scriptops.implicits.string2URI
       val vmap = new ValueExpander(Map(
         "id" -> ExRange(1 to 1 toArray),
         "icon1" -> ExIcon("icon/icon${id}${ext}", zerofillDigit = 1),
@@ -157,6 +156,23 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
         )
       )
       assert(isSame(res(0), ans(0)) === true)
+    }
+
+    "expand circular reference" in {
+      val vmap = new ValueExpander(Map(
+        "id" -> ExRange(1 to 2 toArray),
+        "a" -> ExStr("${b}"),
+        "b" -> ExStr("${a}")
+      ))
+      val res = vmap.expandAt(1)
+      val ans = Array(
+        Map(
+          'id -> Str("1"),
+          'a -> Str("Circular Reference Error"),
+          'b -> Str("Circular Reference Error")
+        )
+      )
+      assert(isSame(res, ans(0)) === true)
     }
 
   }

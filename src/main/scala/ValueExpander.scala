@@ -11,6 +11,8 @@ class ValueExpander(exs: ExValueMap) {
 
   case class KV(id: Int, k: Key)
 
+  val checker = new mutable.HashSet[Key]
+
   val cache = new mutable.WeakHashMap[KV, AValue]
 
   val cvsCache = new mutable.WeakHashMap[String, Array[Array[String]]]
@@ -58,6 +60,7 @@ class ValueExpander(exs: ExValueMap) {
   def apply(id: Int): ValueMap = expandAt(id)
 
   def expandAt(id: Int): ValueMap = {
+    checker.clear()
     val m = new mutable.MapBuilder[Key, AValue, HashMap[Key, AValue]](new HashMap[Key, AValue])
     m += ('id -> Str(id.toString))
     exs withFilter (_._1 != "id") foreach { kv =>
@@ -74,7 +77,15 @@ class ValueExpander(exs: ExValueMap) {
   def expandWithId(id: Int, k: Key, exv: ExValue, zerofillDigit: Int = 0): AValue = {
     import scriptops.implicits.string2URI
 
-    cache.get(KV(id, k)) getOrElse {
+    val c = cache.get(KV(id, k))
+    if (k != 'id && c.isEmpty && checker.contains(k)) {
+      logger.error(s"returning Circular Reference Error. id:$id, key:$k, cache:$checker")
+      return Str("Circular Reference Error")
+    } else {
+      checker += k
+    }
+
+    c getOrElse {
       exv match {
         case ExStr(str) =>
           val ret = Str(extractSubStrs(id, str))
