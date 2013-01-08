@@ -32,26 +32,43 @@ class ValueExpander(exs: ExValueMap) {
         ids
       case _ =>
         logger.error(s"idが見つからないのでExValueMapを展開できません.空のArrayを返します.\n$exs")
-        Array()
+        Array.empty[Int]
     }
 
-    val m = new mutable.MapBuilder[Key, AValue, HashMap[Key, AValue]](new HashMap[Key, AValue])
-    range.foreach { id =>
-      m += ('id -> Str(id.toString))
-      exs withFilter (_._1 != "id") foreach { kv =>
-        kv match {
-          case (k, v: ExValue) =>
-            m += (Symbol(k) -> expandWithId(id, Symbol(k), v))
-          case (k, v: AValue) =>
-            m += (Symbol(k) -> v)
-        }
-      }
-      acc += m.result()
-      m.clear()
-    }
+    iterator.foreach( acc += _ )
 
     cache.clear()
     acc.toArray
+  }
+
+  def iterator = new Iterator[ValueMap] {
+    private val range = exs.get("id") match {
+      case Some(ExRange(ids)) => ids
+      case _ => Array.empty[Int]
+    }
+    private var idx = 0
+    def next(): ValueMap = {
+      val res = expandAt(range(idx))
+      idx += 1
+      res
+    }
+    def hasNext = idx < range.length
+  }
+
+  def apply(id: Int): ValueMap = expandAt(id)
+
+  def expandAt(id: Int): ValueMap = {
+    val m = new mutable.MapBuilder[Key, AValue, HashMap[Key, AValue]](new HashMap[Key, AValue])
+    m += ('id -> Str(id.toString))
+    exs withFilter (_._1 != "id") foreach { kv =>
+      kv match {
+        case (k, v: ExValue) =>
+          m += (Symbol(k) -> expandWithId(id, Symbol(k), v))
+        case (k, v: AValue) =>
+          m += (Symbol(k) -> v)
+      }
+    }
+    m.result()
   }
 
   def expandWithId(id: Int, k: Key, exv: ExValue, zerofillDigit: Int = 0): AValue = {
