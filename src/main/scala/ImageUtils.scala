@@ -9,9 +9,7 @@ object ImageUtils {
   def newImage(w: Int, h: Int): BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)
   
-  def pile(src: BufferedImage, targets: BufferedImage*): BufferedImage = {
-    src
-  }
+  def pile(src: BufferedImage, targets: BufferedImage*): BufferedImage = ???
   
   def sameSizeImage(src: BufferedImage): BufferedImage = 
     new BufferedImage(src.getWidth, src.getHeight, src.getType)

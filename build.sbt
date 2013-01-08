@@ -17,6 +17,8 @@ libraryDependencies ++= Seq(
   //"swt" % "jface" % "3.0.1"
 )
 
+scalacOptions += "-feature"
+
 // reduce the maximum number of errors shown by the Scala compiler
 maxErrors := 20
 
