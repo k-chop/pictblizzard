@@ -14,6 +14,27 @@ object ImageUtils {
     }
   }
 
+  @inline def neighbor(arr: Array[Int], i: Int)(implicit wh: (Int, Int)): Array[Int] = {
+    // nante hidoi code nanda...
+    val (w, h) = wh
+    val a = Array.ofDim[Int](8)
+    val u = i < w
+    val b = (arr.length - i) <= w
+    val r = (i+1)%w == 0
+    val l = i%w == 0
+    a(0) = if (u || l) -1 else i-1-w
+    a(1) = if (u) -1 else i-w
+    a(2) = if (u || r) -1 else i+1-w
+    a(3) = if (l) -1 else i-1
+    a(4) = if (r) -1 else i+1
+    a(5) = if (b || l) -1 else i-1+w
+    a(6) = if (b) -1 else i+w
+    a(7) = if (b || r) -1 else i+1+w
+    a.map { i=>
+      if (0 <= i && i < arr.length) arr(i) else 0
+    }
+  }
+
   def newImage(w: Int, h: Int): BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)
   
