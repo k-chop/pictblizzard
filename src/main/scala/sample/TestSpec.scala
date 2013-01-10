@@ -19,7 +19,7 @@ class TestSpec {
   def run() {
     testReuseLayout()
     testOldSpec()
-    csvRead()
+    //csvRead()
     faceSpec()
     charaSpec()
     battleSpec()

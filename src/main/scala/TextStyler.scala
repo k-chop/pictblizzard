@@ -1,10 +1,11 @@
 package com.github.whelmaze.pictbliz
 
 import java.awt.Color
-import java.awt.image.BufferedImage
+import java.awt.image.{DataBufferInt, BufferedImage}
 
 import scriptops._
 import scriptops.Attrs._
+import com.github.whelmaze.pictbliz.ImageUtils.ARGB
 
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
@@ -25,15 +26,19 @@ class TextStyler(val origimg: BufferedImage,
   val debug = attrmap.contains('debug)
   
   def process(): BufferedImage = {
-    val dest = ImageUtils.sameSizeImage(origimg)
+    // TODO: 陰もAttrMap見てありなし決める
+    val dest = ImageUtils.extraSizeImage(origimg, 1)
     val s = shadowed()
     val c = colored()
+    val h = hemmed(c)
 
     val g = dest.createGraphics
     g.drawImage(s, null, 1, 1) // shadow offset = 1
-    g.drawImage(c, null, 0, 0)
+    g.drawImage(h, null, -1, -1)
     g.dispose()
-    
+
+    // TODO: ふちどりした場合、サイズと描画位置が変更されるのでAttrMapの更新しろ
+
     if (attrmap.contains('border)) bordered(Color.white)
 
     if (debug) {
@@ -95,8 +100,55 @@ class TextStyler(val origimg: BufferedImage,
     ImageUtils.synthesis(maskimg, targetimg)
     maskimg
   }
-  // ふちどりする
-  // def hem() = {}
+
+  def hemmed(src: BufferedImage): BufferedImage = {
+    import ImageUtils.{neighbor, alpha}
+    import scala.annotation.tailrec
+    val ex = 1  // 余分にとるサイズは縁の幅によって変わるけど仮で1固定
+    val destimg = ImageUtils.extraSizeImage(src, ex)
+    val pix: Array[Int] = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
+    val dest: Array[Int] = (destimg.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
+
+    // TODO: 縁取り色はAttrMapから読み込む。今は仮
+    val hemcolor = 0xFFFF0000 // 赤
+/*
+    pix.indices foreach { i: Int =>
+      val a = neighbor(pix, i)
+      val ARGB(alp,_,_,_) = pix(i)
+      val alphas = a.map(_ & 0xFF000000 >>> 24)
+      if (alp == 0 && alphas.sum != 0) dest(i+1+destimg.getWidth) = alpha(hemcolor, alphas.max)
+    }
+  */
+
+    import ImageUtils.{ add, mul }
+
+    val w = src.getWidth
+
+    @tailrec def traverse(n: Int, lim: Int) {
+      if (n < lim) {
+        val a = neighbor(pix, n, w)
+        val alp = (pix(n) & 0xFF000000 >>> 24)
+        var maxalpha = 0
+        var i = 0; val len = a.length
+        while(i < len) {
+          val alphav = (a(i) & 0xFF000000 >>> 24)
+          if (alphav > maxalpha) maxalpha = alphav
+          i += 1
+        }
+        val ct_n = n+destimg.getWidth+1+(n/src.getWidth)*2
+        if (alp == 0 && maxalpha != 0) dest(ct_n) = alpha(hemcolor, maxalpha)
+        if (0 < alp && alp < 255) {
+          val s = alp / 255.0
+          val newcolor = add(mul(pix(n), s), mul(hemcolor, 1-s))
+          dest(ct_n) = alpha(newcolor, 0xFF)
+        }
+        if (alp == 255) dest(ct_n) = pix(n)
+        traverse(n+1, lim)
+      } else return
+    }
+    traverse(0, pix.length)
+    destimg
+  }
   
   def bordered(c: Color): BufferedImage = {
     val g2d = origimg.createGraphics
