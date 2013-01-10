@@ -4,7 +4,15 @@ import java.awt.image.{BufferedImage, DataBufferInt, DataBufferByte}
 
 object ImageUtils {
 
-
+  object ARGB {
+    def unapply(c: Int): Option[(Int, Int, Int, Int)] = {
+      val B = c & 0xFF
+      val G = (c >> 8) & 0xFF
+      val R = (c >> 16) & 0xFF
+      val A = (c >> 24) & 0xFF
+      Some((A, R, G, B))
+    }
+  }
 
   def newImage(w: Int, h: Int): BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)
