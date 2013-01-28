@@ -19,7 +19,7 @@ class TestSpec {
   def run() {
     testReuseLayout()
     testOldSpec()
-    //csvRead()
+    csvRead()
     faceSpec()
     charaSpec()
     battleSpec()
@@ -47,14 +47,14 @@ class TestSpec {
           'front_color -> ASystemGraphics("system6.png"))),
         'name -> AreaUnit(Map(
           'point -> APoint(0, 0)
-        ) ++ stdstyle(style='bold)),
+        ) ++ stdstyle(style='bold, inWin=true)),
         'price -> AreaUnit(Map(
           'rect -> ARect(160, 0, 150, 30),
           'align -> AAlign('right, 'top)
         ) ++ stdstyle()),
         'desc -> AreaUnit(Map(
           'point -> APoint(10, 18)
-        ) ++ stdstyle()),
+        ) ++ stdstyle(inWin=true)),
         'misc -> AreaUnit(Map(
           'rect -> ARect(10, 40, 310, 40),
           'align -> AAlign('right, 'bottom)
@@ -138,7 +138,8 @@ class TestSpec {
     val lay = LayoutUnit(
       Map('size -> ASize(320, 240)),
       AreaMap.fromSeq(
-      'name->AreaUnit(Map('rect -> ARect(5,0,300,13)
+      'name->AreaUnit(Map('rect -> ARect(5,5,300,20),
+                                'auto_expand -> AAutoExpand
                                 ) ++ stdstyle()),
       'icon->AreaUnit(Map('rect -> ARect(280,0,32,32)
                                 ) ++ stdstyle()),

@@ -66,6 +66,9 @@ object Attrs {
   // auto_expand
   case object AAutoExpand extends Attr
 
+  // on_center
+  case object AOnCenter extends Attr
+
   // font
   case class AFont(name: String, style: Symbol, size: Int, lang: FontLang = Ja) extends Attr
 

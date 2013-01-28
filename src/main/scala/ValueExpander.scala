@@ -5,8 +5,13 @@ import collection.immutable.HashMap
 import au.com.bytecode.opencsv.CSVReader
 import java.io.FileReader
 
+import scriptops.Attrs
 import scriptops.Attrs._
 
+/**
+ * 展開可能なExValueMapを、外部の値を読み込んだりしつつ展開する。
+ * @param exs 展開するValueMap
+ */
 class ValueExpander(exs: ExValueMap) {
 
   case class KV(id: Int, k: Key)
@@ -16,6 +21,11 @@ class ValueExpander(exs: ExValueMap) {
   private[this] val cache = new mutable.WeakHashMap[KV, AValue]
 
   private[this] val cvsCache = new mutable.WeakHashMap[String, Array[Array[String]]]
+
+  private[this] lazy val range: Array[Int] = exs.get("id") match {
+    case Some(ExRange(ids)) => ids
+    case _ => Array.empty[Int]
+  }
 
   def getCVSData(path: String): Array[Array[String]] = {
     val aas = if (cvsCache.contains(path))  {
@@ -36,11 +46,7 @@ class ValueExpander(exs: ExValueMap) {
     acc.toArray
   }
 
-  def iterator = new Iterator[ValueMap] {
-    private val range = exs.get("id") match {
-      case Some(ExRange(ids)) => ids
-      case _ => Array.empty[Int]
-    }
+  def iterator: Iterator[Attrs.ValueMap] = new Iterator[ValueMap] {
     private var idx = 0
     def next(): ValueMap = {
       val res = expandAt(range(idx))
@@ -111,12 +117,14 @@ class ValueExpander(exs: ExValueMap) {
   }
 
   def extractSubStrs(id: Int, _str: String, zerofillDigit: Int = 0): String = {
+
     val pf: PartialFunction[AValue, String] = {
       case Str(s) => s
       case Icon(p) => p.toString
       case FaceGraphic(p, n, t) => p.toString + ":" + n.toString
       case NullValue => ""
     }
+
     var str = _str
     val reg = """\$\{(\w+)\}""".r
     reg.findAllIn(str).matchData foreach { m =>
