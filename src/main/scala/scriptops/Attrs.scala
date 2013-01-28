@@ -2,6 +2,7 @@ package com.github.whelmaze.pictbliz.scriptops
 
 
 import java.net.URI
+import com.github.whelmaze.pictbliz.UColor
 
 object Values {
 
@@ -71,6 +72,9 @@ object Attrs {
 
   // font
   case class AFont(name: String, style: Symbol, size: Int, lang: FontLang = Ja) extends Attr
+
+  // hemming
+  case class AHemming(color: UColor, size: Int) extends Attr
 
   // interval
   case class AInterval(xparam: Int, yparam: Int) extends Attr

@@ -68,6 +68,7 @@ class UColor(val self: java.awt.Color) {
         (60 * (r - g) / div) + 240
     HSV(h.toInt, s.toInt, max)
   }
+  val rgb = self.getRGB
   val r = self.getRed
   val g = self.getGreen
   val b = self.getBlue

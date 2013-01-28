@@ -50,15 +50,16 @@ class TestSpec {
         ) ++ stdstyle(style='bold, inWin=true)),
         'price -> AreaUnit(Map(
           'rect -> ARect(160, 0, 150, 30),
-          'align -> AAlign('right, 'top)
-        ) ++ stdstyle()),
+          'align -> AAlign('right, 'top),
+          'hemming -> AHemming(UColor.code("#001300"), 1)
+        ) ++ stdstyle(inWin=true)),
         'desc -> AreaUnit(Map(
           'point -> APoint(10, 18)
         ) ++ stdstyle(inWin=true)),
         'misc -> AreaUnit(Map(
           'rect -> ARect(10, 40, 310, 40),
           'align -> AAlign('right, 'bottom)
-        ) ++ stdstyle(size=12))
+        ) ++ stdstyle(size=12, inWin=true))
       )
     )
     val d = new Drawer(layout)

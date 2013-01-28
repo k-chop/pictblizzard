@@ -2,10 +2,10 @@ package com.github.whelmaze.pictbliz
 
 import java.awt.Color
 import java.awt.image.{DataBufferInt, BufferedImage}
+import scala.annotation.tailrec
 
 import scriptops._
 import scriptops.Attrs._
-import com.github.whelmaze.pictbliz.ImageUtils.ARGB
 
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
@@ -27,16 +27,21 @@ class TextStyler(val origimg: BufferedImage,
   
   def process(): BufferedImage = {
     // TODO: 陰もAttrMap見てありなし決める
-    val dest = ImageUtils.extraSizeImage(origimg, 1)
+    val dest = ImageUtils.extraSizeImage(origimg, 0)
     val s = shadowed()
-    val h = hemmed(origimg)
-    val c = colored(h)
+    val body: BufferedImage = if (attrmap.contains('hemming)) {
+      val AHemming(color, hemSize) = attrmap('hemming)
+      val h = hemmed(origimg, color, hemSize)
+      colored(h)
+    } else {
+      colored(origimg)
+    }
 
     val g = dest.createGraphics
     g.drawImage(s, null, 1, 1) // shadow offset = 1
-    //g.drawImage(c, null, 0, 0)
-    g.drawImage(c, null, 0, 0)
+    g.drawImage(body, null, 0, 0)
     g.dispose()
+
 
     // TODO: ふちどりした場合、サイズと描画位置が変更されるのでAttrMapの更新しろ
 
@@ -83,15 +88,17 @@ class TextStyler(val origimg: BufferedImage,
       }
 
       @scala.annotation.tailrec
-      def drawEachLine(b: Int, l: List[String]): Unit = l match {
-        case Nil => return
-        case head :: rest =>
-          val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length)
-          if (debug) test += ((px, py, pw, ph))
-          val paintTex = colors.getTexture(pw, ph)(texIdx)
-          g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
+      def drawEachLine(b: Int, l: List[String]) {
+        l match {
+          case Nil => return
+          case head :: rest =>
+            val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length)
+            if (debug) test += ((px, py, pw, ph))
+            val paintTex = colors.getTexture(pw, ph)(texIdx)
+            g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
 
-          drawEachLine(b + head.length + 1, rest)
+            drawEachLine(b + head.length + 1, rest)
+        }
       }
       val subs = attrstr.str.substring(begin, end)
       drawEachLine(begin, subs.split("\n").toList)
@@ -101,29 +108,18 @@ class TextStyler(val origimg: BufferedImage,
     ImageUtils.synthesis(maskimg, targetimg)
   }
 
-  def hemmed(src: BufferedImage): BufferedImage = {
+  def hemmed(src: BufferedImage, hemcolor: UColor, hemSize: Int): BufferedImage = {
     import ImageUtils.{neighbor, alpha}
-    import scala.annotation.tailrec
-    val ex = 1  // 余分にとるサイズは縁の幅によって変わるけど仮で1固定
-    val destimg = ImageUtils.extraSizeImage(src, ex)
+
+
+    val destimg = ImageUtils.extraSizeImage(src, hemSize)
     val d = ImageUtils.sameSizeImage(destimg)
     locally {
       val g = destimg.createGraphics()
-      g.drawImage(src, null, ex, ex)
+      g.drawImage(src, null, hemSize, hemSize)
     }
     val da: Array[Int] = (d.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
     val dest: Array[Int] = (destimg.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
-
-    // TODO: 縁取り色はAttrMapから読み込む。今は仮
-    val hemcolor = 0xFFFF0000 // 赤
-/*
-    pix.indices foreach { i: Int =>
-      val a = neighbor(pix, i)
-      val ARGB(alp,_,_,_) = pix(i)
-      val alphas = a.map(_ & 0xFF000000 >>> 24)
-      if (alp == 0 && alphas.sum != 0) dest(i+1+destimg.getWidth) = alpha(hemcolor, alphas.max)
-    }
-  */
 
     import ImageUtils.{ add, mul }
 
@@ -141,7 +137,7 @@ class TextStyler(val origimg: BufferedImage,
           i += 1
         }
         //val ct_n = n+destimg.getWidth+1+(n/src.getWidth)*2
-        if (alp == 0 && maxalpha != 0) da(n) = alpha(hemcolor, maxalpha)
+        if (alp == 0 && maxalpha != 0) da(n) = alpha(hemcolor.rgb, maxalpha)
         if (0 < alp && alp < 255) {
           val s = alp / 255.0
           val newcolor = 0xFFFFFFFF//add(mul(dest(n), s), mul(hemcolor, 1-s))
