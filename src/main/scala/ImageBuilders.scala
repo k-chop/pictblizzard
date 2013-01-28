@@ -14,16 +14,16 @@ object ImageBuilders {
   implicit val StrBuilder = new Buildable[Str] {
     def build(self: Str, attrmap: AttrMap) = {
       val strgraphics = StrGraphics.build(self.s, attrmap)
-      val result = strgraphics.processImage()
+      val res = strgraphics.processImage()
       strgraphics.dispose()
-      ResultImage(findBeginPoint(attrmap), result)
+      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)
     }
   }
 
   implicit val IconBuilder = new Buildable[Icon] {
     def build(self: Icon, attrmap: AttrMap) = {
-      val icon: BufferedImage = PNG.read(self.uri)
-      ResultImage(findBeginPoint(attrmap), icon)
+      val res: BufferedImage = PNG.read(self.uri)
+      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)
     }
   }
 
@@ -32,7 +32,7 @@ object ImageBuilders {
       val image = PNG.read(self.uri).transparent(self.transparent)
       val n = self.no
       val res = image.getSubimage((n%4)*48, (n/4)*48, 48, 48)  // 2000用ってことで決め打ち
-      ResultImage(findBeginPoint(attrmap), res)
+      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)
     }
   }
 
@@ -41,7 +41,7 @@ object ImageBuilders {
       import self._
       val image = PNG.read(uri).transparent(transparent)
       val res = image.getSubimage(no%4*96, no/4*96, 96, 96)
-      ResultImage(findBeginPoint(attrmap), res)
+      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)
     }
   }
 
@@ -52,7 +52,7 @@ object ImageBuilders {
       val (bx, by) = ((no%4)*72, (no/4)*128)
       val (sx, sy) = (act*24, dir*32)
       val res = image.getSubimage(bx+sx, by+sy, 24, 32)
-      ResultImage(findBeginPoint(attrmap), res)
+      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)
     }
   }
 
@@ -78,9 +78,19 @@ object ImageBuilders {
     def build(self: ABackground, attrmap: AttrMap) = ???
   }
 
-  //util
-  def findBeginPoint(attrmap: AttrMap): (Int, Int) = {
+  /**
+   * AttrMapの内容から画像の描画位置(左上)を計算する。
+   * @param attrmap AttrMap
+   * @param width 画像の横幅
+   * @param height 画像の縦幅
+   * @return 描画位置(左上)
+   */
+  def findBeginPoint(attrmap: AttrMap, width: Int, height: Int): (Int, Int) = {
+    val hasOnCenter = attrmap.contains('oncenter)
     AttrMap.findParam(attrmap, 'point, 'rect) map {
+      case APoint(x, y) if hasOnCenter => {
+        ((x - width/2.0).toInt, (y - height/2.0).toInt)
+      }
       case APoint(x, y)      => (x, y)
       case ARect(x, y, _, _) => (x, y)
     } getOrElse (0, 0)
@@ -92,7 +102,9 @@ trait Buildable[T <: Drawable] {
   def build(self: T, attrmap: AttrMap): ResultImage
 }
 
-// 描画位置と描画するImageを持つ
+/**
+ * 描画位置(左上)と描画するImageを持つ
+ */
 case class ResultImage(pos: (Int, Int), img: BufferedImage)
 
 // hidoi
