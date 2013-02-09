@@ -43,7 +43,7 @@ class DrawableImage(img: BufferedImage) {
 
     val bgImage = AttrMap.findParam(areaunit.attrmap, 'tile, 'background, 'window) flatMap {
       case a: Drawable =>
-        ImageBuilder.build(a, areaunit.attrmap += ('size -> exSize))
+        ImageBuilder.build(a, (areaunit.attrmap) += ('size -> exSize))
       case _ => None
     }
 

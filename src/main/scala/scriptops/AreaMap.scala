@@ -44,5 +44,12 @@ case class AreaMap(idmap: IntMap[Key], self: Map[Key, AreaUnit], nextId: Int = 0
   def foreach(f: (Key, AreaUnit) => Unit) {
     idmap foreach ( kv => f(kv._2, self(kv._2)) )
   }
+  override def toString: String = {
+    val s = new mutable.StringBuilder
+    s append s"[AreaMap: nextId=$nextId, "
+    idmap.valuesIterator foreach { v => s append s"${self(v).toString}, " }
+    s append "]"
+    s.toString()
+  }
 }
 //  type AreaMap = TreeMap[Key, AreaUnit]

@@ -7,11 +7,10 @@ import scala.language.postfixOps
 
 class TestSpec {
   import scriptops.implicits.string2URI
-  import scriptops.AttrMap.map2AttrMap
 
-  val strdef: AMap = AMap('interval -> AInterval(0, 3),
+  val strdef = AMap('interval -> AInterval(0, 3),
                    'padding -> APadding(8, 10))
-  def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false): AMap = {
+  def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false) = {
     (if (inWin) strdef else AMap.empty[Key, Attr]) + ('font -> AFont(font, style, size))
   }
 
@@ -75,7 +74,7 @@ class TestSpec {
 
   def faceSpec() {
     val layout = LayoutUnit(
-      Map('size -> ASize(320, 240)),
+      AMap('size -> ASize(320, 240)),
       AreaMap.fromSeq(
         'a -> AreaUnit(AMap('point -> APoint(0, 0))),
         'b -> AreaUnit(AMap('point -> APoint(50, 0))),

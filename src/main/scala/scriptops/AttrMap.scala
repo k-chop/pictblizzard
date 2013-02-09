@@ -24,7 +24,7 @@ object AttrMap {
 
   def apply(elems: (Key, Attr)*): AttrMap = {
     val buf = empty
-    elems.foreach(empty += _)
+    elems.foreach(buf += _)
     buf
   }
 
@@ -33,15 +33,34 @@ object AttrMap {
   implicit def canBuildFrom[A, B] = new CanBuildFrom[AttrMap, (Key, Attr), AttrMap] {
     def apply(from: AttrMap): mutable.Builder[(Key, Attr), AttrMap] = apply()
     def apply(): mutable.Builder[(Key, Attr), AttrMap] = new mutable.MapBuilder[Key, Attr, AttrMap](empty)
-  }}
+  }
+}
+
+// 変更不能で値を取得するだけのAttrMapのView
+class AttrMapView(private[this] val self: AttrMap) {
+
+  def apply(k: Key): Attr = self.apply(k)
+  def get(k: Key): Option[Attr] = self.get(k)
+  def find(p: ((Key, Attr)) => Boolean): Option[(Key, Attr)] = self.find(p)
+  def contains(k: Key): Boolean = self.contains(k)
+
+}
 
 class AttrMap extends mutable.Map[Key, Attr] with mutable.MapLike[Key, Attr, AttrMap] {
+
+  def const: AttrMapView = new AttrMapView(this)
+
+  val self = mutable.Map.empty[Key, Attr]
+
+  def newTo(from: Map[Key, Attr]): AttrMap = {
+    val a = new AttrMap
+    a.self ++= from
+    a
+  }
 
   override def empty = new AttrMap
 
   override def apply(k: Key) = self(k)
-
-  protected val self = mutable.Map.empty[Key, Attr]
 
   def +=(kv: (Attrs.Key, Attr)): this.type = { self += kv; this }
 

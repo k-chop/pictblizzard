@@ -24,7 +24,7 @@ class TextStyler(val origimg: BufferedImage,
   }
   var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
   private[this] val debug = attrmap.contains('debug)
-  
+
   def process(): BufferedImage = {
     // TODO: 陰もAttrMap見てありなし決める
     val dest = ImageUtils.extraSizeImage(origimg, 0)
@@ -41,7 +41,6 @@ class TextStyler(val origimg: BufferedImage,
     g.drawImage(s, null, 1, 1) // shadow offset = 1
     g.drawImage(body, null, 0, 0)
     g.dispose()
-
 
     // TODO: ふちどりした場合、サイズと描画位置が変更されるのでAttrMapの更新しろ
 

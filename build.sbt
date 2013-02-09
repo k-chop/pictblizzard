@@ -17,6 +17,8 @@ libraryDependencies ++= Seq(
   //"swt" % "jface" % "3.0.1"
 )
 
+initialCommands in console := "import com.github.whelmaze.pictbliz; import pictbliz._; import pictbliz.scriptops._; import pictbliz.scriptops.Attrs._"
+
 scalacOptions += "-feature"
 
 // reduce the maximum number of errors shown by the Scala compiler
