@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 import com.github.whelmaze.pictbliz._
 import com.github.whelmaze.pictbliz.scriptops.Attrs._
+import scriptops.AttrMap
 import java.awt.geom.Rectangle2D
 
 class WrappedGlyphVectorSpec extends WordSpec with ShouldMatchers with BeforeAndAfter {
@@ -23,7 +24,7 @@ class WrappedGlyphVectorSpec extends WordSpec with ShouldMatchers with BeforeAnd
   val alphabets: String =
     ((48 to 57) ++ (65 to 90) ++ (97 to 122)) map { _.toChar } mkString ""
 
-  val amap: AttrMap = Map(
+  val amap: AttrMap = AttrMap(
     'a -> ANil,
     'b -> ANil
   )

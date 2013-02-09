@@ -23,7 +23,7 @@ class TextStyler(val origimg: BufferedImage,
     }
   }
   var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
-  val debug = attrmap.contains('debug)
+  private[this] val debug = attrmap.contains('debug)
   
   def process(): BufferedImage = {
     // TODO: 陰もAttrMap見てありなし決める
@@ -60,7 +60,7 @@ class TextStyler(val origimg: BufferedImage,
     dest
   }
   
-  // 影つける
+  // つける
   def shadowed(): BufferedImage = colors match {
     case s: SystemGraphics => {
       val maskimg = ImageUtils.copy(origimg)
@@ -127,7 +127,7 @@ class TextStyler(val origimg: BufferedImage,
 
     @tailrec def traverse(n: Int, lim: Int) {
       if (n < lim) {
-        val a = neighbor(dest, n, w)
+        val a = neighbor(dest, n, w, default = 0)
         val alp = (dest(n) & 0xFF000000 >>> 24)
         var maxalpha = 0
         var i = 0; val len = a.length
@@ -158,5 +158,5 @@ class TextStyler(val origimg: BufferedImage,
     origimg
   }
 
-  
+
 }

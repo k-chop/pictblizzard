@@ -1,9 +1,12 @@
 package com.github.whelmaze.pictbliz.scriptops
 
+import collection.mutable
 import Attrs._
+import collection.generic.{CanBuildFrom, MutableMapFactory}
+import language.implicitConversions
 
 object AttrMap {
-  def empty() = Map.empty[Key, Attr]
+  implicit def map2AttrMap(from: Map[Key, Attr]): AttrMap = AttrMap(from.toSeq: _*)
 
   def findParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
     @scala.annotation.tailrec
@@ -19,4 +22,34 @@ object AttrMap {
     findEnableParamRec(am, ss.toList)
   }
 
+  def apply(elems: (Key, Attr)*): AttrMap = {
+    val buf = empty
+    elems.foreach(empty += _)
+    buf
+  }
+
+  def empty[Key, Attr]: AttrMap = new AttrMap
+
+  implicit def canBuildFrom[A, B] = new CanBuildFrom[AttrMap, (Key, Attr), AttrMap] {
+    def apply(from: AttrMap): mutable.Builder[(Key, Attr), AttrMap] = apply()
+    def apply(): mutable.Builder[(Key, Attr), AttrMap] = new mutable.MapBuilder[Key, Attr, AttrMap](empty)
+  }}
+
+class AttrMap extends mutable.Map[Key, Attr] with mutable.MapLike[Key, Attr, AttrMap] {
+
+  override def empty = new AttrMap
+
+  override def apply(k: Key) = self(k)
+
+  protected val self = mutable.Map.empty[Key, Attr]
+
+  def +=(kv: (Attrs.Key, Attr)): this.type = { self += kv; this }
+
+  def +(kv: (Key, Attr)): this.type = { self + kv; this }
+
+  def -=(key: Attrs.Key): this.type = { self -= key; this}
+
+  def get(key: Attrs.Key): Option[Attr] = self.get(key)
+
+  def iterator: Iterator[(Attrs.Key, Attr)] = self.iterator
 }

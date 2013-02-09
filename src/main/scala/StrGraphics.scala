@@ -5,6 +5,7 @@ import java.awt.font.GlyphVector
 import java.awt.image.BufferedImage
 
 import scriptops.Attrs._
+import scriptops.AttrMap
 
 object StrGraphics {
 
