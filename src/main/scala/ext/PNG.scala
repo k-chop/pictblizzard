@@ -56,8 +56,15 @@ object PNG {
   //def read(file: File): BufferedImage = ImageIO.read(file)
   def read(file: File): BufferedImageBuilder = new BufferedImageBuilder(file)
 
+  /**
+   * 指定したパスに書き出す。指定したディレクトリがない場合は生成する。
+   * @param img ファイルに書きだすデータ
+   * @param path 書き出し先のパス
+   */
   def write(img: BufferedImage, path: String) {
-    ImageIO.write(img, "png", new File(path))
+    val f = new File(path)
+    Option(f.getParentFile) foreach { _.mkdirs() }
+    ImageIO.write(img, "png", f)
   }
   
   import BinaryUtils._

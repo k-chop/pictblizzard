@@ -1,7 +1,7 @@
 package com.github.whelmaze.pictbliz.scriptops
 
 import com.github.whelmaze.pictbliz
-import pictbliz.{Resource, ValueExpander, Drawer}
+import pictbliz.{UColor, Resource, ValueExpander, Drawer}
 import pictbliz.scriptops.Attrs._
 
 import scala.util.parsing.combinator.syntactical._
@@ -34,16 +34,16 @@ object Parser extends StandardTokenParsers with ParserUtil {
       case vva: ExValueMap => valuemaps += (i -> vva)
     }
   }
+
   lazy val gen: Parser[Will[Unit]] = "generate" ~> ident ~ "with" ~ ident ^^ {
     case lays ~ _ ~ vs => Will{
-      println("gen")
       val d = new Drawer(layouts(lays))
       val e = new ValueExpander(valuemaps(vs))
       e.iterator.map { vm =>
         d.draw(vm, NullContext)
       }.zipWithIndex.foreach { case (res, idx) =>
-        val name = Resource.tempdir + idx + ".png"
-        println(name + "output.")
+        val name = Resource.tempdir + "sc/" + idx + ".png"
+        println(name + " output.")
         res.write(name)
       }
     }
@@ -96,6 +96,14 @@ object Parser extends StandardTokenParsers with ParserUtil {
         APoint(args(0).toInt, args(1).toInt)
       case "size" if len == 2 =>
         ASize(args(0).toInt, args(1).toInt)
+      case "align" if len == 1 || len == 2 =>
+        AAlign(Symbol(args(0).toStr), Symbol(args(1).toStr))
+      case "window" if len == 1 =>
+        AWindow(args(0).toStr)
+      case "front_color" if len == 1 =>
+        ASystemGraphics(args(0).toStr)
+      case "hemming" if len == 2 =>
+        AHemming(UColor.code(args(0).toStr), args(1).toInt)
       case _ => ANil
     }
   }
@@ -104,8 +112,9 @@ object Parser extends StandardTokenParsers with ParserUtil {
   def parse(source: String) = {
     all(new lexical.Scanner(source)) match {
       case Success(strs, _) =>
+        println(strs.mkString)
         strs.foreach{
-          case w: Will[_] => println("egge"); w.doit
+          case w: Will[_] => w.doit
           case _ =>
         }
 
@@ -119,11 +128,12 @@ object Parser extends StandardTokenParsers with ParserUtil {
       case Number(n) => n
       case _ => 0
     }
-    def toString(default: String = ""): String = a match {
+    def toStr: String = a match {
       case Str(s) => s
       case ExStr(s) => s
-      case _ => default
+      case _ => ""
     }
+
   }
 
 }
