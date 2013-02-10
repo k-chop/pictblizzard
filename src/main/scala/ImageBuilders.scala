@@ -3,7 +3,7 @@ package com.github.whelmaze.pictbliz
 import scriptops.{Attrs, AttrMap}
 import scriptops.Attrs._
 import java.awt.image.BufferedImage
-import scriptops.Attrs.AttrMap
+import scriptops.{ AttrMap, AttrMapView }
 
 
 object ImageBuilders {

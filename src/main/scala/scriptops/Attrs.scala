@@ -11,7 +11,7 @@ object Values {
 object Attrs {
   // aliases
   type Key = Symbol
-  type AttrMap = Map[Key, Attr]
+  //type AttrMap = Map[Key, Attr]
   type ValueMap = Map[Key, AValue]
   type ExValueMap = Map[String, AnyValue]
 
@@ -24,6 +24,8 @@ object Attrs {
   case class Str(s: String) extends AValue
 
   case class Icon(uri: URI) extends AValue
+
+  case class Number(i: Int) extends AValue
 
   case class FaceGraphic(uri: URI, no: Int, transparent: Boolean) extends AValue
 
@@ -47,7 +49,7 @@ object Attrs {
   //case class ExDatabase() extends ExValue
 
   object LayoutUnit {
-    def empty() = LayoutUnit.apply(AttrMap.empty(), AreaMap.empty())
+    def empty() = LayoutUnit.apply(new AttrMap, AreaMap.empty())
   }
   case class LayoutUnit(env: AttrMap, areamap: AreaMap)
   case class AreaUnit(attrmap: AttrMap) {

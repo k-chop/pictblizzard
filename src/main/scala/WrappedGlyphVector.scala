@@ -4,6 +4,7 @@ import java.awt.font.GlyphVector
 import java.awt.geom.{ Point2D, Rectangle2D }
 import scala.math.{ max, min }
 
+import scriptops.AttrMap
 import scriptops.Attrs._
 
 

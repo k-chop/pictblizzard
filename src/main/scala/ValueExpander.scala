@@ -24,6 +24,7 @@ class ValueExpander(exs: ExValueMap) {
 
   private[this] lazy val range: Array[Int] = exs.get("id") match {
     case Some(ExRange(ids)) => ids
+    case Some(Number(id)) => Array(id)
     case _ => Array.empty[Int]
   }
 
@@ -121,6 +122,7 @@ class ValueExpander(exs: ExValueMap) {
     val pf: PartialFunction[AValue, String] = {
       case Str(s) => s
       case Icon(p) => p.toString
+      case Number(n) => n.toString
       case FaceGraphic(p, n, t) => p.toString + ":" + n.toString
       case NullValue => ""
     }

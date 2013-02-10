@@ -2,16 +2,16 @@ package com.github.whelmaze.pictbliz.sample
 
 import com.github.whelmaze.pictbliz._
 import scriptops.Attrs._
-import scriptops._
+import scriptops.{AttrMap => AMap, AreaMap}
 import scala.language.postfixOps
 
 class TestSpec {
   import scriptops.implicits.string2URI
 
-  val strdef = Map('interval -> AInterval(0, 3),
+  val strdef = AMap('interval -> AInterval(0, 3),
                    'padding -> APadding(8, 10))
   def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false) = {
-    (if (inWin) strdef else Map.empty[Key, Attr]) + ('font -> AFont(font, style, size))
+    (if (inWin) strdef else AMap.empty[Key, Attr]) + ('font -> AFont(font, style, size))
   }
 
   @inline def r(i: Int) = scala.util.Random.nextInt(i)
@@ -39,27 +39,27 @@ class TestSpec {
       "filename" -> ExStr("${itemno}-${name}.png")
     )).expand()
     val layout = LayoutUnit(
-      Map('size -> ASize(320, 80)),
+      AMap('size -> ASize(320, 80)),
       AreaMap.fromSeq(
-        'win -> AreaUnit(Map(
+        'win -> AreaUnit(AMap(
           'rect -> ARect(0, 0, 320, 80),
           'window -> AWindow("system6.png"),
           'front_color -> ASystemGraphics("system6.png"))),
-        'name -> AreaUnit(Map(
+        'name -> AreaUnit(AMap(
           'point -> APoint(0, 0)
-        ) ++ stdstyle(style='bold, inWin=true)),
-        'price -> AreaUnit(Map(
+        ) ++= stdstyle(style='bold, inWin=true)),
+        'price -> AreaUnit(AMap(
           'rect -> ARect(160, 0, 150, 30),
           'align -> AAlign('right, 'top),
           'hemming -> AHemming(UColor.code("#001300"), 1)
-        ) ++ stdstyle(inWin=true)),
-        'desc -> AreaUnit(Map(
+        ) ++= stdstyle(inWin=true)),
+        'desc -> AreaUnit(AMap(
           'point -> APoint(10, 18)
-        ) ++ stdstyle(inWin=true)),
-        'misc -> AreaUnit(Map(
+        ) ++= stdstyle(inWin=true)),
+        'misc -> AreaUnit(AMap(
           'rect -> ARect(10, 40, 310, 40),
           'align -> AAlign('right, 'bottom)
-        ) ++ stdstyle(size=12, inWin=true))
+        ) ++= stdstyle(size=12, inWin=true))
       )
     )
     val d = new Drawer(layout)
@@ -74,14 +74,14 @@ class TestSpec {
 
   def faceSpec() {
     val layout = LayoutUnit(
-      Map('size -> ASize(320, 240)),
+      AMap('size -> ASize(320, 240)),
       AreaMap.fromSeq(
-        'a -> AreaUnit(Map('point -> APoint(0, 0))),
-        'b -> AreaUnit(Map('point -> APoint(50, 0))),
-        'c -> AreaUnit(Map('point -> APoint(100, 0))),
-        'd -> AreaUnit(Map('point -> APoint(0, 50))),
-        'e -> AreaUnit(Map('point -> APoint(50, 50))),
-        'f -> AreaUnit(Map('point -> APoint(100, 50)))
+        'a -> AreaUnit(AMap('point -> APoint(0, 0))),
+        'b -> AreaUnit(AMap('point -> APoint(50, 0))),
+        'c -> AreaUnit(AMap('point -> APoint(100, 0))),
+        'd -> AreaUnit(AMap('point -> APoint(0, 50))),
+        'e -> AreaUnit(AMap('point -> APoint(50, 50))),
+        'f -> AreaUnit(AMap('point -> APoint(100, 50)))
       )
     )
     val rs = Resource.uri("ds1.png")
@@ -99,10 +99,10 @@ class TestSpec {
 
   def charaSpec() {
     val layout = LayoutUnit(
-      Map('size -> ASize(320, 240)),
+      AMap('size -> ASize(320, 240)),
       AreaMap.fromSeq(
         (for(c <- 1 to 200) yield {
-          (Symbol(c.toString): Key) -> AreaUnit(Map('point -> APoint(r(320), r(240))))
+          (Symbol(c.toString): Key) -> AreaUnit(AMap('point -> APoint(r(320), r(240))))
         }): _*
       )
     )
@@ -116,10 +116,10 @@ class TestSpec {
 
   def battleSpec() {
     val layout = LayoutUnit(
-      Map('size -> ASize(320, 240)),
+      AMap('size -> ASize(320, 240)),
       AreaMap.fromSeq(
         (for(c <- 1 to 20) yield {
-          (Symbol(c.toString): Key) -> AreaUnit(Map('point -> APoint(r(320), r(240))))
+          (Symbol(c.toString): Key) -> AreaUnit(AMap('point -> APoint(r(320), r(240))))
         }): _*
       )
     )
@@ -137,19 +137,19 @@ class TestSpec {
     val repo = LayoutRepository.empty()
 
     val lay = LayoutUnit(
-      Map('size -> ASize(320, 240)),
+      AMap('size -> ASize(320, 240)),
       AreaMap.fromSeq(
-      'name->AreaUnit(Map('rect -> ARect(5,5,300,20),
+      'name->AreaUnit(AMap('rect -> ARect(5,5,300,20),
                                 'auto_expand -> AAutoExpand
-                                ) ++ stdstyle()),
-      'icon->AreaUnit(Map('rect -> ARect(280,0,32,32)
-                                ) ++ stdstyle()),
-      'desc->AreaUnit(Map('point -> ARect(0, 20, 12, 2),
+                                ) ++= stdstyle()),
+      'icon->AreaUnit(AMap('rect -> ARect(280,0,32,32)
+                                ) ++= stdstyle()),
+      'desc->AreaUnit(AMap('point -> ARect(0, 20, 12, 2),
                                 'window -> AWindow("system6.png"),
                                 'auto_expand -> AAutoExpand,
                                 'front_color -> ASystemGraphics("system6.png")
-                         ) ++ stdstyle(inWin = true)),
-      'cost->AreaUnit(Map('rect -> ARect(300,2,30,15),
+                         ) ++= stdstyle(inWin = true)),
+      'cost->AreaUnit(AMap('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
     )
 
@@ -211,17 +211,17 @@ class TestSpec {
   def testOldSpec() {
 
     val layout = LayoutUnit(
-      Map('size -> ASize(320,240)), //env
+      AMap('size -> ASize(320,240)), //env
       AreaMap.fromSeq(  //layouts
-        'icon1 -> AreaUnit(Map('point->APoint(0,0))),
-        'icon2 -> AreaUnit(Map('point->APoint(50,0))),
-        'icon3 -> AreaUnit(Map('point->APoint(100,0))),
-        'str -> AreaUnit(Map(
+        'icon1 -> AreaUnit(AMap('point->APoint(0,0))),
+        'icon2 -> AreaUnit(AMap('point->APoint(50,0))),
+        'icon3 -> AreaUnit(AMap('point->APoint(100,0))),
+        'str -> AreaUnit(AMap(
           'rect->ARect(10,30,200,30),
           'align->AAlign('x_center, 'bottom),
           'border->ABorder,
           'font->AFont("Terminus-ja", 'plain, 12))),
-        'str2->AreaUnit(Map('rect->ARect(10,60,200,120),
+        'str2->AreaUnit(AMap('rect->ARect(10,60,200,120),
           'font->AFont("Terminus-ja", 'plain, 12),
           'align->AAlign('x_center, 'y_center)))
       ))

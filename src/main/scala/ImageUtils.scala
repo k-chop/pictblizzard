@@ -35,7 +35,17 @@ object ImageUtils {
 
   def alpha(color: Int, value: Int): Int = (color & 0x00FFFFFF) | (value << 24)
 
-  def neighbor(arr: Array[Int], i: Int, w: Int): Array[Int] = {
+  /**
+   * 与えられたArrayの8近傍を取り、新しいArrayに入れて返す。
+   * 配列の範囲外は引数として与えたdefaultの値を取る。
+   *
+   * @param arr 8近傍を調べるArray(1次元)
+   * @param i 調べる位置のインデックス
+   * @param w Arrayの横幅
+   * @param default 配列の範囲外を表す値
+   * @return 8近傍の値が入ったArray
+   */
+  def neighbor(arr: Array[Int], i: Int, w: Int, default: Int): Array[Int] = {
     // nante hidoi code nanda...
     val a = Array(0, 0, 0, 0, 0, 0, 0, 0)
     val u = i < w
@@ -53,7 +63,7 @@ object ImageUtils {
 
     var j = 0; val len = arr.length
     while(j < 8) {
-      a(j) = if (0 <= a(j) && a(j) < len) arr(a(j)) else 0
+      a(j) = if (0 <= a(j) && a(j) < len) arr(a(j)) else default
       j += 1
     }
     a
