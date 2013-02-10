@@ -9,6 +9,8 @@ import scala.util.parsing.combinator._
 import scala.collection.mutable
 
 import util.Try
+import java.net.URI
+import java.io.File
 
 trait ParserUtil {
   class Will[T](ex: => T) {
@@ -17,6 +19,19 @@ trait ParserUtil {
   object Will {
     def apply[T](ex : => T) = new Will[T](ex)
   }
+
+  def validateFontStyle(s: String): Symbol = s match {
+    case "plain" => 'plain
+    case "bold" => 'bold
+    case "italic" => 'italic
+    case "bolditalic" => 'bolditalic
+    case _ => 'plain // 不明な指定は全部標準書体に置き換える
+  }
+
+  private[scriptops] implicit class StringConv(s: String) {
+    def toURI: URI = (new File(s)).toURI
+  }
+
 }
 
 object Parser extends StandardTokenParsers with ParserUtil {
@@ -39,10 +54,12 @@ object Parser extends StandardTokenParsers with ParserUtil {
     case lays ~ _ ~ vs => Will{
       val d = new Drawer(layouts(lays))
       val e = new ValueExpander(valuemaps(vs))
+      var n: Option[String] = None
       e.iterator.map { vm =>
+        n = Option( vm.get('filename) match { case Some(Str(s)) => s case _ => "" } )
         d.draw(vm, NullContext)
       }.zipWithIndex.foreach { case (res, idx) =>
-        val name = Resource.tempdir + "sc/" + idx + ".png"
+        val name = Resource.tempdir + "sc/" + (n getOrElse idx) + ".png"
         println(name + " output.")
         res.write(name)
       }
@@ -58,7 +75,9 @@ object Parser extends StandardTokenParsers with ParserUtil {
 
   lazy val literal: Parser[AnyValue] = {
     numericLit ^^ { case n => Number(n.toInt) } |
-    stringLit ^^ { case s => ExStr(s) }
+    stringLit ^^ {
+      case s => ExStr(s.replace("\\n", "\n"))
+    }
   }
 //  lazy val values = value | "{" ~> repsep(value, ",") <~ "}" ^^ { case a => s"""{ ${a.mkString(",")} }"""}
   lazy val layoutOne: Parser[(Key, AreaUnit)] = {
@@ -83,8 +102,22 @@ object Parser extends StandardTokenParsers with ParserUtil {
 
   lazy val valuesDef: Parser[ExValueMap] = "values" ~> "{" ~> rep1(valuesOne) <~ "}" ^^ { case s => s.toMap }
 
-  lazy val valuesOne: Parser[(String, AnyValue)] = ident ~ ":" ~ evaluable ^^ {
-    case i ~ _ ~ ev => (i, ev)
+  lazy val valuesOne: Parser[(String, AnyValue)] = {
+    ident ~ ":" ~ evaluable ^^ { case i ~ _ ~ ev => (i, ev) } |
+    ident ~ ":" ~ valuesApply ^^ { case i ~ _ ~ va => (i, va) }
+  }
+
+  lazy val valuesApply: Parser[AnyValue] = ident ~ "(" ~ repsep(evaluable, ",") <~ ")" ^^ {
+    case i ~ _ ~ seq => fetchValue(i, seq)
+  }
+
+  def fetchValue(name: String, args: Seq[AnyValue]): AnyValue = {
+    val len = args.size
+    name match {
+      case "icon" if len == 1 => // ExIconのときはどうすんの
+        Icon(Resource.uri(args(0).toStr))
+      case _ => NullValue
+    }
   }
 
   def fetchAttr(name: String, args: Seq[AnyValue]): Attr = {
@@ -104,17 +137,26 @@ object Parser extends StandardTokenParsers with ParserUtil {
         ASystemGraphics(args(0).toStr)
       case "hemming" if len == 2 =>
         AHemming(UColor.code(args(0).toStr), args(1).toInt)
+      case "auto_expand" =>
+        AAutoExpand
+      case "on_center" =>
+        AOnCenter
+      case "interval" if len == 2 =>
+        AInterval(args(0).toInt, args(1).toInt)
+      case "padding" if len == 2 =>
+        APadding(args(0).toInt, args(1).toInt)
+      case "font" if len == 3 =>
+        AFont(args(0).toStr, validateFontStyle(args(1).toStr), args(2).toInt)
       case _ => ANil
     }
   }
-  //def eval(str: String): AnyValue = ExStr(str)
 
   def parse(source: String) = {
     all(new lexical.Scanner(source)) match {
       case Success(strs, _) =>
-        println(strs.mkString)
+        println(strs.mkString) // => とりあえず文字列で出力
         strs.foreach{
-          case w: Will[_] => w.doit
+          case w: Will[_] => w.doit // 実行
           case _ =>
         }
 
@@ -129,8 +171,8 @@ object Parser extends StandardTokenParsers with ParserUtil {
       case _ => 0
     }
     def toStr: String = a match {
-      case Str(s) => s
-      case ExStr(s) => s
+      case Str(s) => s.replace("\\n", "\n")
+      case ExStr(s) => s.replace("\\n", "\n")
       case _ => ""
     }
 
