@@ -14,12 +14,15 @@ libraryDependencies ++= Seq(
   "org.clapper" %% "grizzled-slf4j" % "1.0.1",
   "org.slf4j" % "slf4j-api" % "1.7.1",
   "ch.qos.logback" % "logback-classic" % "1.0.7"
-  //"swt" % "jface" % "3.0.1"
 )
 
 initialCommands in console := "import com.github.whelmaze.pictbliz; import pictbliz._; import pictbliz.scriptops._; import pictbliz.scriptops.Attrs._"
 
+initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
+
 scalacOptions += "-feature"
+
+fork in run := true
 
 // reduce the maximum number of errors shown by the Scala compiler
 maxErrors := 20

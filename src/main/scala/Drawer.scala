@@ -12,7 +12,10 @@ class Drawer(layout: LayoutUnit) {
   private[this] val areamap: AreaMap = layout.areamap
 
   def draw(valuemap: ValueMap, context: Context): DrawableImage = {
-    val img = new DrawableImage(ImageUtils.newImage(sizeX, sizeY))
+    val filename = valuemap.get('filename) collect {
+      case Str(s) => s
+    } getOrElse("")
+    val img = new DrawableImage(ImageUtils.newImage(sizeX, sizeY), filename)
     img.clear(Color.black)
     areamap foreach {
       case (name, unit) =>
@@ -23,7 +26,7 @@ class Drawer(layout: LayoutUnit) {
 
 }
 
-class DrawableImage(img: BufferedImage) {
+class DrawableImage(img: BufferedImage, val name: String) {
   
   def clear(c: Color) = {
     val g2d = img.createGraphics
@@ -59,7 +62,7 @@ class DrawableImage(img: BufferedImage) {
 
   def result = img
   def write(ref: String) {
-    ext.PNG.write(img, ref)
+    ext.PNG.write(img, ref, name)
   }
   
 }

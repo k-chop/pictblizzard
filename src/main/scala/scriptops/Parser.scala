@@ -1,25 +1,44 @@
 package com.github.whelmaze.pictbliz.scriptops
 
 import com.github.whelmaze.pictbliz
-import pictbliz.{UColor, Resource, ValueExpander, Drawer}
+import pictbliz._
 import pictbliz.scriptops.Attrs._
 
 import scala.util.parsing.combinator.syntactical._
 import scala.util.parsing.combinator._
 import scala.collection.mutable
 
+import scriptops.Attrs.AAlign
+import scriptops.Attrs.AFont
+import scriptops.Attrs.AHemming
+import scriptops.Attrs.AInterval
+import scriptops.Attrs.APadding
+import scriptops.Attrs.APoint
+import scriptops.Attrs.AreaUnit
+import scriptops.Attrs.ARect
+import scriptops.Attrs.ASize
+import scriptops.Attrs.ASystemGraphics
+import scriptops.Attrs.AWindow
+import scriptops.Attrs.ExRange
+import scriptops.Attrs.ExStr
+import scriptops.Attrs.Icon
+import scriptops.Attrs.Number
+import scriptops.Attrs.Str
 import util.Try
 import java.net.URI
 import java.io.File
+import scala.Some
+
+
+// Operationトレイトとか作って、操作によって別のクラスにした方がよさげ
+class Will[T](ex: => T) {
+  def doit: T = ex
+}
+object Will {
+  def apply[T](ex : => T) = new Will[T](ex)
+}
 
 trait ParserUtil {
-  class Will[T](ex: => T) {
-    def doit: T = ex
-  }
-  object Will {
-    def apply[T](ex : => T) = new Will[T](ex)
-  }
-
   def validateFontStyle(s: String): Symbol = s match {
     case "plain" => 'plain
     case "bold" => 'bold
@@ -50,7 +69,7 @@ object Parser extends StandardTokenParsers with ParserUtil {
     }
   }
 
-  lazy val gen: Parser[Will[Unit]] = "generate" ~> ident ~ "with" ~ ident ^^ {
+  lazy val gen: Parser[Will[Seq[DrawableImage]]] = "generate" ~> ident ~ "with" ~ ident ^^ {
     case lays ~ _ ~ vs => Will{
       val d = new Drawer(layouts(lays))
       val e = new ValueExpander(valuemaps(vs))
@@ -58,11 +77,7 @@ object Parser extends StandardTokenParsers with ParserUtil {
       e.iterator.map { vm =>
         n = Option( vm.get('filename) match { case Some(Str(s)) => s case _ => "" } )
         d.draw(vm, NullContext)
-      }.zipWithIndex.foreach { case (res, idx) =>
-        val name = Resource.tempdir + "sc/" + (n getOrElse idx) + ".png"
-        println(name + " output.")
-        res.write(name)
-      }
+      }.toSeq
     }
   }
 
@@ -151,15 +166,15 @@ object Parser extends StandardTokenParsers with ParserUtil {
     }
   }
 
-  def parse(source: String) = {
+  def parse(source: String): Seq[Any] = {
     all(new lexical.Scanner(source)) match {
-      case Success(strs, _) =>
-        println(strs.mkString) // => とりあえず文字列で出力
-        strs.foreach{
+      case Success(results, _) =>
+        println(results.mkString) // => とりあえず文字列で出力
+        results.foreach{
           case w: Will[_] => w.doit // 実行
           case _ =>
         }
-
+        results
       case Failure(msg, d) => println(msg); println(d.pos.longString); sys.error("")
       case Error(msg, _) => println(msg); sys.error("")
     }

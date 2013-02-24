@@ -123,6 +123,7 @@ object ImageBuilder {
       case b: ABackground => buildImpl(b, m)
       case t: ATile => buildImpl(t, m)
       case w: AWindow => buildImpl(w, m)
+      case n: Number => sys.error("Number:{${a}} is not drawbale.\nAttrMap ->\n${m.toString}")
       case NullValue => emptyResult
     })
   }

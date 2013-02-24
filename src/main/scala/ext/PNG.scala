@@ -43,6 +43,7 @@ class BufferedImageBuilder(ref: File) {
 }
 
 object PNG {
+  private[this] var counter = 0
 
   object refconvert {
     implicit def uri2File(uri: java.net.URI) = new File(uri)
@@ -60,9 +61,10 @@ object PNG {
    * 指定したパスに書き出す。指定したディレクトリがない場合は生成する。
    * @param img ファイルに書きだすデータ
    * @param path 書き出し先のパス
+   * @param name ファイル名
    */
-  def write(img: BufferedImage, path: String) {
-    val f = new File(path)
+  def write(img: BufferedImage, path: String, name: String) {
+    val f = new File(s"$path/$name.png")
     Option(f.getParentFile) foreach { _.mkdirs() }
     ImageIO.write(img, "png", f)
   }
