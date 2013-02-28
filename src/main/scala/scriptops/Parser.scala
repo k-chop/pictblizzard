@@ -28,6 +28,7 @@ import util.Try
 import java.net.URI
 import java.io.File
 import scala.Some
+import grizzled.slf4j.Logging
 
 
 // Operationトレイトとか作って、操作によって別のクラスにした方がよさげ
@@ -170,10 +171,6 @@ object Parser extends StandardTokenParsers with ParserUtil {
     all(new lexical.Scanner(source)) match {
       case Success(results, _) =>
         println(results.mkString) // => とりあえず文字列で出力
-        results.foreach{
-          case w: Will[_] => w.doit // 実行
-          case _ =>
-        }
         results
       case Failure(msg, d) => println(msg); println(d.pos.longString); sys.error("")
       case Error(msg, _) => println(msg); sys.error("")
@@ -181,6 +178,7 @@ object Parser extends StandardTokenParsers with ParserUtil {
   }
 
   private[scriptops] implicit class AnyValueInterpreter(val a: AnyValue) extends AnyVal {
+    // 変換不能な値はログで出力しといた方がよさげ
     def toInt: Int = a match {
       case Number(n) => n
       case _ => 0
