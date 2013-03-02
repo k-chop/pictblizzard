@@ -2,7 +2,6 @@ target
 boot
 temp
 memo.org
-textures_fromrtp.png
 .cache
 .classpath
 .idea
@@ -10,3 +9,4 @@ textures_fromrtp.png
 .settings
 lib
 lib32
+no-v
