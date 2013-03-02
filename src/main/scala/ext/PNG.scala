@@ -65,6 +65,7 @@ object PNG {
    */
   def write(img: BufferedImage, path: String, name: String) {
     val f = new File(s"$path/$name.png")
+    println(s"write to ${f.getPath} ...")
     Option(f.getParentFile) foreach { _.mkdirs() }
     ImageIO.write(img, "png", f)
   }

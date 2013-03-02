@@ -14,7 +14,7 @@ object SystemGraphics {
   }
 
   def default: SystemGraphics = {
-    fromPath(Resource.uri("systemrtp2000.png"))
+    fromPath(Resource.uri("no-v/systemrtp2000.png"))
   }
 }
 

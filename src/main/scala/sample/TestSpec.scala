@@ -36,15 +36,15 @@ class TestSpec {
       "price" -> ExStr("${t_price} \\c[4]G\\c[0]"),
       "desc" -> ExStr("\\c[2]${t_desc}\\c[0]"),
       "misc" -> ExStr("攻撃${t_atk}, 命中率:${t_hit}, ${t_kind}武器"),
-      "filename" -> ExStr("${itemno}-${name}.png")
+      "filename" -> ExStr("${itemno}-${name}")
     )).expand()
     val layout = LayoutUnit(
       AMap('size -> ASize(320, 80)),
       AreaMap.fromSeq(
         'win -> AreaUnit(AMap(
           'rect -> ARect(0, 0, 320, 80),
-          'window -> AWindow("system6.png"),
-          'front_color -> ASystemGraphics("system6.png"))),
+          'window -> AWindow("no-v/system6.png"),
+          'front_color -> ASystemGraphics("no-v/system6.png"))),
         'name -> AreaUnit(AMap(
           'point -> APoint(0, 0)
         ) ++= stdstyle(style='bold, inWin=true)),
@@ -64,11 +64,9 @@ class TestSpec {
     )
     val d = new Drawer(layout)
     vmap map { vm =>
-      (d.draw(vm, NullContext), vm('filename))
+      d.draw(vm, NullContext)
     } foreach {
-      case (res, Str(s)) =>
-        res.write(Resource.tempdir + "items/" + s)
-      case _ =>
+      _.write(Resource.tempdir + "items/")
     }
   }
 
@@ -84,17 +82,18 @@ class TestSpec {
         'f -> AreaUnit(AMap('point -> APoint(100, 50)))
       )
     )
-    val rs = Resource.uri("ds1.png")
+    val rs = Resource.uri("no-v/ds1.png")
     val vm = Map(
       'a -> FaceGraphic(rs, 0, transparent = false),
       'b -> FaceGraphic(rs, 1, transparent = false),
       'c -> FaceGraphic(rs, 2, transparent = false),
       'd -> FaceGraphic(rs, 3, transparent = false),
       'e -> FaceGraphic(rs, 4, transparent = false),
-      'f -> FaceGraphic(rs, 5, transparent = false)
+      'f -> FaceGraphic(rs, 5, transparent = false),
+      'filename -> Str("facetest")
     )
     val d = new Drawer(layout)
-    d.draw(vm, NullContext).write(Resource.tempdir + "facetest.png")
+    d.draw(vm, NullContext).write(Resource.tempdir)
   }
 
   def charaSpec() {
@@ -106,12 +105,13 @@ class TestSpec {
         }): _*
       )
     )
-    val rs = Resource.uri("sl1.png")
-    val vm = (for(c <- 1 to 200) yield {
+    val rs = Resource.uri("no-v/sl1.png")
+    val _vm = (for(c <- 1 to 200) yield {
       (Symbol(c.toString): Key) -> CharaGraphic(rs, CharaProperty(r(8), r(4), r(3)))
     }).toMap
+    val vm: Map[Key, AValue] = _vm + ('filename -> Str("charatest"))
     val d = new Drawer(layout)
-    d.draw(vm, NullContext).write(Resource.tempdir + "charatest.png")
+    d.draw(vm, NullContext).write(Resource.tempdir)
   }
 
   def battleSpec() {
@@ -123,12 +123,13 @@ class TestSpec {
         }): _*
       )
     )
-    val rs = Resource.uri("bs1.png")
-    val vm = (for(c <- 1 to 20) yield {
+    val rs = Resource.uri("no-v/bs1.png")
+    val _vm = (for(c <- 1 to 20) yield {
       (Symbol(c.toString): Key) -> BattleGraphic(rs, r(15), transparent = true)
     }).toMap
+    val vm: Map[Key, AValue] = _vm + ('filename -> Str("battletest"))
     val d = new Drawer(layout)
-    d.draw(vm, NullContext).write(Resource.tempdir + "battletest.png")
+    d.draw(vm, NullContext).write(Resource.tempdir)
   }
 
 
@@ -145,9 +146,9 @@ class TestSpec {
       'icon->AreaUnit(AMap('rect -> ARect(280,0,32,32)
                                 ) ++= stdstyle()),
       'desc->AreaUnit(AMap('point -> ARect(0, 20, 12, 2),
-                                'window -> AWindow("system6.png"),
+                                'window -> AWindow("no-v/system6.png"),
                                 'auto_expand -> AAutoExpand,
-                                'front_color -> ASystemGraphics("system6.png")
+                                'front_color -> ASystemGraphics("no-v/system6.png")
                          ) ++= stdstyle(inWin = true)),
       'cost->AreaUnit(AMap('rect -> ARect(300,2,30,15),
                                 'font -> AFont("Verdana", 'plain, 10))))
@@ -191,12 +192,12 @@ class TestSpec {
       'desc->Str("1931年に建てられた高さ443m、102階建てのビル。\n相手は死ぬ"),
       'cost->Str("42"))
 
-    val vs: List[ValueMap] = List(v1,v2,v3,v4,v5,v6)
+    val _vs: List[ValueMap] = List(v1,v2,v3,v4,v5,v6)
     //val vs = List(v4)
 
-    val ex1: ExValueMap = Map(
-
-    )
+    val vs = _vs.zipWithIndex.map { case (s, i) =>
+      s + ('filename -> Str(f"skill$i%2d"))
+    }
 
     //val expanded1: Array[ValueMap] = ValueExpander.expand(ex1)
 
@@ -204,7 +205,7 @@ class TestSpec {
     (vs).map{
       d.draw(_, NullContext)
     }.zipWithIndex.foreach { case (res, idx) =>
-      res.write(Resource.tempdir + "skill0%d.png" format idx)
+      res.write(Resource.tempdir)
     }
   }
 
@@ -231,11 +232,12 @@ class TestSpec {
       'icon2 -> Icon("icon/icon2.png"),
       'icon3 -> Icon("icon/icon3.png"),
       'str -> Str("test"),
-      'str2 -> Str("a\nb\ncedf\ngiaasdasd\near"))
+      'str2 -> Str("a\nb\ncedf\ngiaasdasd\near"),
+      'filename -> Str("test"))
 
     val d = new Drawer(layout)
     val result = d.draw(valuemap, NullContext)
-    result.write(Resource.tempdir + "test.png")
+    result.write(Resource.tempdir)
   }
 
 
