@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage
 import org.eclipse.swt.events._
 
 
-import com.github.whelmaze.pictbliz.scriptops.{Will, Parser}
+import com.github.whelmaze.pictbliz.scriptops.Parser
 import com.github.whelmaze.pictbliz.{DrawableImage, Resource}
 import gui.SWTUtils
 import org.eclipse.swt.graphics.{Font, Image, ImageData}
@@ -89,11 +89,7 @@ class RootModel extends Model {
     clearCache()
 
     result foreach {
-      case a: Will[Seq[DrawableImage]] =>
-        val imgs = a.doit
-        imgs foreach { i: DrawableImage =>
-          imgCache += i
-        }
+      // 画像を生成してimgCacheに格納
       case _ =>
     }
     imgCache.headOption.map { _.result }

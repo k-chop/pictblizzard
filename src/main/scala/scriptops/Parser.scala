@@ -30,15 +30,6 @@ import java.io.File
 import scala.Some
 import grizzled.slf4j.Logging
 
-
-// Operationトレイトとか作って、操作によって別のクラスにした方がよさげ
-class Will[T](ex: => T) {
-  def doit: T = ex
-}
-object Will {
-  def apply[T](ex : => T) = new Will[T](ex)
-}
-
 trait ParserUtil {
   def validateFontStyle(s: String): Symbol = s match {
     case "plain" => 'plain
@@ -70,16 +61,8 @@ object Parser extends StandardTokenParsers with ParserUtil {
     }
   }
 
-  lazy val gen: Parser[Will[Seq[DrawableImage]]] = "generate" ~> ident ~ "with" ~ ident ^^ {
-    case lays ~ _ ~ vs => Will{
-      val d = new Drawer(layouts(lays))
-      val e = new ValueExpander(valuemaps(vs))
-      var n: Option[String] = None
-      e.iterator.map { vm =>
-        n = Option( vm.get('filename) match { case Some(Str(s)) => s case _ => "" } )
-        d.draw(vm, NullContext)
-      }.toSeq
-    }
+  lazy val gen: Parser[Any] = "generate" ~> ident ~ "with" ~ ident ^^ {
+    null
   }
 
   lazy val exp = evaluable | layoutOne | layoutDef | valuesOne | valuesDef
