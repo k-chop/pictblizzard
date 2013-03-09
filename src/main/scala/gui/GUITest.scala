@@ -228,7 +228,7 @@ class ExecuteButtons(parent: Composite, style: Int) extends Composite(parent, st
     dat.verticalIndent = 8
     dat
   })
-  btGen.setText("コンパイル")
+  btGen.setText("プレビュー")
   btGen.pack()
 
   val btOutput = new Button(this, SWT.PUSH)
