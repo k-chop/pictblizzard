@@ -55,7 +55,7 @@ class UColor(val self: java.awt.Color) {
   lazy val hsv = {
     val max = math.max(r, math.max(g, b))
     val min = math.min(r, math.min(g, b))
-    val s = if (max == 0) 0 else (255.0 * ((max - min) / max.toDouble))
+    val s = if (max == 0) 0 else 255.0 * ((max - min) / max.toDouble)
     val div = (max - min).toDouble
     val h =
       if (max == min)

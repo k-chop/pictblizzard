@@ -174,7 +174,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   * 次の改行の位置をさがす。なければ-1を返すよ。Optionにした方がよくね
   */
   private def nextNewline(from: Int): Int = {
-    (codes.view drop (from) find { _._2 == newlineCode } getOrElse((-1,0)) )._1
+    (codes.view drop from find { _._2 == newlineCode } getOrElse((-1,0)) )._1
   }
 
   private def padding(attr: Attr): WrappedGlyphVector = {

@@ -11,12 +11,11 @@ object AttrMap {
   def findParam(am: AttrMap, ss: Symbol*): Option[Attr] = {
     @scala.annotation.tailrec
     def findEnableParamRec(am: AttrMap, sl: List[Symbol]): Option[Attr] = sl match {
-      case s :: cdr => {
+      case s :: cdr =>
         am find { case(k,v) => k == s } match {
           case Some((k,v)) => Some(v)
           case None => findEnableParamRec(am, cdr)
         }
-      }
       case Nil => None
     }
     findEnableParamRec(am, ss.toList)
