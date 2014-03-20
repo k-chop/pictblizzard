@@ -20,7 +20,7 @@ object GUITest {
 
   def main(args: Array[String]) {
 
-    val g = (new GUITest)
+    val g = new GUITest
 
   }
 }

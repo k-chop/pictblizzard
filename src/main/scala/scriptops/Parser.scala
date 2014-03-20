@@ -36,7 +36,7 @@ object Parser extends StandardTokenParsers {
   import NodeDefinition._
 
   private[scriptops] implicit class StringConv(val s: String) extends AnyVal {
-    def toURI: URI = (new File(s)).toURI
+    def toURI: URI = new File(s).toURI
   }
 
   lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":","..", "[", "]")
@@ -55,7 +55,7 @@ object Parser extends StandardTokenParsers {
   lazy val gen: Parser[GenerateExpr] = {
     "generate" ~> ident ~ "with" ~ repsep(ident, ",") ^^ {
       case name ~ _ ~ values =>
-        GenerateExpr(Var(name), values.map(Var(_)))
+        GenerateExpr(Var(name), values.map(Var))
     }
   }
 

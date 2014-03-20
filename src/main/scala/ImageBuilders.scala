@@ -88,9 +88,8 @@ object ImageBuilders {
   def findBeginPoint(attrmap: AttrMap, width: Int, height: Int): (Int, Int) = {
     val hasOnCenter = attrmap.contains('oncenter)
     AttrMap.findParam(attrmap, 'point, 'rect) map {
-      case APoint(x, y) if hasOnCenter => {
+      case APoint(x, y) if hasOnCenter =>
         ((x - width/2.0).toInt, (y - height/2.0).toInt)
-      }
       case APoint(x, y)      => (x, y)
       case ARect(x, y, _, _) => (x, y)
     } getOrElse (0, 0)

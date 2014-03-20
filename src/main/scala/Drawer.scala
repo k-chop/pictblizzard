@@ -14,7 +14,7 @@ class Drawer(layout: LayoutUnit) {
   def draw(valuemap: ValueMap, context: Context): DrawableImage = {
     val filename = valuemap.get('filename) collect {
       case Str(s) => s
-    } getOrElse("")
+    } getOrElse ""
     val img = new DrawableImage(ImageUtils.newImage(sizeX, sizeY), filename)
     img.clear(Color.black)
     areamap foreach {
@@ -46,7 +46,7 @@ class DrawableImage(img: BufferedImage, val name: String) {
 
     val bgImage = AttrMap.findParam(areaunit.attrmap, 'tile, 'background, 'window) flatMap {
       case a: Drawable =>
-        ImageBuilder.build(a, (areaunit.attrmap) += ('size -> exSize))
+        ImageBuilder.build(a, areaunit.attrmap += ('size -> exSize))
       case _ => None
     }
 
