@@ -31,165 +31,106 @@ import scala.Some
 import grizzled.slf4j.Logging
 
 
-// Operationトレイトとか作って、操作によって別のクラスにした方がよさげ
-class Will[T](ex: => T) {
-  def doit: T = ex
-}
-object Will {
-  def apply[T](ex : => T) = new Will[T](ex)
-}
 
-trait ParserUtil {
-  def validateFontStyle(s: String): Symbol = s match {
-    case "plain" => 'plain
-    case "bold" => 'bold
-    case "italic" => 'italic
-    case "bolditalic" => 'bolditalic
-    case _ => 'plain // 不明な指定は全部標準書体に置き換える
-  }
+object Parser extends StandardTokenParsers {
+  import NodeDefinition._
 
-  private[scriptops] implicit class StringConv(s: String) {
+  private[scriptops] implicit class StringConv(val s: String) extends AnyVal {
     def toURI: URI = (new File(s)).toURI
   }
 
-}
-
-object Parser extends StandardTokenParsers with ParserUtil {
-  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":","..")
+  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":","..", "[", "]")
   lexical.reserved += ("val", "layout", "values", "value", "with", "generate")
 
   val layouts = mutable.Map.empty[String, LayoutUnit]
   val valuemaps = mutable.Map.empty[String, ExValueMap]
 
-  lazy val all = rep1(top)
-  lazy val top = bind | gen
-  lazy val bind = "val" ~> ident ~ "=" ~ exp ^^ {
-    case i ~ _ ~ ex => ex match {
-      case lay: LayoutUnit => layouts += (i -> lay)
-      case vva: ExValueMap => valuemaps += (i -> vva)
+  lazy val all: Parser[List[Node]] = rep1(top)
+  lazy val top: Parser[Node] = bind | gen
+  lazy val bind: Parser[BindExpr] = "val" ~> ident ~ "=" ~ exp ^^ {
+    case i ~ _ ~ (ex: Node) =>
+      BindExpr(i, ex)
+  }
+
+  lazy val gen: Parser[GenerateExpr] = {
+    "generate" ~> ident ~ "with" ~ repsep(ident, ",") ^^ {
+      case name ~ _ ~ values =>
+        GenerateExpr(Var(name), values.map(Var(_)))
     }
   }
 
-  lazy val gen: Parser[Will[Seq[DrawableImage]]] = "generate" ~> ident ~ "with" ~ ident ^^ {
-    case lays ~ _ ~ vs => Will{
-      val d = new Drawer(layouts(lays))
-      val e = new ValueExpander(valuemaps(vs))
-      var n: Option[String] = None
-      e.iterator.map { vm =>
-        n = Option( vm.get('filename) match { case Some(Str(s)) => s case _ => "" } )
-        d.draw(vm, NullContext)
-      }.toSeq
-    }
+  lazy val exp = evaluable | layoutOne | valuesOne | layoutOnes | layoutDef | valuesDef
+  lazy val evaluable: Parser[Node] = range | literal | numberseq //| (ident ^^ { case s => Var(s) })
+
+  lazy val range: Parser[RangeValue] = numericLit ~ ".." ~ numericLit ^^ {
+    case begin ~ _ ~ end => RangeValue(begin.toInt, end.toInt)
   }
 
-  lazy val exp = evaluable | layoutOne | layoutDef | valuesOne | valuesDef
-  lazy val evaluable: Parser[AnyValue] = range | literal
-
-  lazy val range: Parser[ExRange] = numericLit ~ ".." ~ numericLit ^^ {
-    case begin ~ _ ~ end => ExRange((begin.toInt to end.toInt).toArray)
+  lazy val numberseq: Parser[NumberSeqValue] = "[" ~> repsep(numericLit, ",") <~ "]" ^^ {
+    case seq => println("a"); NumberSeqValue(seq.map(_.toInt))
   }
 
-  lazy val literal: Parser[AnyValue] = {
-    numericLit ^^ { case n => Number(n.toInt) } |
+  lazy val literal: Parser[NodeValue] = {
+    numericLit ^^ { case n => NumberValue(n.toInt) } |
     stringLit ^^ {
-      case s => ExStr(s.replace("\\n", "\n"))
+      case s => StrValue(s.replace("\\n", "\n"))
     }
   }
-//  lazy val values = value | "{" ~> repsep(value, ",") <~ "}" ^^ { case a => s"""{ ${a.mkString(",")} }"""}
-  lazy val layoutOne: Parser[(Key, AreaUnit)] = {
-    ident ~ ":" ~ layoutApplys ^^ { case i ~ _ ~ a => Symbol(i) -> AreaUnit(a.toMap)}
+
+  lazy val layoutOne: Parser[Node] = {
+    ident ~ ":" ~ layoutApplys ^^ {
+      case i ~ _ ~ a => LayoutOne(i, a)
+    } | ident ^^ { s => Var(s) }
   }
 
-  lazy val layoutApply: Parser[(Key, Attr)] = ident ~ "(" ~ repsep(evaluable, ",") <~ ")" ^^ {
-    case i ~ _ ~ seq => Symbol(i) -> fetchAttr(i, seq)
-  } | ident ^^ { case i => Symbol(i) -> fetchAttr(i, Nil) }
+  lazy val layoutOnes: Parser[LayoutOnes] = {
+    "{" ~> rep1(layoutOne) <~ "}" ^^ { case ls => LayoutOnes(ls) }
+  }
 
-  lazy val layoutApplys: Parser[Seq[(Key, Attr)]] = {
+  lazy val layoutApply: Parser[LayoutApply] = {
+    ident ~ "(" ~ repsep(evaluable, ",") <~ ")" ^^ {
+      case name ~ _ ~ args =>
+        LayoutApply(name, args)
+    } | ident ^^ { s => LayoutApply(s, Nil) }
+  }
+
+  lazy val layoutApplys: Parser[List[LayoutApply]] = {
     layoutApply ^^ { case a => List(a) } |
     "{" ~> repsep(layoutApply, ",") <~ "}" ^^ { case a => a }
   }
 
   lazy val symbol = ":" ~> ident ^^ { case i => s":$i"}
 
-  // TODO: envの指定
-  lazy val layoutDef: Parser[LayoutUnit] = "layout" ~> "(" ~> rep1(layoutApply) ~ ")" ~ "{" ~ rep1(layoutOne) <~ "}" ^^ {
-    case env ~ _ ~ _ ~ as => LayoutUnit(AttrMap(env: _*), AreaMap.fromSeq(as: _*))
+  lazy val layoutDef: Parser[LayoutDef] = "layout" ~> "(" ~> layoutApplys ~ ")" ~ layoutOnes ^^ {
+    case env ~ _ ~ as => LayoutDef(env, as.ls)
   }
 
-  lazy val valuesDef: Parser[ExValueMap] = "values" ~> "{" ~> rep1(valuesOne) <~ "}" ^^ { case s => s.toMap }
-
-  lazy val valuesOne: Parser[(String, AnyValue)] = {
-    ident ~ ":" ~ evaluable ^^ { case i ~ _ ~ ev => (i, ev) } |
-    ident ~ ":" ~ valuesApply ^^ { case i ~ _ ~ va => (i, va) }
-  }
-
-  lazy val valuesApply: Parser[AnyValue] = ident ~ "(" ~ repsep(evaluable, ",") <~ ")" ^^ {
-    case i ~ _ ~ seq => fetchValue(i, seq)
-  }
-
-  def fetchValue(name: String, args: Seq[AnyValue]): AnyValue = {
-    val len = args.size
-    name match {
-      case "icon" if len == 1 => // ExIconのときはどうすんの
-        Icon(Resource.uri(args(0).toStr))
-      case _ => NullValue
+  lazy val valuesDef: Parser[ValuesDef] = {
+    "values" ~> "{" ~> rep1(valuesOne) <~ "}" ^^ {
+      case s => ValuesDef(s)
     }
   }
 
-  def fetchAttr(name: String, args: Seq[AnyValue]): Attr = {
-    val len = args.size
-    name match {
-      case "rect"  if len == 4 =>
-        ARect(args(0).toInt, args(1).toInt, args(2).toInt, args(3).toInt)
-      case "point" if len == 2 =>
-        APoint(args(0).toInt, args(1).toInt)
-      case "size" if len == 2 =>
-        ASize(args(0).toInt, args(1).toInt)
-      case "align" if len == 1 || len == 2 =>
-        AAlign(Symbol(args(0).toStr), Symbol(args(1).toStr))
-      case "window" if len == 1 =>
-        AWindow(args(0).toStr)
-      case "front_color" if len == 1 =>
-        ASystemGraphics(args(0).toStr)
-      case "hemming" if len == 2 =>
-        AHemming(UColor.code(args(0).toStr), args(1).toInt)
-      case "auto_expand" =>
-        AAutoExpand
-      case "on_center" =>
-        AOnCenter
-      case "interval" if len == 2 =>
-        AInterval(args(0).toInt, args(1).toInt)
-      case "padding" if len == 2 =>
-        APadding(args(0).toInt, args(1).toInt)
-      case "font" if len == 3 =>
-        AFont(args(0).toStr, validateFontStyle(args(1).toStr), args(2).toInt)
-      case _ => ANil
-    }
+  lazy val valuesOne: Parser[Node] = {
+    ident ~ ":" ~ evaluable ^^ { case i ~ _ ~ ev => ValuesOne(i, ev) } |
+    ident ~ ":" ~ valuesApply ^^ { case i ~ _ ~ va => ValuesOne(i, va) } |
+    ident ^^ { s => Var(s) }
+  }
+
+  lazy val valuesApply: Parser[ValuesApply] = ident ~ "(" ~ repsep(evaluable, ",") <~ ")" ^^ {
+    case i ~ _ ~ seq => ValuesApply(i, seq)
   }
 
   def parse(source: String): Seq[Any] = {
     all(new lexical.Scanner(source)) match {
       case Success(results, _) =>
-        println(results.mkString) // => とりあえず文字列で出力
+        println(results.mkString("\n")) // => とりあえず文字列で出力
         results
       case Failure(msg, d) => println(msg); println(d.pos.longString); sys.error("")
       case Error(msg, _) => println(msg); sys.error("")
     }
   }
 
-  private[scriptops] implicit class AnyValueInterpreter(val a: AnyValue) extends AnyVal {
-    // 変換不能な値はログで出力しといた方がよさげ
-    def toInt: Int = a match {
-      case Number(n) => n
-      case _ => 0
-    }
-    def toStr: String = a match {
-      case Str(s) => s.replace("\\n", "\n")
-      case ExStr(s) => s.replace("\\n", "\n")
-      case _ => ""
-    }
-
-  }
 
 }
 

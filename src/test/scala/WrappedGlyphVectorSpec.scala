@@ -1,20 +1,18 @@
 package com.github.whelmaze.pictbliz.test
 
-import org.scalatest._
-import org.scalatest.matchers.ShouldMatchers
 
 import com.github.whelmaze.pictbliz._
 import com.github.whelmaze.pictbliz.scriptops.Attrs._
 import scriptops.AttrMap
 import java.awt.geom.Rectangle2D
 
-class WrappedGlyphVectorSpec extends WordSpec with ShouldMatchers with BeforeAndAfter {
+class WrappedGlyphVectorSpec extends UnitSpec {
 
   val isWindows = {
-    val os = Option(System.getProperty("os.name"))
-    os map { s =>
-      s.toLowerCase.contains("windows")
-    } getOrElse false
+    val os = sys.env.get("os.name")
+    os exists {
+      _.toLowerCase.contains("windows")
+    }
   }
 
   def onWindows(f: => Unit) {

@@ -1,10 +1,8 @@
 package com.github.whelmaze.pictbliz.test
 
 import com.github.whelmaze.pictbliz._
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
 
-class ColorUtilsSpec extends WordSpec with ShouldMatchers {
+class ColorUtilsSpec extends UnitSpec {
 
   "UColor object " should {
     "valid color from color code" in {

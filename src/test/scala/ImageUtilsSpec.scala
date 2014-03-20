@@ -1,12 +1,10 @@
 package com.github.whelmaze.pictbliz.test
 
 import com.github.whelmaze.pictbliz._
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
 
 import ImageUtils.ARGB
 
-class ImageUtilsSpec extends WordSpec with ShouldMatchers {
+class ImageUtilsSpec extends UnitSpec {
 
   "ARGB object" should {
     "extract 0xAARRGGBB with unapply" in {

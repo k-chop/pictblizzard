@@ -1,14 +1,11 @@
 package com.github.whelmaze.pictbliz
 package test
 
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
-import com.github.whelmaze.pictbliz.{ImageBuilders, DrawableImage, Drawer}
+import com.github.whelmaze.pictbliz.ImageBuilders
 import com.github.whelmaze.pictbliz.scriptops.Attrs._
-import com.github.whelmaze.pictbliz.scriptops.AttrMap
 
-class ImageBuildersSpec extends WordSpec with ShouldMatchers {
-  import scriptops.implicits.string2URI
+class ImageBuildersSpec extends UnitSpec {
+
 
   "ImageBuilders" should {
     "find begin point collectly with method findBeginPoint" in {
