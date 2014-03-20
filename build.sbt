@@ -4,7 +4,7 @@ version := "0.0.1"
 
 organization := "com.github.chuwb"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.3"
 
 //parallelExecution in Test := false
 
