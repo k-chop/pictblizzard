@@ -1,14 +1,12 @@
 package com.github.whelmaze.pictbliz.test
 
 import com.github.whelmaze.pictbliz._
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
 import scriptops.implicits.string2URI
 import scala.language.postfixOps
 
 import scriptops.Attrs._
 
-class ValueExpanderSpec extends WordSpec with ShouldMatchers {
+class ValueExpanderSpec extends UnitSpec {
 
   "ValueExpander" should {
     "expand 1 correctly" in {
@@ -26,7 +24,7 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
         'ok -> Str("okbokujou"),
         'bokujou -> Str("bokujou")
       ))
-      assert(isSame(res(0), ans(0)) === true)
+      res(0) shouldBe ans(0)
     }
 
     "expand 2 correctly" in {
@@ -52,8 +50,8 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'bokujou -> Str("bokujou")
         )
       )
-      assert(isSame(res(0), ans(0)) === true)
-      assert(isSame(res(1), ans(1)) === true)
+      res(0) shouldBe ans(0)
+      res(1) shouldBe ans(1)
     }
 
     "expand csv correctly" in {
@@ -82,8 +80,8 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'all -> Str("1:jirou(otoko), neet")
         )
       )
-      assert(isSame(res(0), ans(0)) === true)
-      assert(isSame(res(1), ans(1)) === true)
+      res(0) shouldBe ans(0)
+      res(1) shouldBe ans(1)
     }
 
     "return empty Array with valuemap has no key('id')" in {
@@ -94,8 +92,8 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
       ))
       val res = vmap.expand()
       val ans = Array()
-      ans should have length (0)
-      res should have length (0)
+      ans should have length 0
+      res should have length 0
     }
 
     "expand ExStr(no more expand)" in {
@@ -114,7 +112,7 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'hoge -> Str("fuga")
         )
       )
-      assert(isSame(res(0), ans(0)) === true)
+      res(0) shouldBe ans(0)
     }
 
     "expand ExIcon(no zerofill)" in {
@@ -133,8 +131,8 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'icon -> Icon("icon/icon2.png")
         )
       )
-      assert(isSame(res(0), ans(0)) === true)
-      assert(isSame(res(1), ans(1)) === true)
+      res(0) shouldBe ans(0)
+      res(1) shouldBe ans(1)
     }
 
     "expand ExIcon(with zerofill)" in {
@@ -155,7 +153,7 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'ext -> Str(".png")
         )
       )
-      assert(isSame(res(0), ans(0)) === true)
+      res(0) shouldBe ans(0)
     }
 
     "expand circular reference" in {
@@ -172,7 +170,7 @@ class ValueExpanderSpec extends WordSpec with ShouldMatchers {
           'b -> Str("Circular Reference Error")
         )
       )
-      assert(isSame(res, ans(0)) === true)
+      res shouldBe ans(0)
     }
 
   }

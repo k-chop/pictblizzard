@@ -1,16 +1,14 @@
 package com.github.whelmaze.pictbliz.test
 
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
 import collection.immutable.IntMap
 
 import com.github.whelmaze.pictbliz.scriptops.Attrs._
 import com.github.whelmaze.pictbliz.scriptops._
 
-class ScriptOpsSpec extends WordSpec with ShouldMatchers {
-
+class ScriptOpsSpec extends UnitSpec {
 
   "ScriptOps.AreaMap" should {
+
     val kvA = 'a -> AreaUnit(Map('A -> ANil))
     val kvB = 'b -> AreaUnit(Map('B -> ANil))
     val kvC = 'c -> AreaUnit(Map('C -> ANil))
@@ -25,13 +23,13 @@ class ScriptOpsSpec extends WordSpec with ShouldMatchers {
 
       val res = AreaMap.fromSeq(kvA, kvB, kvC)
       ans.idmap should be (res.idmap)
-      isSame(ans.self, res.self) should be (true)
+      ans.self shouldBe res.self
     }
 
     "create valid AreaMap from AreaMap.add()" in {
       val emptymap = AreaMap.empty()
       val res = emptymap.add(kvA).add(kvB).add(kvC)
-      isSame(ans.self, res.self) should be (true)
+      ans.self shouldBe res.self
     }
 
   }

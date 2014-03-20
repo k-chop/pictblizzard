@@ -9,7 +9,7 @@ scalaVersion := "2.10.3"
 //parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "1.9.1" % "test",
+  "org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
   "net.sf.opencsv" % "opencsv" % "2.0",
   "org.clapper" %% "grizzled-slf4j" % "1.0.1",
   "org.slf4j" % "slf4j-api" % "1.7.1",
