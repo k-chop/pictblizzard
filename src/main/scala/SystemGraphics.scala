@@ -3,6 +3,8 @@ package com.github.whelmaze.pictbliz
 import java.awt.image.{ BufferedImage, AffineTransformOp }
 import java.awt.geom.AffineTransform
 
+import com.typesafe.scalalogging.LazyLogging
+
 object SystemGraphics {
 
   // 見つからなかった場合どこに責任負わせんの
@@ -18,7 +20,7 @@ object SystemGraphics {
   }
 }
 
-class SystemGraphics (path: java.net.URI) extends Texturable {
+class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
 
   def length = 21
 

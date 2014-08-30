@@ -3,6 +3,7 @@ package com.github.whelmaze.pictbliz
 import java.awt.{ Font, Color }
 import java.awt.image.BufferedImage
 
+import com.typesafe.scalalogging.LazyLogging
 import scriptops._
 import scriptops.Attrs._
 
@@ -26,7 +27,7 @@ class Drawer(layout: LayoutUnit) {
 
 }
 
-class DrawableImage(img: BufferedImage, val name: String) {
+class DrawableImage(img: BufferedImage, val name: String) extends LazyLogging {
   
   def clear(c: Color) = {
     val g2d = img.createGraphics

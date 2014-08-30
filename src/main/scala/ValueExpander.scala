@@ -1,5 +1,7 @@
 package com.github.whelmaze.pictbliz
 
+import com.typesafe.scalalogging.LazyLogging
+
 import collection.mutable
 import collection.immutable.HashMap
 import au.com.bytecode.opencsv.CSVReader
@@ -12,7 +14,7 @@ import scriptops.Attrs._
  * 展開可能なExValueMapを、外部の値を読み込んだりしつつ展開する。
  * @param exs 展開するValueMap
  */
-class ValueExpander(exs: ExValueMap) {
+class ValueExpander(exs: ExValueMap) extends LazyLogging {
 
   case class KV(id: Int, k: Key)
 

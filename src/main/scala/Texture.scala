@@ -3,6 +3,8 @@ package com.github.whelmaze.pictbliz
 import java.awt.image.{ BufferedImage, AffineTransformOp }
 import java.awt.geom.AffineTransform
 
+import com.typesafe.scalalogging.LazyLogging
+
 object Texture {
   // とりあえず仮
   final val base_x = 16
@@ -10,7 +12,7 @@ object Texture {
   final val base_xy = (base_x, base_y)
 }
 
-class Texture(path: java.net.URI) extends Texturable {
+class Texture(path: java.net.URI) extends Texturable with LazyLogging {
 
   lazy val img: BufferedImage = javax.imageio.ImageIO.read(new java.io.File(path))
 

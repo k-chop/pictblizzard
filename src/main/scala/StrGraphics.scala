@@ -4,10 +4,11 @@ import java.awt.{ Font, Color, Graphics2D }
 import java.awt.font.GlyphVector
 import java.awt.image.BufferedImage
 
+import com.typesafe.scalalogging.LazyLogging
 import scriptops.Attrs._
 import scriptops.AttrMap
 
-object StrGraphics {
+object StrGraphics extends LazyLogging {
 
   val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 12)
 

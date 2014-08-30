@@ -1,36 +1,14 @@
 package com.github.whelmaze.pictbliz.scriptops
 
-import com.github.whelmaze.pictbliz
-import pictbliz._
-import pictbliz.scriptops.Attrs._
+import com.github.whelmaze.pictbliz._
+import com.github.whelmaze.pictbliz.scriptops.Attrs._
 
 import scala.util.parsing.combinator.syntactical._
 import scala.util.parsing.combinator._
 import scala.collection.mutable
 
-import scriptops.Attrs.AAlign
-import scriptops.Attrs.AFont
-import scriptops.Attrs.AHemming
-import scriptops.Attrs.AInterval
-import scriptops.Attrs.APadding
-import scriptops.Attrs.APoint
-import scriptops.Attrs.AreaUnit
-import scriptops.Attrs.ARect
-import scriptops.Attrs.ASize
-import scriptops.Attrs.ASystemGraphics
-import scriptops.Attrs.AWindow
-import scriptops.Attrs.ExRange
-import scriptops.Attrs.ExStr
-import scriptops.Attrs.Icon
-import scriptops.Attrs.Number
-import scriptops.Attrs.Str
-import util.Try
 import java.net.URI
 import java.io.File
-import scala.Some
-import grizzled.slf4j.Logging
-
-
 
 object Parser extends StandardTokenParsers {
   import NodeDefinition._
