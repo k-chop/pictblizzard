@@ -17,7 +17,7 @@ object Parser extends StandardTokenParsers {
     def toURI: URI = new File(s).toURI
   }
 
-  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":","..", "[", "]")
+  lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":","..", "[", "]", "#")
   lexical.reserved += ("val", "layout", "values", "value", "with", "generate")
 
   val layouts = mutable.Map.empty[String, LayoutUnit]

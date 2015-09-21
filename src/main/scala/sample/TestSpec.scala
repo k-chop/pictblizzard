@@ -33,10 +33,10 @@ class TestSpec {
       "name" -> ExCSV(path, 1),
       "win" -> ExStr(""),
       "t_price" -> ExCSV(path, 2), "t_desc" -> ExCSV(path, 3), "t_kind" -> ExCSV(path, 4), "t_atk" -> ExCSV(path, 6), "t_hit" -> ExCSV(path, 15),
-      "price" -> ExStr("${t_price} \\c[4]G\\c[0]"),
-      "desc" -> ExStr("\\c[2]${t_desc}\\c[0]"),
-      "misc" -> ExStr("攻撃${t_atk}, 命中率:${t_hit}, ${t_kind}武器"),
-      "filename" -> ExStr("${itemno}-${name}")
+      "price" -> ExStr("#{t_price} \\c[4]G\\c[0]"),
+      "desc" -> ExStr("\\c[2]#{t_desc}\\c[0]"),
+      "misc" -> ExStr("攻撃#{t_atk}, 命中率:#{t_hit}, #{t_kind}武器"),
+      "filename" -> ExStr("#{itemno}-#{name}")
     )).expand()
     val layout = LayoutUnit(
       AMap('size -> ASize(320, 80)),

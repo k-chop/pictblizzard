@@ -130,7 +130,7 @@ class ValueExpander(exs: ExValueMap) extends LazyLogging {
     }
 
     var str = _str
-    val reg = """\$\{(\w+)\}""".r
+    val reg = """\#\{(\w+)\}""".r
     reg.findAllIn(str).matchData foreach { m =>
       val name = m.group(m.groupCount)
       val replaceTo = exs(name) match {

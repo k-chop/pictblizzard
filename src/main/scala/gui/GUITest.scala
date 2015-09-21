@@ -271,7 +271,7 @@ class InputArea(parent: Composite, style: Int) extends Composite(parent, style) 
                                        |  desc: "一瞬で相手の周囲の大気ごと氷結させる\n相手は死ぬ"
                                        |  cost: "42"
                                        |  icon: icon("icon/icon1.png")
-                                       |  filename: "${id}_${name}"
+                                       |  filename: "#{id}_#{name}"
                                        |}
                                        |
                                        |generate b with a
