@@ -20,7 +20,7 @@ initialCommands in console := "import com.github.whelmaze.pictbliz; import pictb
 
 initialCommands in (Compile, consoleQuick) <<= initialCommands in Compile
 
-scalacOptions ++= Seq("-feature", "-unchecked")
+scalacOptions ++= Seq("-feature", "-unchecked", "-Xlint", "-language:_")
 
 // add SWT to the unmanaged classpath
 //unmanagedJars in Compile += file("/usr/share/java/swt.jar")
