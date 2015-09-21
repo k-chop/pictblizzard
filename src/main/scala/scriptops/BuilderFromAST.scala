@@ -1,8 +1,8 @@
-//package com.github.whelmaze.pictbliz.scriptops
+//package pictbliz.scriptops
 //
 //import NodeDefinition._
 //import Attrs._
-//import com.github.whelmaze.pictbliz.{UColor, Resource}
+//import pictbliz.{UColor, Resource}
 //import collection.mutable
 //
 //

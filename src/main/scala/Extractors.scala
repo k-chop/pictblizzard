@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 
 object Extractors {
 

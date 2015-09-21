@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 
 import java.awt.{ Font, Color }
 import java.awt.image.BufferedImage

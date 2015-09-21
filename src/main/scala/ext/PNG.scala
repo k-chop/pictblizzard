@@ -1,11 +1,11 @@
-package com.github.whelmaze.pictbliz.ext
+package pictbliz.ext
 
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import java.io.File
-import com.github.whelmaze.pictbliz.{BinaryUtils, ImageUtils}
+import pictbliz.{BinaryUtils, ImageUtils}
 
 import scala.language.implicitConversions
 

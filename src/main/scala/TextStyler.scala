@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 
 import java.awt.Color
 import java.awt.image.{DataBufferInt, BufferedImage}

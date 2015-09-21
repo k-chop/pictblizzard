@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz.scriptops
+package pictbliz.scriptops
 
 /**
  * Parser内で使うASTを表すcase class群を定義するobject.

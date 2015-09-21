@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 
 import java.awt.font.GlyphVector
 import java.awt.geom.{ Point2D, Rectangle2D }

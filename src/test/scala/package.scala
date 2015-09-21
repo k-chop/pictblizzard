@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 package test
 
 import org.scalatest.{BeforeAndAfter, WordSpec, Matchers}

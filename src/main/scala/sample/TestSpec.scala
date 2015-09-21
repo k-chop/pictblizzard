@@ -1,6 +1,6 @@
-package com.github.whelmaze.pictbliz.sample
+package pictbliz.sample
 
-import com.github.whelmaze.pictbliz._
+import pictbliz._
 import scriptops.Attrs._
 import scriptops.{AttrMap => AMap, AreaMap}
 import scala.language.postfixOps

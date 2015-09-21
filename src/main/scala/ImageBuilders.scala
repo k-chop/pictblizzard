@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 
 import scriptops.{Attrs, AttrMap}
 import scriptops.Attrs._

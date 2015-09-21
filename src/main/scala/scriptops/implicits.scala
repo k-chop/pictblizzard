@@ -1,6 +1,7 @@
-package com.github.whelmaze.pictbliz.scriptops
+package pictbliz
+package scriptops
 
-import com.github.whelmaze.pictbliz.Resource
+import pictbliz.Resource
 import scala.language.implicitConversions
 
 object implicits {

@@ -1,6 +1,5 @@
-package com.github.whelmaze.pictbliz.test
-
-import com.github.whelmaze.pictbliz._
+package pictbliz
+package test
 
 import ImageUtils.ARGB
 

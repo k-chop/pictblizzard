@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz.scriptops
+package pictbliz.scriptops
 
 import collection.immutable.IntMap
 import collection.mutable

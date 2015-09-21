@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 
 import com.typesafe.scalalogging.LazyLogging
 import sample.TestSpec

@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz.ext
+package pictbliz.ext
 
 object BMP {
   

@@ -1,8 +1,8 @@
-package com.github.whelmaze.pictbliz.scriptops
+package pictbliz.scriptops
 
 
 import java.net.URI
-import com.github.whelmaze.pictbliz.UColor
+import pictbliz.UColor
 
 object Values {
 

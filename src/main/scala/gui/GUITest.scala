@@ -1,4 +1,4 @@
-package com.github.whelmaze.pictbliz.gui
+package pictbliz.gui
 
 import org.eclipse.jface._
 import org.eclipse.swt.widgets._
@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage
 import org.eclipse.swt.events._
 
 
-import com.github.whelmaze.pictbliz.scriptops.Parser
-import com.github.whelmaze.pictbliz.{DrawableImage, Resource}
+import pictbliz.scriptops.Parser
+import pictbliz.{DrawableImage, Resource}
 import gui.SWTUtils
 import org.eclipse.swt.graphics.{Font, Image, ImageData}
 

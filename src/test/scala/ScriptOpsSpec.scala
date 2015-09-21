@@ -1,9 +1,10 @@
-package com.github.whelmaze.pictbliz.test
+package pictbliz
+package test
 
 import collection.immutable.IntMap
 
-import com.github.whelmaze.pictbliz.scriptops.Attrs._
-import com.github.whelmaze.pictbliz.scriptops._
+import pictbliz.scriptops.Attrs._
+import pictbliz.scriptops._
 
 class ScriptOpsSpec extends UnitSpec {
 

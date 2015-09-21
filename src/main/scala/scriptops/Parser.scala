@@ -1,10 +1,9 @@
-package com.github.whelmaze.pictbliz.scriptops
+package pictbliz
+package scriptops
 
-import com.github.whelmaze.pictbliz._
-import com.github.whelmaze.pictbliz.scriptops.Attrs._
+import pictbliz.scriptops.Attrs._
 
 import scala.util.parsing.combinator.syntactical._
-import scala.util.parsing.combinator._
 import scala.collection.mutable
 
 import java.net.URI
