@@ -3,17 +3,17 @@ name := "pictblizzard"
 
 version := "0.0.1"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
-  "net.sf.opencsv" % "opencsv" % "2.0",
+  "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
+  "com.opencsv" % "opencsv" % "3.5",
   "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-  "org.slf4j" % "slf4j-api" % "1.7.7",
-  "org.slf4j" % "slf4j-nop" % "1.7.7",
-  "com.github.nscala-time" %% "nscala-time" % "1.2.0",
-  "org.json4s" %% "json4s-native" % "3.2.10"
+  "org.slf4j" % "slf4j-api" % "1.7.12",
+  "org.slf4j" % "slf4j-nop" % "1.7.12",
+  "com.github.nscala-time" %% "nscala-time" % "2.2.0",
+  "org.json4s" %% "json4s-native" % "3.3.0.RC6"
 )
 
 initialCommands in console := "import com.github.whelmaze.pictbliz; import pictbliz._; import pictbliz.scriptops._; import pictbliz.scriptops.Attrs._"
