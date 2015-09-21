@@ -1,8 +1,7 @@
-package com.github.whelmaze.pictbliz.test
+package pictbliz
+package test
 
-
-import com.github.whelmaze.pictbliz._
-import com.github.whelmaze.pictbliz.scriptops.Attrs._
+import pictbliz.scriptops.Attrs._
 import scriptops.AttrMap
 import java.awt.geom.Rectangle2D
 

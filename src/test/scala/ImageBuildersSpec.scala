@@ -1,8 +1,7 @@
-package com.github.whelmaze.pictbliz
+package pictbliz
 package test
 
-import com.github.whelmaze.pictbliz.ImageBuilders
-import com.github.whelmaze.pictbliz.scriptops.Attrs._
+import pictbliz.scriptops.Attrs._
 
 class ImageBuildersSpec extends UnitSpec {
 

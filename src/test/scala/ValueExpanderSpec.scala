@@ -1,6 +1,6 @@
-package com.github.whelmaze.pictbliz.test
+package pictbliz
+package test
 
-import com.github.whelmaze.pictbliz._
 import scriptops.implicits.string2URI
 import scala.language.postfixOps
 
