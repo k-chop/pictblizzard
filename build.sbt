@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.12",
   "org.slf4j" % "slf4j-nop" % "1.7.12",
   "com.github.nscala-time" %% "nscala-time" % "2.2.0",
-  "org.json4s" %% "json4s-native" % "3.3.0.RC6"
+  "org.json4s" %% "json4s-native" % "3.3.0.RC6",
+  "org.scalaz" %% "scalaz-core" % "7.1.4"
 )
 
 initialCommands in console := "import com.github.whelmaze.pictbliz; import pictbliz._; import pictbliz.scriptops._; import pictbliz.scriptops.Attrs._"
