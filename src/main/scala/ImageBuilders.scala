@@ -92,7 +92,7 @@ object ImageBuilders {
         ((x - width/2.0).toInt, (y - height/2.0).toInt)
       case APoint(x, y)      => (x, y)
       case ARect(x, y, _, _) => (x, y)
-    } getOrElse (0, 0)
+    } getOrElse ((0, 0))
   }
 
 }
@@ -122,7 +122,7 @@ object ImageBuilder {
       case b: ABackground => buildImpl(b, m)
       case t: ATile => buildImpl(t, m)
       case w: AWindow => buildImpl(w, m)
-      case n: Number => sys.error("Number:{${a}} is not drawbale.\nAttrMap ->\n${m.toString}")
+      case n: Number => sys.error(s"Number:$a is not drawable.\nAttrMap ->\n${m.toString}")
       case NullValue => emptyResult
     })
   }

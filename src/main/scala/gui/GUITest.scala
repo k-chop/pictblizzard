@@ -268,7 +268,7 @@ class InputArea(parent: Composite, style: Int) extends Composite(parent, style) 
                                        |val a = values {
                                        |  id  : 1
                                        |  name: "エターナルフォースブリザード"
-                                       |  desc: "一瞬で相手の周囲の大気ごと氷結させる\n相手は死ぬ\nおっぱいいっぱい夢いっぱい！！\n\nそんなことより踏まれたい"
+                                       |  desc: "一瞬で相手の周囲の大気ごと氷結させる\n相手は死ぬ"
                                        |  cost: "42"
                                        |  icon: icon("icon/icon1.png")
                                        |  filename: "${id}_${name}"

@@ -8,7 +8,7 @@ object Extractors {
     def unapply(rect2d: Rectangle2D): Option[(Int, Int)] = {
       val w = rect2d.getWidth.toInt
       val h = rect2d.getHeight.toInt
-      Some(w, h)
+      Some((w, h))
     }
   }
 
@@ -18,7 +18,7 @@ object Extractors {
       val h = rect2d.getHeight.toInt
       val x = rect2d.getX.toInt
       val y = rect2d.getY.toInt
-      Some(x, y, w, h)
+      Some((x, y, w, h))
     }
   }
   

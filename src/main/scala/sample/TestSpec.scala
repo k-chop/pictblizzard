@@ -11,7 +11,7 @@ class TestSpec {
   val strdef = AMap('interval -> AInterval(0, 3),
                    'padding -> APadding(8, 10))
   def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false) = {
-    (if (inWin) strdef else AMap.empty[Key, Attr]) + ('font -> AFont(font, style, size))
+    (if (inWin) strdef else AMap.empty) + ('font -> AFont(font, style, size))
   }
 
   @inline def r(i: Int) = scala.util.Random.nextInt(i)

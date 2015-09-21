@@ -27,7 +27,7 @@ object AttrMap {
     buf
   }
 
-  def empty[Key, Attr]: AttrMap = new AttrMap
+  def empty: AttrMap = new AttrMap
 
   implicit def canBuildFrom[A, B] = new CanBuildFrom[AttrMap, (Key, Attr), AttrMap] {
     def apply(from: AttrMap): mutable.Builder[(Key, Attr), AttrMap] = apply()

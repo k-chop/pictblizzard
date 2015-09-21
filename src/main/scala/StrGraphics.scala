@@ -102,7 +102,7 @@ class StrGraphics(_str: String,
       if (hasAutoexp || !hasRect) { // どちらか大きい方に拡大される
         val (dx, dy) = attrmap.get('padding) collect {
           case APadding(xp, yp) => (xp*2, yp*2)
-        } getOrElse (x*2, y + v.ascent.toInt)
+        } getOrElse ((x*2, y + v.ascent.toInt))
         ( max(w1, w2 + dx - 1), max(h1, h2 + dy - 1) )
         
       } else if (hasRect) // rectの定義そのまま

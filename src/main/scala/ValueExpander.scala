@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 import collection.mutable
 import collection.immutable.HashMap
-import au.com.bytecode.opencsv.CSVReader
+import com.opencsv.CSVReader
 import java.io.FileReader
 
 import scriptops.Attrs
