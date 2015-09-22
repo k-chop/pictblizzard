@@ -64,7 +64,7 @@ class TestSpec {
     )
     val d = new Drawer(layout)
     vmap map { vm =>
-      d.draw(vm, NullContext)
+      d.draw(vm)
     } foreach {
       _.write(Resource.tempdir + "items/")
     }
@@ -93,7 +93,7 @@ class TestSpec {
       'filename -> Str("facetest")
     )
     val d = new Drawer(layout)
-    d.draw(vm, NullContext).write(Resource.tempdir)
+    d.draw(vm).write(Resource.tempdir)
   }
 
   def charaSpec() {
@@ -111,7 +111,7 @@ class TestSpec {
     }).toMap
     val vm: Map[Key, AValue] = _vm + ('filename -> Str("charatest"))
     val d = new Drawer(layout)
-    d.draw(vm, NullContext).write(Resource.tempdir)
+    d.draw(vm).write(Resource.tempdir)
   }
 
   def battleSpec() {
@@ -129,7 +129,7 @@ class TestSpec {
     }).toMap
     val vm: Map[Key, AValue] = _vm + ('filename -> Str("battletest"))
     val d = new Drawer(layout)
-    d.draw(vm, NullContext).write(Resource.tempdir)
+    d.draw(vm).write(Resource.tempdir)
   }
 
 
@@ -202,8 +202,8 @@ class TestSpec {
     //val expanded1: Array[ValueMap] = ValueExpander.expand(ex1)
 
     val d = new Drawer(lay)
-    (vs).map{
-      d.draw(_, NullContext)
+    vs.map{
+      d.draw
     }.zipWithIndex.foreach { case (res, idx) =>
       res.write(Resource.tempdir)
     }
@@ -236,7 +236,7 @@ class TestSpec {
       'filename -> Str("test"))
 
     val d = new Drawer(layout)
-    val result = d.draw(valuemap, NullContext)
+    val result = d.draw(valuemap)
     result.write(Resource.tempdir)
   }
 

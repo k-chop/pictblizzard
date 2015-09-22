@@ -117,11 +117,4 @@ object Attrs {
 
   case object En extends FontLang
 
-
-  sealed trait Context
-
-  class LexicalContext extends Context
-
-  object NullContext extends Context
-
 }

@@ -12,7 +12,7 @@ class Drawer(layout: LayoutUnit) {
   private[this] val ASize(sizeX, sizeY) = layout.env('size)
   private[this] val areamap: AreaMap = layout.areamap
 
-  def draw(valuemap: ValueMap, context: Context): DrawableImage = {
+  def draw(valuemap: ValueMap): DrawableImage = {
     val filename = valuemap.get('filename) collect {
       case Str(s) => s
     } getOrElse ""
