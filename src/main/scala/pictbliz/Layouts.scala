@@ -2,7 +2,6 @@ package pictbliz
 
 import scalaz.Endo
 
-
 object Layouts {
 
   type Id = String
@@ -21,6 +20,5 @@ object Layouts {
 
     def render(value: Values.Value): ImagePart = value.render(params)
   }
-
 
 }

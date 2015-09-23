@@ -81,7 +81,7 @@ sealed abstract class ParamSetters {
 
 }
 
-// Attributes (AttrMap)
+// Parameters for Layout
 case class Params(
     //
     border: Boolean = false,
@@ -115,6 +115,5 @@ case class Params(
 
   def set: ParamSet = Endo(identity)
   //def merge: ParamSet = Endo(p => p)
-
 }
 

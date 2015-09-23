@@ -51,4 +51,5 @@ sealed abstract class ImagePartInstances {
       f1.copy(image = newTo)
     }
   }
+
 }

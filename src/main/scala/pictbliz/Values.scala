@@ -8,6 +8,7 @@ import pictbliz.ext.PNG
 object Values {
 
   trait Value {
+
     def render(params: Params): ImagePart
   }
 
@@ -79,6 +80,5 @@ object Values {
 }
 
 abstract class Renderer[T] {
-
 
 }
