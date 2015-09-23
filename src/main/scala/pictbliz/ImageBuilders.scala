@@ -13,10 +13,11 @@ object ImageBuilders {
 
   implicit val StrBuilder = new Buildable[Str] {
     def build(self: Str, attrmap: AttrMap) = {
-      val strgraphics = StrGraphics.build(self.s, attrmap)
+/*      val strgraphics = StrGraphics.build(self.s, attrmap)
       val res = strgraphics.processImage()
       strgraphics.dispose()
-      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)
+      ResultImage(findBeginPoint(attrmap, res.getWidth, res.getHeight), res)*/
+      ImageBuilder.emptyResult
     }
   }
 

@@ -9,59 +9,36 @@ import scriptops.Attrs._
 
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
-                  val attrmap: AttrMap,
+                  val params: Params,
                   val attrstr: AttributedText)
 {
-  var colors: Texturable = {
-    AttrMap.findParam(attrmap, 'front_color) match {
-      case Some(ASystemGraphics(path: String)) =>
-        SystemGraphics.fromPath(path)
-      case Some(ASingleColors(xs: Array[String])) =>
-        new SingleColors(xs)
-      case _ =>
-        SystemGraphics.default
-    }
-  }
-  var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
-  private[this] val debug = attrmap.contains('debug)
+  var colors: Texturable = params.frontColor
+  //var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
 
   def process(): BufferedImage = {
     // TODO: 陰もAttrMap見てありなし決める
     val dest = ImageUtils.extraSizeImage(origimg, 0)
     val s = shadowed()
-    val body: BufferedImage = if (attrmap.contains('hemming)) {
-      val AHemming(color, hemSize) = attrmap('hemming)
-      val h = hemmed(origimg, color, hemSize)
-      colored(h)
-    } else {
-      colored(origimg)
-    }
+    val body: BufferedImage =
+      params.hemming.fold(colored(origimg)) { hem =>
+        colored( hemmed(origimg, hem.color, hem.size) )
+      }
 
     val g = dest.createGraphics
     g.drawImage(s, null, 1, 1) // shadow offset = 1
     g.drawImage(body, null, 0, 0)
     g.dispose()
 
-    // TODO: ふちどりした場合、サイズと描画位置が変更されるのでAttrMapの更新しろ
+    // TODO: ふちどりした場合、サイズと描画位置が変更されるのでParamsの更新する
 
-    if (attrmap.contains('border)) bordered(Color.white)
+    if (params.border) bordered(Color.white)
 
-    if (debug) {
-      val b = dest.createGraphics()
-      b.setPaint(Color.black)
-      test foreach {
-        case (x, y, width, height) =>
-          b.drawRect(x, y + glyphvec.ascent.toInt, width, height)
-      }
-      b.dispose()
-    }
-    
     dest
   }
   
   // つける
   def shadowed(): BufferedImage = colors match {
-    case s: SystemGraphics => {
+    case s: SystemGraphics =>
       val maskimg = ImageUtils.copy(origimg)
       val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
       val g = targetimg.createGraphics
@@ -71,7 +48,7 @@ class TextStyler(val origimg: BufferedImage,
       g.dispose()
       
       ImageUtils.synthesis(maskimg, targetimg)
-    }
+
     case _ => sys.error("not implemented")
   }
   // 色つける
@@ -89,10 +66,10 @@ class TextStyler(val origimg: BufferedImage,
       @scala.annotation.tailrec
       def drawEachLine(b: Int, l: List[String]) {
         l match {
-          case Nil => return
+          case Nil =>
           case head :: rest =>
             val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length)
-            if (debug) test += ((px, py, pw, ph))
+            //if (debug) test += ((px, py, pw, ph))
             val paintTex = colors.getTexture(pw, ph)(texIdx)
             g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
 
@@ -117,21 +94,19 @@ class TextStyler(val origimg: BufferedImage,
       val g = destimg.createGraphics()
       g.drawImage(src, null, hemSize, hemSize)
     }
-    val da: Array[Int] = (d.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
-    val dest: Array[Int] = (destimg.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
-
-    import ImageUtils.{ add, mul }
+    val da: Array[Int] = d.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    val dest: Array[Int] = destimg.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
 
     val w = destimg.getWidth
 
     @tailrec def traverse(n: Int, lim: Int) {
       if (n < lim) {
         val a = neighbor(dest, n, w, default = 0)
-        val alp = (dest(n) & 0xFF000000 >>> 24)
+        val alp = dest(n) & 0xFF000000 >>> 24
         var maxalpha = 0
         var i = 0; val len = a.length
         while(i < len) {
-          val alphav = (a(i) & 0xFF000000 >>> 24)
+          val alphav = a(i) & 0xFF000000 >>> 24
           if (alphav > maxalpha) maxalpha = alphav
           i += 1
         }
@@ -144,7 +119,7 @@ class TextStyler(val origimg: BufferedImage,
         }
         if (alp == 255) da(n) = dest(n)
         traverse(n+1, lim)
-      } else return
+      }
     }
     traverse(0, dest.length)
     d

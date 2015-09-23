@@ -1,4 +1,5 @@
-package pictbliz.gui
+package pictbliz
+package gui
 
 import org.eclipse.jface._
 import org.eclipse.swt.widgets._
@@ -9,11 +10,8 @@ import text.{ITextViewer, Document, TextViewer}
 import java.awt.image.BufferedImage
 import org.eclipse.swt.events._
 
-
 import pictbliz.scriptops.Parser
-import pictbliz.{DrawableImage, Resource}
-import gui.SWTUtils
-import org.eclipse.swt.graphics.{Font, Image, ImageData}
+import org.eclipse.swt.graphics.{Image, ImageData}
 
 
 object GUITest {
@@ -68,14 +66,14 @@ trait Model {
  * View, Presenterに依存しない
  */
 class RootModel extends Model {
-  protected var imgCache = collection.mutable.ListBuffer.empty[DrawableImage]
+  protected var imgCache = collection.mutable.ListBuffer.empty[ImagePart]
 
   def clearCache() {
     imgCache.clear()
   }
 
   def writeAll(path: String) {
-    imgCache.foreach( _.write(path) )
+    //imgCache.foreach( _.write(path) )
   }
 
   /**
@@ -92,7 +90,7 @@ class RootModel extends Model {
       // 画像を生成してimgCacheに格納
       case _ =>
     }
-    imgCache.headOption.map { _.result }
+    imgCache.headOption.map { _.image }
   }
 }
 

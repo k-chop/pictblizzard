@@ -1,18 +1,22 @@
-package pictbliz.sample
+package pictbliz
+package sample
 
-import pictbliz._
 import scriptops.Attrs._
-import scriptops.{AttrMap => AMap, AreaMap}
 import scala.language.postfixOps
+
+import Params._
+import Layouts._
+
+import scalaz.syntax.semigroup._
 
 class TestSpec {
   import scriptops.implicits.string2URI
 
-  val strdef = AMap('interval -> AInterval(0, 3),
-                   'padding -> APadding(8, 10))
-  def stdstyle(font: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false) = {
-    (if (inWin) strdef else AMap.empty) + ('font -> AFont(font, style, size))
-  }
+  def defaultStyle(fontName: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false): ParamSet =
+      if (inWin)
+        message |+| font(fontName, style, size)
+      else
+        font(fontName, style, size)
 
   @inline def r(i: Int) = scala.util.Random.nextInt(i)
 
@@ -38,48 +42,48 @@ class TestSpec {
       "misc" -> ExStr("攻撃#{t_atk}, 命中率:#{t_hit}, #{t_kind}武器"),
       "filename" -> ExStr("#{itemno}-#{name}")
     )).expand()
-    val layout = LayoutUnit(
-      AMap('size -> ASize(320, 80)),
-      AreaMap.fromSeq(
-        'win -> AreaUnit(AMap(
-          'rect -> ARect(0, 0, 320, 80),
-          'window -> AWindow("no-v/system6.png"),
-          'front_color -> ASystemGraphics("no-v/system6.png"))),
-        'name -> AreaUnit(AMap(
-          'point -> APoint(0, 0)
-        ) ++= stdstyle(style='bold, inWin=true)),
-        'price -> AreaUnit(AMap(
-          'rect -> ARect(160, 0, 150, 30),
-          'align -> AAlign('right, 'top),
-          'hemming -> AHemming(UColor.code("#001300"), 1)
-        ) ++= stdstyle(inWin=true)),
-        'desc -> AreaUnit(AMap(
-          'point -> APoint(10, 18)
-        ) ++= stdstyle(inWin=true)),
-        'misc -> AreaUnit(AMap(
-          'rect -> ARect(10, 40, 310, 40),
-          'align -> AAlign('right, 'bottom)
-        ) ++= stdstyle(size=12, inWin=true))
+    val layout = WholeLayout(
+      (320, 80),
+      Seq(
+        "win" -> PartLayout.ep(
+          rect(0, 0, 320, 80) |+|
+          window("no-v/system6.png") |+|
+          frontColor("no-v/system6.png")),
+        "name" -> PartLayout.ep(
+          defaultStyle(style='bold, inWin=true) |+|
+          point(0, 0)),
+        "price" -> PartLayout.ep(
+          defaultStyle(inWin=true) |+|
+          rect(160, 0, 150, 30) |+|
+          align(Align.Right, Align.Top) |+|
+          hemming(UColor.code("#001300"), 1)),
+        "desc" -> PartLayout.ep(
+          defaultStyle(inWin=true) |+|
+          point(10, 18)),
+        "misc" -> PartLayout.ep(
+          defaultStyle(size=12, inWin=true) |+|
+          rect(10, 40, 310, 40) |+|
+          align(Align.Right, Align.Bottom))
       )
     )
-    val d = new Drawer(layout)
-    vmap map { vm =>
-      d.draw(vm)
+    val gen = new Generator(layout)
+    /*vmap map { vm =>
+      gen.genImage(vm)
     } foreach {
       _.write(Resource.tempdir + "items/")
-    }
+    }*/
   }
 
   def faceSpec() {
-    val layout = LayoutUnit(
-      AMap('size -> ASize(320, 240)),
-      AreaMap.fromSeq(
-        'a -> AreaUnit(AMap('point -> APoint(0, 0))),
-        'b -> AreaUnit(AMap('point -> APoint(50, 0))),
-        'c -> AreaUnit(AMap('point -> APoint(100, 0))),
-        'd -> AreaUnit(AMap('point -> APoint(0, 50))),
-        'e -> AreaUnit(AMap('point -> APoint(50, 50))),
-        'f -> AreaUnit(AMap('point -> APoint(100, 50)))
+    val layout = WholeLayout(
+      (320, 240),
+      Seq(
+        "a" -> PartLayout.ep(point(0, 0)),
+        "b" -> PartLayout.ep(point(50, 0)),
+        "c" -> PartLayout.ep(point(100, 0)),
+        "d" -> PartLayout.ep(point(0, 50)),
+        "e" -> PartLayout.ep(point(50, 50)),
+        "f" -> PartLayout.ep(point(100, 50))
       )
     )
     val rs = Resource.uri("no-v/ds1.png")
@@ -92,16 +96,16 @@ class TestSpec {
       'f -> FaceGraphic(rs, 5, transparent = false),
       'filename -> Str("facetest")
     )
-    val d = new Drawer(layout)
-    d.draw(vm).write(Resource.tempdir)
+    val gen = new Generator(layout)
+    //gen.genImage(vm).write(Resource.tempdir)
   }
 
   def charaSpec() {
-    val layout = LayoutUnit(
-      AMap('size -> ASize(320, 240)),
-      AreaMap.fromSeq(
+    val layout = WholeLayout(
+      (320, 240),
+      Seq(
         (for(c <- 1 to 200) yield {
-          (Symbol(c.toString): Key) -> AreaUnit(AMap('point -> APoint(r(320), r(240))))
+          c.toString -> PartLayout.ep(point(r(320), r(240)))
         }): _*
       )
     )
@@ -110,16 +114,16 @@ class TestSpec {
       (Symbol(c.toString): Key) -> CharaGraphic(rs, CharaProperty(r(8), r(4), r(3)))
     }).toMap
     val vm: Map[Key, AValue] = _vm + ('filename -> Str("charatest"))
-    val d = new Drawer(layout)
-    d.draw(vm).write(Resource.tempdir)
+    val gen = new Generator(layout)
+    //gen.genImage(vm).write(Resource.tempdir)
   }
 
   def battleSpec() {
-    val layout = LayoutUnit(
-      AMap('size -> ASize(320, 240)),
-      AreaMap.fromSeq(
+    val layout = WholeLayout(
+      (320, 240),
+      Seq(
         (for(c <- 1 to 20) yield {
-          (Symbol(c.toString): Key) -> AreaUnit(AMap('point -> APoint(r(320), r(240))))
+          c.toString -> PartLayout.ep(point(r(320), r(240)))
         }): _*
       )
     )
@@ -128,33 +132,37 @@ class TestSpec {
       (Symbol(c.toString): Key) -> BattleGraphic(rs, r(15), transparent = true)
     }).toMap
     val vm: Map[Key, AValue] = _vm + ('filename -> Str("battletest"))
-    val d = new Drawer(layout)
-    d.draw(vm).write(Resource.tempdir)
+    val gen = new Generator(layout)
+    //gen.genImage(vm).write(Resource.tempdir)
   }
 
 
   def testReuseLayout() {
 
-    val repo = LayoutRepository.empty()
-
-    val lay = LayoutUnit(
-      AMap('size -> ASize(320, 240)),
-      AreaMap.fromSeq(
-      'name->AreaUnit(AMap('rect -> ARect(5,5,300,20),
-                                'auto_expand -> AAutoExpand
-                                ) ++= stdstyle()),
-      'icon->AreaUnit(AMap('rect -> ARect(280,0,32,32)
-                                ) ++= stdstyle()),
-      'desc->AreaUnit(AMap('point -> ARect(0, 20, 12, 2),
-                                'window -> AWindow("no-v/system6.png"),
-                                'auto_expand -> AAutoExpand,
-                                'front_color -> ASystemGraphics("no-v/system6.png")
-                         ) ++= stdstyle(inWin = true)),
-      'cost->AreaUnit(AMap('rect -> ARect(300,2,30,15),
-                                'font -> AFont("Verdana", 'plain, 10))))
-    )
-
-    repo.add('normalwindow, lay)
+    val lay = WholeLayout(
+      (320, 240),
+      Seq(
+      "name" -> PartLayout.ep(
+        rect(5,5,300,20) |+|
+        autoExpand |+|
+        defaultStyle()
+      ),
+      "icon" -> PartLayout.ep(
+        rect(280,0,32,32) |+|
+        defaultStyle()
+      ),
+      "desc" -> PartLayout.ep(
+        rect(0, 20, 12, 2) |+|
+        window("no-v/system6.png") |+|
+        autoExpand |+|
+        frontColor("no-v/system6.png") |+|
+        defaultStyle(inWin = true)
+      ),
+      "cost" -> PartLayout.ep(
+        rect(300,2,30,15) |+|
+        font("Verdana", 'plain, 10)
+      )
+    ))
 
     val v1 = Map(
       'name->Str("エターナルフォースブリザード"),
@@ -201,31 +209,35 @@ class TestSpec {
 
     //val expanded1: Array[ValueMap] = ValueExpander.expand(ex1)
 
-    val d = new Drawer(lay)
-    vs.map{
-      d.draw
+    val gen = new Generator(lay)
+    /*vs.map{
+      d.genImage
     }.zipWithIndex.foreach { case (res, idx) =>
       res.write(Resource.tempdir)
-    }
+    }*/
   }
 
   def testOldSpec() {
 
-    val layout = LayoutUnit(
-      AMap('size -> ASize(320,240)), //env
-      AreaMap.fromSeq(  //layouts
-        'icon1 -> AreaUnit(AMap('point->APoint(0,0))),
-        'icon2 -> AreaUnit(AMap('point->APoint(50,0))),
-        'icon3 -> AreaUnit(AMap('point->APoint(100,0))),
-        'str -> AreaUnit(AMap(
-          'rect->ARect(10,30,200,30),
-          'align->AAlign('x_center, 'bottom),
-          'border->ABorder,
-          'font->AFont("Terminus-ja", 'plain, 12))),
-        'str2->AreaUnit(AMap('rect->ARect(10,60,200,120),
-          'font->AFont("Terminus-ja", 'plain, 12),
-          'align->AAlign('x_center, 'y_center)))
-      ))
+    val layout = WholeLayout(
+      (320,240),
+      Seq(
+        "icon1" -> PartLayout.ep(point(0,0)),
+        "icon2" -> PartLayout.ep(point(50,0)),
+        "icon3"-> PartLayout.ep(point(100,0)),
+        "str" -> PartLayout.ep(
+          rect(10,30,200,30) |+|
+          align(Align.Center, Align.Bottom) |+|
+          border |+|
+          font("Terminus-ja", 'plain, 12)
+        ),
+        "str2" -> PartLayout.ep(
+          rect(10,60,200,120) |+|
+          font("Terminus-ja", 'plain, 12) |+|
+          align(Align.Center, Align.Center)
+        )
+      )
+    )
 
     val valuemap = Map(
       'icon1 -> Icon("icon/icon1.png"),
@@ -235,9 +247,9 @@ class TestSpec {
       'str2 -> Str("a\nb\ncedf\ngiaasdasd\near"),
       'filename -> Str("test"))
 
-    val d = new Drawer(layout)
-    val result = d.draw(valuemap)
-    result.write(Resource.tempdir)
+    val gen = new Generator(layout)
+    //val result = gen.genImage(valuemap)
+    //result.write(Resource.tempdir)
   }
 
 

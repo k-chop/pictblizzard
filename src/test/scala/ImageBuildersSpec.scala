@@ -18,7 +18,6 @@ class ImageBuildersSpec extends UnitSpec {
       ImageBuilders.findBeginPoint(c, 1, 1) should be (3, 5)
       ImageBuilders.findBeginPoint(d, 320, 240) should be (0, 0)
     }
-
   }
 
 }
