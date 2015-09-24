@@ -25,10 +25,8 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
   def length = 21
 
   val img: BufferedImage = {
-    import ext.PNG.refconvert._
-    import ext.PNG.autobuild._
 
-    val res = ext.PNG.read(path).asARGB
+    val res = ext.PNG.fromURI(path, argb = true)
     
     if (res.getWidth != 160 || res.getHeight != 80)
       throw new IllegalArgumentException("SystemGraphic's image size must be 160 x 80.")

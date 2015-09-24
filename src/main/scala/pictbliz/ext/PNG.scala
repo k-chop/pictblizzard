@@ -9,53 +9,24 @@ import pictbliz.{BinaryUtils, ImageUtils}
 
 import scala.language.implicitConversions
 
-class BufferedImageBuilder(ref: File) {
-  private[this] var _argb = false
-  private[this] var _transparent = false
+object PNG {
 
-  def build: BufferedImage = {
-    var image = ImageIO.read(ref)
-    if (_argb) image = ImageUtils.toARGBImage(image)
-    if (_transparent) {
-      val transp = PNG.transparentColor(ref)
+  def fromFile(file: File, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
+    buildBufferedImage(file, argb, transparent)
+  def fromURI(uri: java.net.URI, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
+    fromFile(new File(uri), argb, transparent)
+  def fromString(str: String, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
+    fromFile(new File(str), argb, transparent)
+
+  private[this] def buildBufferedImage(file: File, argb: Boolean, transparent: Boolean): BufferedImage = {
+    var image = ImageIO.read(file)
+    if (argb) image = ImageUtils.toARGBImage(image)
+    if (transparent) {
+      val transp = PNG.transparentColor(file)
       image = ImageUtils.enableAlpha(image, transp)
     }
     image
   }
-
-  def asARGB = {
-    _argb = true
-    this
-  }
-
-  def transparent(b: Boolean) = {
-    if (b) _argb = true
-    _transparent = b
-
-    this
-  }
-
-  def refresh = {
-    _argb = false
-    _transparent = false
-    this
-  }
-}
-
-object PNG {
-  private[this] var counter = 0
-
-  object refconvert {
-    implicit def uri2File(uri: java.net.URI) = new File(uri)
-    implicit def str2File(str: String) = new File(str)
-  }
-
-  object autobuild {
-    implicit def builder2image(b: BufferedImageBuilder) = b.build
-  }
-
-  //def read(file: File): BufferedImage = ImageIO.read(file)
-  def read(file: File): BufferedImageBuilder = new BufferedImageBuilder(file)
 
   /**
    * 指定したパスに書き出す。指定したディレクトリがない場合は生成する。
@@ -82,7 +53,7 @@ object PNG {
       map.order(java.nio.ByteOrder.LITTLE_ENDIAN)
       map.get(QWORD)
       if (!(QWORD sameElements PNG_IDENTIFER)) {
-        throw new IllegalArgumentException("ヘッダが不正です.")
+        throw new IllegalArgumentException(s"Invalid header: ${QWORD.deep}")
       }
       var result: Int = 0x0
       while (map.hasRemaining) {
