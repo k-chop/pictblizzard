@@ -5,24 +5,24 @@ import java.nio.channels.FileChannel
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import java.io.File
+import java.nio.file.Path
+
+import com.typesafe.scalalogging.LazyLogging
 import pictbliz.{BinaryUtils, ImageUtils}
 
 import scala.language.implicitConversions
 
-object PNG {
+object PNG extends LazyLogging {
+  import FilePath._
 
-  def fromFile(file: File, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
-    buildBufferedImage(file, argb, transparent)
-  def fromURI(uri: java.net.URI, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
-    fromFile(new File(uri), argb, transparent)
-  def fromString(str: String, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
-    fromFile(new File(str), argb, transparent)
+  def read[T: ToPath](path: T, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
+    buildBufferedImage(implicitly[ToPath[T]].toPath(path), argb, transparent)
 
-  private[this] def buildBufferedImage(file: File, argb: Boolean, transparent: Boolean): BufferedImage = {
-    var image = ImageIO.read(file)
+  private[this] def buildBufferedImage(path: Path, argb: Boolean, transparent: Boolean): BufferedImage = {
+    var image = ImageIO.read(path.toFile)
     if (argb) image = ImageUtils.toARGBImage(image)
     if (transparent) {
-      val transp = PNG.transparentColor(file)
+      val transp = PNG.transparentColor(path)
       image = ImageUtils.enableAlpha(image, transp)
     }
     image
@@ -36,7 +36,7 @@ object PNG {
    */
   def write(img: BufferedImage, path: String, name: String) {
     val f = new File(s"$path/$name.png")
-    println(s"write to ${f.getPath} ...")
+    logger.trace(s"write to ${f.getPath} ...")
     Option(f.getParentFile) foreach { _.mkdirs() }
     ImageIO.write(img, "png", f)
   }
@@ -46,8 +46,8 @@ object PNG {
   private[this] val DWORD = new Array[Byte](4)
   private[this] val QWORD = new Array[Byte](8)
 
-  def transparentColor(path: File): Int = {
-    val cnl = new FileInputStream(path).getChannel
+  def transparentColor(path: Path): Int = {
+    val cnl = new FileInputStream(path.toFile).getChannel
     try {
       val map = cnl.map(FileChannel.MapMode.READ_ONLY, 0, cnl.size())
       map.order(java.nio.ByteOrder.LITTLE_ENDIAN)
@@ -77,7 +77,5 @@ object PNG {
     }
 
   }
-
-  def transparentColor(path: String): Int = transparentColor(new File(path))
 
 }

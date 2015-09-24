@@ -66,7 +66,7 @@ sealed abstract class ParamSetters {
   def window(systemGraphicsPath: String): ParamSet =
     Endo(_.copy(window = Window(systemGraphicsPath).some))
   def frontColor(systemGraphicsPath: String): ParamSet =
-    Endo(_.copy(frontColor = SystemGraphics.fromPath(systemGraphicsPath)))
+    Endo(_.copy(frontColor = SystemGraphics.make(systemGraphicsPath)))
   def border: ParamSet =
     Endo(_.copy(border = true))
   def onCenter: ParamSet =

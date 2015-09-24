@@ -2,31 +2,27 @@ package pictbliz
 
 import java.awt.image.{ BufferedImage, AffineTransformOp }
 import java.awt.geom.AffineTransform
+import java.nio.file.Path
 
 import com.typesafe.scalalogging.LazyLogging
 
 object SystemGraphics {
+  import ext.FilePath._
 
-  // 見つからなかった場合どこに責任負わせんの
-  def fromPath(path: java.net.URI): SystemGraphics = {
-    new SystemGraphics(path)
-  }
-  def fromPath(path: String): SystemGraphics = {
-    new SystemGraphics(Resource.uri(path))
-  }
+  def make[T: ToPath](path: T): SystemGraphics =
+    new SystemGraphics(implicitly[ToPath[T]].toPath(path))
 
-  def default: SystemGraphics = {
-    fromPath(Resource.uri("no-v/systemrtp2000.png"))
-  }
+  def default: SystemGraphics =
+    make(Resource.uri("no-v/systemrtp2000.png"))
 }
 
-class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
+class SystemGraphics (path: Path) extends Texturable with LazyLogging {
 
   def length = 21
 
   val img: BufferedImage = {
 
-    val res = ext.PNG.fromURI(path, argb = true)
+    val res = ext.PNG.read(path, argb = true)
     
     if (res.getWidth != 160 || res.getHeight != 80)
       throw new IllegalArgumentException("SystemGraphic's image size must be 160 x 80.")
@@ -35,7 +31,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
   }
   
   lazy val pltezero: Int = {
-    val res = ext.PNG.transparentColor(path.getRawPath)
+    val res = ext.PNG.transparentColor(path)
     logger.trace(
       "%s\nこのファイルの透過色は, ARGBの順に%d,%d,%d,%dです." format (path,res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff)
     )

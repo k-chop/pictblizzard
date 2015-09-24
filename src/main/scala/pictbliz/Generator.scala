@@ -4,7 +4,7 @@ import Layouts._
 
 class Generator(layout: WholeLayout) {
 
-  def genImage(values: Map[Id, Values.Value]): ImagePart = {
+  def genImage(values: Map[Layouts.Id, Values.Value]): ImagePart = {
     import scalaz.syntax.semigroup._
 
     val (width, height) = layout.size

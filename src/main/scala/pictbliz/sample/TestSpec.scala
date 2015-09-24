@@ -75,6 +75,8 @@ class TestSpec {
   }
 
   def faceSpec() {
+    import Values._
+
     val layout = WholeLayout(
       (320, 240),
       Seq(
