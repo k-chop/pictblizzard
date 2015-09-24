@@ -2,11 +2,7 @@ package pictbliz
 
 import java.awt.image.BufferedImage
 
-import scalaz.{Semigroup, Monoid}
-
-// DrawableImage
-//class ResultImage
-// ResultImage
+import scalaz.Semigroup
 
 object Images {
 

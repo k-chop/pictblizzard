@@ -30,8 +30,8 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
 
     val res = ext.PNG.read(path).asARGB
     
-    if (res.getWidth != 160 || res.getHeight != 80) // もっと適切な例外がある気がする
-      throw new IllegalArgumentException("システムグラフィックの画像サイズは160 x 80でなければなりません．")
+    if (res.getWidth != 160 || res.getHeight != 80)
+      throw new IllegalArgumentException("SystemGraphic's image size must be 160 x 80.")
     else
       res
   }
@@ -109,7 +109,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
         if (x >= w) {
           drawTile(0, y + 32)
         } else if (y >= h) {
-          return
+          //return
         } else {
           g.drawImage(bg, null, x, y)
           drawTile(x + 32, y)

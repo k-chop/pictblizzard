@@ -4,14 +4,15 @@ import java.awt
 
 object ColorUtils {
 
-  def toColor(str: String): UColor = {
-    sys.error("not implemented")
-  }
+  def toColor(str: String): UColor = sys.error("not implemented")
 }
 
 object UColor {
+
   final val regex = """\#([0-9a-fA-F]{2,2}){3,4}""".r
+
   def code(s: String) = {
+
     if (!s.startsWith("#") && regex.findPrefixMatchOf(s).isEmpty)
       throw new IllegalArgumentException("invalid color code -> " + s)
     val (r: Int,g: Int,b: Int,a: Int) = if (s.length == 7) { // #ffffff(rgb)
@@ -23,7 +24,9 @@ object UColor {
     }
     new UColor(new awt.Color(r,g,b,a))
   }
+
   def hsv(h: Int, s: Int, v: Int, a: Int = 0) = {
+
     if (s == 0) new UColor(new awt.Color(v, v, v, a))
     else {
       val i = math.floor(h/60.0) % 6
@@ -42,7 +45,9 @@ object UColor {
       new UColor(new awt.Color(r,g,b,a))
     }
   }
+
   def rgb(r: Int, g: Int, b: Int, a: Int = 0) = {
+
     new UColor(new awt.Color(r,g,b,a))
   }
 }
@@ -51,7 +56,9 @@ object UColor {
  * 誤差がヤバイ
  */
 class UColor(val self: java.awt.Color) {
+
   case class HSV(h: Int, s:Int, v:Int)
+
   lazy val hsv = {
     val max = math.max(r, math.max(g, b))
     val min = math.min(r, math.min(g, b))
@@ -66,8 +73,10 @@ class UColor(val self: java.awt.Color) {
         (60 * (b - r) / div) + 120
       else
         (60 * (r - g) / div) + 240
+
     HSV(h.toInt, s.toInt, max)
   }
+
   val rgb = self.getRGB
   val r = self.getRed
   val g = self.getGreen
@@ -76,7 +85,7 @@ class UColor(val self: java.awt.Color) {
   lazy val h = hsv.h
   lazy val s = hsv.s
   lazy val v = hsv.v
-  def equals(c: UColor): Boolean = {
-    self == c.self
-  }
+
+  def equals(c: UColor): Boolean = self == c.self
+
 }
