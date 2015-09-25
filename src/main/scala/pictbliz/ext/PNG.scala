@@ -18,8 +18,9 @@ object PNG extends LazyLogging {
     buildBufferedImage(implicitly[ToPath[T]].toPath(path), argb, transparent)
 
   private[this] def buildBufferedImage(path: Path, argb: Boolean, transparent: Boolean): BufferedImage = {
+    val toARGB = argb || (!argb && transparent)
     var image = ImageIO.read(path.toFile)
-    if (argb) image = ImageUtils.toARGBImage(image)
+    if (toARGB) image = ImageUtils.toARGBImage(image)
     if (transparent) {
       val transp = PNG.transparentColor(path)
       image = ImageUtils.enableAlpha(image, transp)
