@@ -145,7 +145,7 @@ class RootView(val presenter: RootPresenter, val root: RootComposite) extends Vi
   root.exbutton.btOutput.addSelectionListener(new SelectionListener {
     // 画像出力
     def widgetSelected(p1: SelectionEvent) {
-      val dest = Resource.tempdir
+      val dest = Resource.tempDir
       presenter.writeAll(dest)
       log(s"$dest に画像を出力しました.")
     }

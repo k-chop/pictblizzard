@@ -1,6 +1,7 @@
 package pictbliz
 
 import java.awt.image.BufferedImage
+import java.nio.file.Path
 
 import scalaz.Semigroup
 
@@ -29,7 +30,23 @@ object Images {
 
 }
 
-case class ImagePart(pos: (Int, Int), image: BufferedImage)
+case class ImageResult(filename: String, image: BufferedImage) {
+  import ext.FilePath.ToPath
+
+  def write[T: ToPath](dir: T): Unit = ext.PNG.write(image, implicitly[ToPath[T]].toPath(dir), filename)
+
+}
+
+case class ImagePart(pos: (Int, Int), image: BufferedImage) {
+
+  def result(values: Map[Layouts.Id, Values.Value]): ImageResult = {
+    val filename = values.get("filename") match {
+      case Some(Values.Text(str)) => str
+      case _ => "untitled"
+    }
+    ImageResult(filename, image)
+  }
+}
 
 object ImagePart extends ImagePartInstances
 

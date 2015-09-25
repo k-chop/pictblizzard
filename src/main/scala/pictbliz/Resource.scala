@@ -8,6 +8,6 @@ object Resource {
   def uri(path: String) = loader.getResource(path).toURI
   def str(path: String) = loader.getResource(path).getPath
 
-  val tempdir = "./temp/"
+  val tempDir = "./temp/"
   
 }

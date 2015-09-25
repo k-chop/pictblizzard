@@ -90,16 +90,16 @@ class TestSpec {
     )
     val rs = Resource.uri("no-v/ds1.png")
     val vm = Map(
-      'a -> FaceGraphic(rs, 0, transparent = false),
-      'b -> FaceGraphic(rs, 1, transparent = false),
-      'c -> FaceGraphic(rs, 2, transparent = false),
-      'd -> FaceGraphic(rs, 3, transparent = false),
-      'e -> FaceGraphic(rs, 4, transparent = false),
-      'f -> FaceGraphic(rs, 5, transparent = false),
-      'filename -> Str("facetest")
+      "a" -> FaceGraphic(rs, 0, transparent = false),
+      "b" -> FaceGraphic(rs, 1, transparent = false),
+      "c" -> FaceGraphic(rs, 2, transparent = false),
+      "d" -> FaceGraphic(rs, 3, transparent = false),
+      "e" -> FaceGraphic(rs, 4, transparent = false),
+      "f" -> FaceGraphic(rs, 5, transparent = false),
+      "filename" -> Text("facetest")
     )
     val gen = new Generator(layout)
-    //gen.genImage(vm).write(Resource.tempdir)
+    gen.genImage(vm).write(Resource.tempDir)
   }
 
   def charaSpec() {

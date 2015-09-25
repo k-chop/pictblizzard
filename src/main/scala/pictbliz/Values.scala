@@ -15,9 +15,9 @@ object Values {
   case class Text(str: String) extends Value {
 
     def render(params: Params): ImagePart = {
-      val strgraphics = StrGraphics.build(str, params)
-      val res = strgraphics.processImage()
-      strgraphics.dispose()
+      val strGraphics = StrGraphics.build(str, params)
+      val res = strGraphics.processImage()
+      strGraphics.dispose()
       ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
     }
   }
@@ -67,9 +67,9 @@ object Values {
       val (w, h) = params.rect.fold((1, 1))(r => (r.w, r.h))
       val buf = ImageUtils.newImage(w, h)
 
-      val syswin = sysg.getSystemWindow(w, h, zoom=true)
+      val systemWindow = sysg.getSystemWindow(w, h, zoom=true)
       val g = buf.createGraphics
-      g.drawImage(syswin, null, 0, 0)
+      g.drawImage(systemWindow, null, 0, 0)
       g.dispose()
       ImagePart((0, 0), buf)
     }

@@ -4,8 +4,7 @@ import java.io.FileInputStream
 import java.nio.channels.FileChannel
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-import java.io.File
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 
 import com.typesafe.scalalogging.LazyLogging
 import pictbliz.{BinaryUtils, ImageUtils}
@@ -34,11 +33,11 @@ object PNG extends LazyLogging {
    * @param path 書き出し先のパス
    * @param name ファイル名
    */
-  def write(img: BufferedImage, path: String, name: String) {
-    val f = new File(s"$path/$name.png")
-    logger.trace(s"write to ${f.getPath} ...")
-    Option(f.getParentFile) foreach { _.mkdirs() }
-    ImageIO.write(img, "png", f)
+  def write(img: BufferedImage, path: Path, name: String) {
+    val filePath = path.resolve(s"$name.png")
+    logger.trace(s"write to ${filePath.toString} ...")
+    Option(filePath.getParent) foreach { Files.createDirectories(_) }
+    ImageIO.write(img, "png", filePath.toFile)
   }
   
   import BinaryUtils._
