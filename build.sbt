@@ -11,7 +11,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "org.slf4j" % "slf4j-api" % "1.7.12",
-  "org.slf4j" % "slf4j-nop" % "1.7.12",
+  "org.slf4j" % "slf4j-simple" % "1.7.12",
   "com.github.nscala-time" %% "nscala-time" % "2.2.0",
   "org.json4s" %% "json4s-native" % "3.3.0.RC6",
   "org.scalaz" %% "scalaz-core" % "7.1.4"

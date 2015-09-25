@@ -1,7 +1,7 @@
 package pictbliz
 package test
 
-import scriptops.implicits.string2URI
+import .string2URI
 import scala.language.postfixOps
 
 import scriptops.Attrs._

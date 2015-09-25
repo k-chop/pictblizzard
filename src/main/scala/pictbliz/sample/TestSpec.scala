@@ -1,6 +1,7 @@
 package pictbliz
 package sample
 
+import com.typesafe.scalalogging.LazyLogging
 import scriptops.Attrs._
 import scala.language.postfixOps
 
@@ -9,10 +10,9 @@ import Layouts._
 
 import scalaz.syntax.semigroup._
 
-class TestSpec {
-  import scriptops.implicits.string2URI
+class TestSpec extends LazyLogging {
 
-  def defaultStyle(fontName: String = "ＭＳ ゴシック", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false): ParamSet =
+  def defaultStyle(fontName: String = "MS Gothic", size: Int = 12, style: Symbol = 'plain, inWin: Boolean = false): ParamSet =
       if (inWin)
         message |+| font(fontName, style, size)
       else
@@ -22,8 +22,8 @@ class TestSpec {
 
   def run() {
     testReuseLayout()
-    testOldSpec()
-    csvRead()
+    //testOldSpec()
+    //csvRead()
     faceSpec()
     charaSpec()
     battleSpec()
@@ -47,8 +47,8 @@ class TestSpec {
       Seq(
         "win" -> PartLayout.ep(
           rect(0, 0, 320, 80) |+|
-          window("no-v/system6.png") |+|
-          frontColor("no-v/system6.png")),
+          window("testdata/no-v/system6.png") |+|
+          frontColor("testdata/no-v/system6.png")),
         "name" -> PartLayout.ep(
           defaultStyle(style='bold, inWin=true) |+|
           point(0, 0)),
@@ -88,7 +88,7 @@ class TestSpec {
         "f" -> PartLayout.ep(point(100, 50))
       )
     )
-    val rs = Resource.uri("no-v/ds1.png")
+    val rs = "testdata/no-v/ds1.png"
     val vm = Map(
       "a" -> FaceGraphic(rs, 0, transparent = false),
       "b" -> FaceGraphic(rs, 1, transparent = false),
@@ -103,6 +103,8 @@ class TestSpec {
   }
 
   def charaSpec() {
+    import Values._
+
     val layout = WholeLayout(
       (320, 240),
       Seq(
@@ -111,16 +113,18 @@ class TestSpec {
         }): _*
       )
     )
-    val rs = Resource.uri("no-v/sl1.png")
+    val rs = "testdata/no-v/sl1.png"
     val _vm = (for(c <- 1 to 200) yield {
-      (Symbol(c.toString): Key) -> CharaGraphic(rs, CharaProperty(r(8), r(4), r(3)))
+      c.toString -> CharaGraphic(rs, CharaProperty(r(8), r(4), r(3)))
     }).toMap
-    val vm: Map[Key, AValue] = _vm + ('filename -> Str("charatest"))
+    val vm = _vm + ("filename" -> Text("charatest"))
     val gen = new Generator(layout)
-    //gen.genImage(vm).write(Resource.tempdir)
+    gen.genImage(vm).write(Resource.tempDir)
   }
 
   def battleSpec() {
+    import Values._
+
     val layout = WholeLayout(
       (320, 240),
       Seq(
@@ -129,17 +133,17 @@ class TestSpec {
         }): _*
       )
     )
-    val rs = Resource.uri("no-v/bs1.png")
+    val rs = "testdata/no-v/bs1.png"
     val _vm = (for(c <- 1 to 20) yield {
-      (Symbol(c.toString): Key) -> BattleGraphic(rs, r(15), transparent = true)
+      c.toString -> BattleGraphic(rs, r(15), transparent = true)
     }).toMap
-    val vm: Map[Key, AValue] = _vm + ('filename -> Str("battletest"))
+    val vm = _vm + ("filename" -> Text("battletest"))
     val gen = new Generator(layout)
-    //gen.genImage(vm).write(Resource.tempdir)
+    gen.genImage(vm).write(Resource.tempDir)
   }
 
-
   def testReuseLayout() {
+    import Values._
 
     val lay = WholeLayout(
       (320, 240),
@@ -155,9 +159,9 @@ class TestSpec {
       ),
       "desc" -> PartLayout.ep(
         rect(0, 20, 12, 2) |+|
-        window("no-v/system6.png") |+|
+        window("testdata/no-v/system6.png") |+|
         autoExpand |+|
-        frontColor("no-v/system6.png") |+|
+        frontColor("testdata/no-v/system6.png") |+|
         defaultStyle(inWin = true)
       ),
       "cost" -> PartLayout.ep(
@@ -166,60 +170,61 @@ class TestSpec {
       )
     ))
 
+    lay.parts.foreach { case (k, p) => logger.info(s"$k: $p")}
+
     val v1 = Map(
-      'name->Str("エターナルフォースブリザード"),
-      'icon->Icon("icon/icon1.png"),
-      'desc->Str("一瞬で相手の周囲の大気ごと氷結させる\n相手は死ぬ"),
-      'cost->Str("42"))
+      "name" -> Text("エターナルフォースブリザード"),
+      "icon" -> Icon("testdata/icon/icon1.png"),
+      "desc" -> Text("一瞬で相手の周囲の大気ごと氷結させる\n相手は死ぬ"),
+      "cost" -> Text("42"))
 
     val v2 = Map(
-      'name->Str("\\c[2]サマーサンシャインバースト"),
-      'icon->Icon("icon/icon2.png"),
-      'desc->Str("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[4]死ぬ\n\n\\c[0]どう考えても自分も\\c[4]死ぬ"),
-      'cost->Str("42")) //
+      "name" -> Text("\\c[2]サマーサンシャインバースト"),
+      "icon" -> Icon("testdata/icon/icon2.png"),
+      "desc" -> Text("一瞬で太陽を相手の頭上に発生させる\n相手は\\c[4]死ぬ\n\n\\c[0]どう考えても自分も\\c[4]死ぬ"),
+      "cost" -> Text("42")) //
 
     val v3 = Map(
-      'name->Str("\\c[1]インフェルノ\\c[0]・\\c[2]オブ\\c[0]・\\c[3]メサイア"),
-      'icon->Icon("icon/icon3.png"),
-      'desc->Str("冥界王ダーク・インフェルノを召喚し半径8kmの大地に\n無差別に\\c[2]種\\c[0]を撒き散らしそれはやがて実を結ぶ"),
-      'cost->Str("42"))
+      "name" -> Text("\\c[1]インフェルノ\\c[0]・\\c[2]オブ\\c[0]・\\c[3]メサイア"),
+      "icon" -> Icon("testdata/icon/icon3.png"),
+      "desc" -> Text("冥界王ダーク・インフェルノを召喚し半径8kmの大地に\n無差別に\\c[2]種\\c[0]を撒き散らしそれはやがて実を結ぶ"),
+      "cost" -> Text("42"))
     
     val v4 = Map(
-      'name->Str("ヘルズボルケイノシュート"),
-      'icon->Icon("icon/icon1.png"),
-      'desc->Str("\\c[6]死の世界\\c[0]から呼び寄せた\\c[8]闇\\c[0]の\\c[2]火弾\\c[0]を\nマッハ2でぶつける\n相手は\\c[4]死ぬ"),
-      'cost->Str("42"))
+      "name" -> Text("ヘルズボルケイノシュート"),
+      "icon" -> Icon("testdata/icon/icon1.png"),
+      "desc" -> Text("\\c[6]死の世界\\c[0]から呼び寄せた\\c[8]闇\\c[0]の\\c[2]火弾\\c[0]を\nマッハ2でぶつける\n相手は\\c[4]死ぬ"),
+      "cost" -> Text("42"))
 
     val v5 = Map(
-      'name->Str("アルティメットインフィニティサンデイ"),
-      'icon->Icon("icon/icon2.png"),
-      'desc->Str("毎日が日曜日。\n相手は死ぬ"),
-      'cost->Str("42"))
+      "name" -> Text("アルティメットインフィニティサンデイ"),
+      "icon" -> Icon("testdata/icon/icon2.png"),
+      "desc" -> Text("毎日が日曜日。\n相手は死ぬ"),
+      "cost" -> Text("42"))
 
     val v6 = Map(
-      'name->Str("エンパイア・ステート・ビル"),
-      'icon->Icon("icon/icon3.png"),
-      'desc->Str("1931年に建てられた高さ443m、102階建てのビル。\n相手は死ぬ"),
-      'cost->Str("42"))
+      "name" -> Text("エンパイア・ステート・ビル"),
+      "icon" -> Icon("testdata/icon/icon3.png"),
+      "desc" -> Text("1931年に建てられた高さ443m、102階建てのビル。\n相手は死ぬ"),
+      "cost" -> Text("42"))
 
-    val _vs: List[ValueMap] = List(v1,v2,v3,v4,v5,v6)
+    val _vs = List(v1,v2,v3,v4,v5,v6)
     //val vs = List(v4)
 
     val vs = _vs.zipWithIndex.map { case (s, i) =>
-      s + ('filename -> Str(f"skill$i%2d"))
+      s + ("filename" -> Text(f"skill$i%2d"))
     }
 
-    //val expanded1: Array[ValueMap] = ValueExpander.expand(ex1)
-
     val gen = new Generator(lay)
-    /*vs.map{
-      d.genImage
-    }.zipWithIndex.foreach { case (res, idx) =>
-      res.write(Resource.tempdir)
-    }*/
+    vs.map {
+      gen.genImage(_)
+    }.foreach { case res =>
+      res.write(Resource.tempDir)
+    }
   }
 
   def testOldSpec() {
+    import Values._
 
     val layout = WholeLayout(
       (320,240),
@@ -245,9 +250,9 @@ class TestSpec {
       'icon1 -> Icon("icon/icon1.png"),
       'icon2 -> Icon("icon/icon2.png"),
       'icon3 -> Icon("icon/icon3.png"),
-      'str -> Str("test"),
-      'str2 -> Str("a\nb\ncedf\ngiaasdasd\near"),
-      'filename -> Str("test"))
+      'str -> Text("test"),
+      'str2 -> Text("a\nb\ncedf\ngiaasdasd\near"),
+      'filename -> Text("test"))
 
     val gen = new Generator(layout)
     //val result = gen.genImage(valuemap)

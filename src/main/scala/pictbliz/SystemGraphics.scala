@@ -13,7 +13,7 @@ object SystemGraphics {
     new SystemGraphics(implicitly[ToPath[T]].toPath(path))
 
   def default: SystemGraphics =
-    make(Resource.uri("no-v/systemrtp2000.png"))
+    make("testdata/no-v/systemrtp2000.png")
 }
 
 class SystemGraphics (path: Path) extends Texturable with LazyLogging {

@@ -1,7 +1,6 @@
 package pictbliz
 
 import java.awt.image.BufferedImage
-import java.net.URI
 
 import pictbliz.ext.PNG
 
@@ -22,26 +21,26 @@ object Values {
     }
   }
 
-  case class Icon(uri: URI) extends Value {
+  case class Icon(path: String) extends Value {
     def render(params: Params): ImagePart = {
-      val res: BufferedImage = PNG.read(uri)
+      val res: BufferedImage = PNG.read(path)
       ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
     }
   }
 
-  case class FaceGraphic(uri: URI, no: Int, transparent: Boolean) extends Value {
+  case class FaceGraphic(path: String, no: Int, transparent: Boolean) extends Value {
     def render(params: Params): ImagePart = {
-      val image = PNG.read(uri, transparent = transparent)
+      val image = PNG.read(path, transparent = transparent)
       val n = no
       val res = image.getSubimage((n%4)*48, (n/4)*48, 48, 48)  // for rpg maker 2000k
       ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
     }
   }
 
-  case class CharaGraphic(uri: URI, prop: CharaProperty, transparent: Boolean = true) extends Value {
+  case class CharaGraphic(path: String, prop: CharaProperty, transparent: Boolean = true) extends Value {
     def render(params: Params): ImagePart = {
       import prop._
-      val image = PNG.read(uri, transparent = transparent)
+      val image = PNG.read(path, transparent = transparent)
       val (bx, by) = ((no%4)*72, (no/4)*128)
       val (sx, sy) = (act*24, dir*32)
       val res = image.getSubimage(bx+sx, by+sy, 24, 32)
@@ -51,9 +50,9 @@ object Values {
 
   case class CharaProperty(no: Int, dir: Int, act: Int)
 
-  case class BattleGraphic(uri: URI, no: Int, transparent: Boolean = true) extends Value {
+  case class BattleGraphic(path: String, no: Int, transparent: Boolean = true) extends Value {
     def render(params: Params): ImagePart = {
-      val image = PNG.read(uri, transparent = transparent)
+      val image = PNG.read(path, transparent = transparent)
       val res = image.getSubimage(no%4*96, no/4*96, 96, 96)
       ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
     }

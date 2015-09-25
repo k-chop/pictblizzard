@@ -1,4 +1,5 @@
-package pictbliz.ext
+package pictbliz
+package ext
 
 import java.io.File
 import java.net.URI

@@ -2,6 +2,8 @@ package pictbliz
 
 import java.awt.Color
 import java.awt.image.{DataBufferInt, BufferedImage}
+import com.typesafe.scalalogging.LazyLogging
+
 import scala.annotation.tailrec
 
 import scriptops._
@@ -10,7 +12,7 @@ import scriptops.Attrs._
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
                   val params: Params,
-                  val attrstr: AttributedText)
+                  val attrstr: AttributedText) extends LazyLogging
 {
   var colors: Texturable = params.frontColor
   //var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
@@ -49,7 +51,11 @@ class TextStyler(val origimg: BufferedImage,
       
       ImageUtils.synthesis(maskimg, targetimg)
 
-    case _ => sys.error("not implemented")
+    case s: SingleColors =>
+      origimg
+    case _ =>
+      logger.error(s"not implemented: $colors")
+      origimg
   }
   // 色つける
   def colored(origimg: BufferedImage): BufferedImage = {
