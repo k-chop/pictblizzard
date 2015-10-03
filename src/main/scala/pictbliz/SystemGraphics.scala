@@ -44,7 +44,7 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
   private val unit_h: Int = 16
   private val offset_y: Int = 48
   
-  def getTexture(w: Int, h: Int)(idx: Int = 0): BufferedImage = {
+  def getTexture(w: Int, h: Int, idx: Int = 0): BufferedImage = {
 
     if (idx < 0 || 20 < idx)
       throw new IllegalArgumentException("システムグラフィックのカラーインデックスの有効範囲は[0]から[20(影色)]までです．")
@@ -82,10 +82,12 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
     result
   }
 
-  def getSystemWindow(w: Int, h: Int, zoom: Boolean = false): BufferedImage = {
-    // ハードコードしすぎワロエナイ
+  def getShadowTexture(w: Int, h: Int): BufferedImage = getTexture(w, h, 20)
 
-    if (w < 16 || h < 16) throw new IllegalArgumentException("16x16以上じゃないと無理ですー！ (w: %d, h: %d)" format (w,h))
+  def getSystemWindow(w: Int, h: Int, zoom: Boolean = false): BufferedImage = {
+    // so many magic numbers lol
+
+    require(w <= 16 && h <= 16, s"texture width and height must be 16 or above (w: $w, h: $h)")
     
     var dest = ImageUtils.newImage(w, h)
 

@@ -16,7 +16,7 @@ class SingleColors(val color: Array[Color]) extends Texturable {
   def this(color: Color*) = this(color.toArray)
   def this(colorNames: Array[String]) = this( colorNames.map { UColor.code(_).self } )
 
-  def getTexture(w: Int, h: Int)(idx: Int) = {
+  def getTexture(w: Int, h: Int, idx: Int) = {
     require(idx < length)
 
     val img = ImageUtils.newImage(w, h)
@@ -26,5 +26,8 @@ class SingleColors(val color: Array[Color]) extends Texturable {
     g.fillRect(0, 0, w, h)
     img
   }
+
+  // Shadow color is last element of colors array.
+  def getShadowTexture(w: Int, h: Int) = getTexture(w, h, length - 1)
   
 }

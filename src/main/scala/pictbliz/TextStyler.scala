@@ -39,23 +39,18 @@ class TextStyler(val origimg: BufferedImage,
   }
   
   // つける
-  def shadowed(): BufferedImage = colors match {
-    case s: SystemGraphics =>
-      val maskimg = ImageUtils.copy(origimg)
-      val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
-      val g = targetimg.createGraphics
-      val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds
-      val paintTex = colors.getTexture(pw, ph)(20)
-      g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
-      g.dispose()
-      
-      ImageUtils.synthesis(maskimg, targetimg)
+  def shadowed(): BufferedImage = {
 
-    case s: SingleColors =>
-      origimg
-    case _ =>
-      logger.error(s"not implemented: $colors")
-      origimg
+    val maskimg = ImageUtils.copy(origimg)
+    val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
+    val g = targetimg.createGraphics
+    val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds
+    val paintTex = colors.getShadowTexture(pw, ph)
+    g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
+    g.dispose()
+
+    ImageUtils.synthesis(maskimg, targetimg)
+
   }
   // 色つける
   def colored(origimg: BufferedImage): BufferedImage = {
@@ -76,7 +71,7 @@ class TextStyler(val origimg: BufferedImage,
           case head :: rest =>
             val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length)
             //if (debug) test += ((px, py, pw, ph))
-            val paintTex = colors.getTexture(pw, ph)(texIdx)
+            val paintTex = colors.getTexture(pw, ph, texIdx)
             g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
 
             drawEachLine(b + head.length + 1, rest)

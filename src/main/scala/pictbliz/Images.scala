@@ -2,7 +2,6 @@ package pictbliz
 
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.nio.file.Path
 
 import scalaz.Semigroup
 

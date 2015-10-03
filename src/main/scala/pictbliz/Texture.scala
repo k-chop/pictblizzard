@@ -21,7 +21,8 @@ class Texture(path: java.net.URI) extends Texturable with LazyLogging {
 
   def length = size_x * size_y
 
-  def getTexture(w: Int, h: Int)(idx: Int = 0): BufferedImage = {
+  def getTexture(w: Int, h: Int, idx: Int = 0): BufferedImage = {
+
     if (idx < length) {
       val msg = "ファイル[%s]のテクスチャNo指定可能範囲は%dですが, %dが指定されました." format (path.toString, length, idx)
       logger.error(msg)
@@ -49,4 +50,7 @@ class Texture(path: java.net.URI) extends Texturable with LazyLogging {
     resg.dispose()
     result
   }
+
+  // Shadow texture is last element of textures.
+  def getShadowTexture(w: Int, h: Int) = getTexture(w, h, length - 1)
 }

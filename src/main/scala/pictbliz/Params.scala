@@ -104,7 +104,7 @@ case class Params(
     //
     tile: Option[Tile] = None,
     //
-    frontColor: Texturable = SingleColors.default,
+    frontColor: Texturable = SystemGraphics.default,
     //
     hemming: Option[Hemming] = None,
     //
