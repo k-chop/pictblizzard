@@ -1,5 +1,6 @@
 package pictbliz
 
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 
@@ -11,7 +12,16 @@ object Images {
 
   final def empty = ImageUtils.newImage(1, 1)
   final def emptyPart = ImagePart(origin, empty)
-  final def blank(width: Int, height: Int) = ImagePart(origin, ImageUtils.newImage(width, height))
+  final def blank(width: Int, height: Int, bgColor: Color = Color.black) =
+    ImagePart(origin, clear(ImageUtils.newImage(width, height), bgColor))
+
+  def clear(buf: BufferedImage, color: Color): BufferedImage = {
+    val g2d = buf.createGraphics()
+    g2d.setPaint(color)
+    g2d.fillRect(0, 0, buf.getWidth, buf.getHeight)
+    g2d.dispose()
+    buf
+  }
 
   def findBeginPoint(params: Params, width: Int, height: Int): (Int, Int) = {
 
