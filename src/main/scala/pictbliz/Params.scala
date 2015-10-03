@@ -94,7 +94,7 @@ case class Params(
     //
     align: Align = Align(Align.Left, Align.Top),
     //
-    point: Option[Point] = Some(Point(0, 0)),
+    point: Option[Point] = None,
     //
     rect: Option[Rect] = None,
     //
