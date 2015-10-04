@@ -113,6 +113,6 @@ case class Params(
     interval: Option[Interval] = None
     ) {
 
-  //def merge: ParamSet = Endo(p => p)
+  def merge: ParamSet = Endo(identity)
 }
 

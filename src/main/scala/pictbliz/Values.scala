@@ -1,6 +1,7 @@
 package pictbliz
 
 import java.awt.image.BufferedImage
+import scalaz.syntax.semigroup._
 
 import pictbliz.ext.PNG
 
@@ -12,12 +13,20 @@ object Values {
   }
 
   case class Text(str: String) extends Value {
+    import Params._
 
     def render(params: Params): ImagePart = {
       val strGraphics = StrGraphics.build(str, params)
       val res = strGraphics.processImage()
       strGraphics.dispose()
-      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
+      if (params.window.isDefined) {
+        println(params.rect)
+        val (x, y) = params.rect.collect{ case Rect(xx, yy, _, _) => (xx, yy)}.getOrElse((0, 0))
+        println(x, y)
+        // findBeginPoint(params, res.getWidth, res.getHeight)
+        (Values.Window(params.window.get.systemGraphicsPath).render(params.copy(rect = Some(Rect(x, y, res.getWidth, res.getHeight)))) |+| ImagePart(Images.origin, res)).copy(pos = (x,y))
+      } else
+        ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
     }
   }
 
@@ -64,6 +73,7 @@ object Values {
     def render(params: Params): ImagePart = {
       val sysg = SystemGraphics.make(systemGraphicsPath)
       val (w, h) = params.rect.fold((1, 1))(r => (r.w, r.h))
+      println(w, h)
       val buf = ImageUtils.newImage(w, h)
 
       val systemWindow = sysg.getSystemWindow(w, h, zoom=true)
