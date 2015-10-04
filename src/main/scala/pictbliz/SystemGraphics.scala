@@ -87,7 +87,7 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
   def getSystemWindow(w: Int, h: Int, zoom: Boolean = false): BufferedImage = {
     // so many magic numbers lol
 
-    require(w <= 16 && h <= 16, s"texture width and height must be 16 or above (w: $w, h: $h)")
+    require(16 <= w && 16 <= h, s"texture width and height must be 16 or above (w: $w, h: $h)")
     
     var dest = ImageUtils.newImage(w, h)
 
