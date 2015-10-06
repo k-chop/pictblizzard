@@ -84,10 +84,11 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
 
   def getShadowTexture(w: Int, h: Int): BufferedImage = getTexture(w, h, 20)
 
-  def getSystemWindow(w: Int, h: Int, zoom: Boolean = false): BufferedImage = {
+  def getSystemWindow(_w: Int, _h: Int, zoom: Boolean = false): BufferedImage = {
     // so many magic numbers lol
 
-    require(16 <= w && 16 <= h, s"texture width and height must be 16 or above (w: $w, h: $h)")
+    val w = math.max(_w, 16)
+    val h = math.max(_h, 16)
     
     var dest = ImageUtils.newImage(w, h)
 
@@ -160,7 +161,10 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
     }
     
     g.dispose()
-    dest
+
+    if(_w < 16 || _h < 16) {
+      dest.getSubimage(0, 0, _w, _h)
+    } else dest
   }
   
 }
