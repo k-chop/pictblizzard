@@ -39,7 +39,10 @@ object Params extends ParamSetters {
 
   case class Background(path: String)
 
-  case class Window(systemGraphicsPath: String)
+  case class Window(systemGraphicsPath: String) {
+    // hmm....
+    def toValue: Values.Window = Values.Window(systemGraphicsPath)
+  }
 
   //
   type ParamSet = Endo[Params]
@@ -78,6 +81,12 @@ sealed abstract class ParamSetters {
   def defaultFont: ParamSet = font("MS Gothic", 'plain, 12)
   def message: ParamSet = interval(0, 3) |+| padding(8, 10)
   def stdStyle: ParamSet = defaultFont |+| message
+  def autoExpandSizeWith(ip: ImagePart): ParamSet = Endo( p =>
+    if (p.autoExpand) {
+      val (mx, my) = p.rect.collect{ case Rect(x, y, _, _) => (x, y) }.getOrElse((0, 0))
+      p.copy(rect = Rect(mx, my, ip.image.getWidth, ip.image.getHeight).some)
+    } else p
+  )
 
 }
 

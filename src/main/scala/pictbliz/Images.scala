@@ -55,6 +55,8 @@ case class ImagePart(pos: (Int, Int), image: BufferedImage) {
     }
     ImageResult(filename, image)
   }
+
+  def isEmpty = pos._1 == 0 && pos._2 == 0 && image.getWidth == 1 && image.getHeight == 1
 }
 
 object ImagePart extends ImagePartInstances
@@ -64,13 +66,20 @@ sealed abstract class ImagePartInstances {
   implicit val imagePartInstances: Semigroup[ImagePart] = new Semigroup[ImagePart] {
 
     def append(f1: ImagePart, f2: => ImagePart): ImagePart = {
-      val (dx, dy) = f2.pos
-      val newTo = ImageUtils.copy(f1.image)
+      if (f1.isEmpty)
+        f2
+      else if (f2.isEmpty)
+        f1
+      else {
+        val dx = f2.pos._1 - f1.pos._1
+        val dy = f2.pos._2 - f1.pos._2
+        val newTo = ImageUtils.copy(f1.image)
 
-      val g2d = newTo.createGraphics()
-      g2d.drawImage(f2.image, null, dx, dy)
-      g2d.dispose()
-      f1.copy(image = newTo)
+        val g2d = newTo.createGraphics()
+        g2d.drawImage(f2.image, null, dx, dy)
+        g2d.dispose()
+        f1.copy(image = newTo)
+      }
     }
   }
 
