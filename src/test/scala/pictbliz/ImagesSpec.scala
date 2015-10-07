@@ -1,9 +1,8 @@
 package pictbliz
-package test
 
 import pictbliz.scriptops.Attrs._
 
-class ImageBuildersSpec extends UnitSpec {
+class ImagesSpec extends UnitSpec {
 
 
   "ImageBuilders" should {

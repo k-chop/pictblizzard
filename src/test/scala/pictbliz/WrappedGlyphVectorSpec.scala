@@ -1,5 +1,4 @@
 package pictbliz
-package test
 
 import pictbliz.scriptops.Attrs._
 import scriptops.AttrMap

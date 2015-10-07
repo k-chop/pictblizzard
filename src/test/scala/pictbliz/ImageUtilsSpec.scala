@@ -1,5 +1,4 @@
 package pictbliz
-package test
 
 import ImageUtils.ARGB
 

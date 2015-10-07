@@ -1,6 +1,4 @@
 package pictbliz
-package test
-
 
 class AttributedTextSpec extends UnitSpec {
 
