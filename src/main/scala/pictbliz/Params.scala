@@ -88,6 +88,8 @@ sealed abstract class ParamSetters {
     } else p
   )
 
+  def make(ps: ParamSet): Params = ps apply Params()
+
 }
 
 // Parameters for Layout
@@ -123,5 +125,6 @@ case class Params(
     ) {
 
   def merge: ParamSet = Endo(identity)
+
 }
 
