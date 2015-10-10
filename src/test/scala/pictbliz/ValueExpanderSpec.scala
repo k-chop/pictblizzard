@@ -1,13 +1,7 @@
 package pictbliz
-package test
-
-import scriptops.implicits.string2URI
-import scala.language.postfixOps
-
-import scriptops.Attrs._
 
 class ValueExpanderSpec extends UnitSpec {
-
+/*
   "ValueExpander" should {
     "expand 1 correctly" in {
       val vmap = new ValueExpander(Map(
@@ -174,4 +168,5 @@ class ValueExpanderSpec extends UnitSpec {
     }
 
   }
+  */
 }

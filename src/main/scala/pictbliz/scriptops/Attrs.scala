@@ -51,7 +51,11 @@ object Attrs {
   object LayoutUnit {
     def empty() = LayoutUnit.apply(new AttrMap, AreaMap.empty())
   }
+
+  @deprecated("Use 'WholeLayout' instead.")
   case class LayoutUnit(env: AttrMap, areamap: AreaMap)
+
+  @deprecated("Use 'PartLayout' instead.")
   case class AreaUnit(attrmap: AttrMap) {
 
 
@@ -116,12 +120,5 @@ object Attrs {
   case object Ja extends FontLang
 
   case object En extends FontLang
-
-
-  sealed trait Context
-
-  class LexicalContext extends Context
-
-  object NullContext extends Context
 
 }

@@ -4,58 +4,31 @@ import java.io.FileInputStream
 import java.nio.channels.FileChannel
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-import java.io.File
+import java.nio.file.{Files, Path}
+
+import com.typesafe.scalalogging.LazyLogging
 import pictbliz.{BinaryUtils, ImageUtils}
 
 import scala.language.implicitConversions
 
-class BufferedImageBuilder(ref: File) {
-  private[this] var _argb = false
-  private[this] var _transparent = false
+object PNG extends LazyLogging {
+  import FilePath._
 
-  def build: BufferedImage = {
-    var image = ImageIO.read(ref)
-    if (_argb) image = ImageUtils.toARGBImage(image)
-    if (_transparent) {
-      val transp = PNG.transparentColor(ref)
+  def read[T: ToPath](path: T, argb: Boolean = false, transparent: Boolean = false): BufferedImage =
+    buildBufferedImage(implicitly[ToPath[T]].toPath(path), argb, transparent)
+
+  private[this] def buildBufferedImage(path: Path, argb: Boolean, transparent: Boolean): BufferedImage = {
+    logger.debug(s"Build from $path, argb: $argb, alpha: $transparent")
+
+    val toARGB = argb || (!argb && transparent)
+    var image = ImageIO.read(path.toFile)
+    if (toARGB) image = ImageUtils.toARGBImage(image)
+    if (transparent) {
+      val transp = PNG.transparentColor(path)
       image = ImageUtils.enableAlpha(image, transp)
     }
     image
   }
-
-  def asARGB = {
-    _argb = true
-    this
-  }
-
-  def transparent(b: Boolean) = {
-    if (b) _argb = true
-    _transparent = b
-
-    this
-  }
-
-  def refresh = {
-    _argb = false
-    _transparent = false
-    this
-  }
-}
-
-object PNG {
-  private[this] var counter = 0
-
-  object refconvert {
-    implicit def uri2File(uri: java.net.URI) = new File(uri)
-    implicit def str2File(str: String) = new File(str)
-  }
-
-  object autobuild {
-    implicit def builder2image(b: BufferedImageBuilder) = b.build
-  }
-
-  //def read(file: File): BufferedImage = ImageIO.read(file)
-  def read(file: File): BufferedImageBuilder = new BufferedImageBuilder(file)
 
   /**
    * 指定したパスに書き出す。指定したディレクトリがない場合は生成する。
@@ -63,11 +36,11 @@ object PNG {
    * @param path 書き出し先のパス
    * @param name ファイル名
    */
-  def write(img: BufferedImage, path: String, name: String) {
-    val f = new File(s"$path/$name.png")
-    println(s"write to ${f.getPath} ...")
-    Option(f.getParentFile) foreach { _.mkdirs() }
-    ImageIO.write(img, "png", f)
+  def write(img: BufferedImage, path: Path, name: String) {
+    val filePath = path.resolve(s"$name.png")
+    logger.trace(s"write to ${filePath.toString} ...")
+    Option(filePath.getParent) foreach { Files.createDirectories(_) }
+    ImageIO.write(img, "png", filePath.toFile)
   }
   
   import BinaryUtils._
@@ -75,14 +48,14 @@ object PNG {
   private[this] val DWORD = new Array[Byte](4)
   private[this] val QWORD = new Array[Byte](8)
 
-  def transparentColor(path: File): Int = {
-    val cnl = new FileInputStream(path).getChannel
+  def transparentColor(path: Path): Int = {
+    val cnl = new FileInputStream(path.toFile).getChannel
     try {
       val map = cnl.map(FileChannel.MapMode.READ_ONLY, 0, cnl.size())
       map.order(java.nio.ByteOrder.LITTLE_ENDIAN)
       map.get(QWORD)
       if (!(QWORD sameElements PNG_IDENTIFER)) {
-        throw new IllegalArgumentException("ヘッダが不正です.")
+        throw new IllegalArgumentException(s"Invalid header: ${QWORD.deep}")
       }
       var result: Int = 0x0
       while (map.hasRemaining) {
@@ -106,7 +79,5 @@ object PNG {
     }
 
   }
-
-  def transparentColor(path: String): Int = transparentColor(new File(path))
 
 }

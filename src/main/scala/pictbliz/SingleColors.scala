@@ -5,7 +5,7 @@ import java.awt.Color
 object SingleColors {
 
   lazy val default = {
-    new SingleColors(Color.white, Color.red, Color.green, Color.blue, Color.black)
+    new SingleColors(Color.white, Color.red, Color.green, Color.blue, Color.black, Color.gray)
   }
 
 }
@@ -13,13 +13,11 @@ object SingleColors {
 class SingleColors(val color: Array[Color]) extends Texturable {
   def length = color.length
 
-  def this(_color: Color*) = this(_color.toArray)
-  def this(colornames: Array[String]) = {
-    this( colornames map { s => UColor.code(s).self } )
-  }
+  def this(color: Color*) = this(color.toArray)
+  def this(colorNames: Array[String]) = this( colorNames.map { UColor.code(_).self } )
 
-  def getTexture(w: Int, h: Int)(idx: Int) = {
-    if (length <= idx) throw new IndexOutOfBoundsException
+  def getTexture(w: Int, h: Int, idx: Int) = {
+    require(idx < length)
 
     val img = ImageUtils.newImage(w, h)
     val g = img.createGraphics
@@ -28,5 +26,8 @@ class SingleColors(val color: Array[Color]) extends Texturable {
     g.fillRect(0, 0, w, h)
     img
   }
+
+  // Shadow color is last element of colors array.
+  def getShadowTexture(w: Int, h: Int) = getTexture(w, h, length - 1)
   
 }

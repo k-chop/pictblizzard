@@ -21,7 +21,7 @@ object ImageUtils {
       val g = color & 0xFF00 >>> 8
       val b = color & 0xFF
       val aa = a*amp; val ra = r*amp; val ga = g*amp; val ba = b*amp
-      (aa.toInt << 24) | (ra.toInt << 16) | (ga.toInt << 8) | (ba.toInt)
+      (aa.toInt << 24) | (ra.toInt << 16) | (ga.toInt << 8) | ba.toInt
     } else color
   }
 
@@ -94,17 +94,17 @@ object ImageUtils {
       return src
     
     val dest = newImage(src.getWidth, src.getHeight)
-    val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferByte].getData
-    val destPixel = (dest.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
+    val srcPixel = src.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    val destPixel = dest.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
     val cm = src.getColorModel
     (0 until srcPixel.length) foreach { i =>
-      destPixel(i) = (0xff000000|0x00ffffff&(cm.getRGB(srcPixel(i)))) 
+      destPixel(i) = 0xff000000 | 0x00ffffff & cm.getRGB(srcPixel(i))
     }
     dest
   }
   
   def enableAlpha(src: BufferedImage, transColor: Int): BufferedImage = {
-    val srcPixel = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
+    val srcPixel = src.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
 
     (0 until srcPixel.length) foreach { i =>
       if (srcPixel(i) == transColor)
@@ -117,8 +117,8 @@ object ImageUtils {
     require(src.getType == BufferedImage.TYPE_INT_ARGB && target.getType == BufferedImage.TYPE_INT_ARGB,
         "source & target's image type should be 'TYPE_INT_ARGB'")
 
-    val srcPixel    = (src.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
-    val targetPixel = (target.getRaster.getDataBuffer).asInstanceOf[DataBufferInt].getData
+    val srcPixel    = src.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    val targetPixel = target.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
 
     for {
       idy <- 0 until src.getHeight

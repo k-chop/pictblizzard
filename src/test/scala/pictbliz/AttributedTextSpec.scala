@@ -1,6 +1,4 @@
 package pictbliz
-package test
-
 
 class AttributedTextSpec extends UnitSpec {
 
@@ -27,7 +25,7 @@ class AttributedTextSpec extends UnitSpec {
       val ar4 = new AttributedText("""\c[1]test""")
       ar4.str should equal ("test")
       ar4.ranges should have length 1
-      ar4.ranges(0) should equal (AR(0,4,CtrColor(1)))
+      ar4.ranges.head should equal (AR(0,4,CtrColor(1)))
       
       val ar5 = new AttributedText("""test\c[1]""")
       ar5.str should equal ("test")
@@ -36,7 +34,7 @@ class AttributedTextSpec extends UnitSpec {
       val ar6 = new AttributedText("""plain""")
       ar6.str should equal ("plain")
       ar6.ranges should have length 1
-      ar6.ranges(0) should equal (AR(0,5,CtrColor(0)))
+      ar6.ranges.head should equal (AR(0,5,CtrColor(0)))
       
     }
   }

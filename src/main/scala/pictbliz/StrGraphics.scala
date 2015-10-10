@@ -5,8 +5,6 @@ import java.awt.font.GlyphVector
 import java.awt.image.BufferedImage
 
 import com.typesafe.scalalogging.LazyLogging
-import scriptops.Attrs._
-import scriptops.AttrMap
 
 object StrGraphics extends LazyLogging {
 
@@ -23,7 +21,7 @@ object StrGraphics extends LazyLogging {
     g.setFont(font)
   }
 
-  def build(str: String, attrmap: AttrMap): StrGraphics = {
+  def build(str: String, params: Params): StrGraphics = {
     def extractStyle(s: Symbol): Int = s match {
       case 'plain => Font.PLAIN
       case 'bold => Font.BOLD
@@ -32,15 +30,15 @@ object StrGraphics extends LazyLogging {
       case n => logger.warn("不明なフォントスタイルです: "+n+"\nデフォルトのスタイルを使用します."); Font.PLAIN
     }
 
-    val font = attrmap.get('font) map { attr =>
-      val AFont(name, style, pt, _) = attr
+    val font = params.font map { font =>
+      val Params.Font(name, style, pt) = font
       new Font(name, extractStyle(style), pt)
     } getOrElse {
       //logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
       DEFAULT_FONT
     }
 
-    new StrGraphics(str, font, attrmap)
+    new StrGraphics(str, font, params)
   }
 
 
@@ -48,7 +46,7 @@ object StrGraphics extends LazyLogging {
 
 class StrGraphics(_str: String,
                   val font: Font,
-                  val attrmap: AttrMap)
+                  val params: Params)
 {
   val g2d = ImageUtils.newImage(1, 1).createGraphics
   StrGraphics.initGraphics2D(g2d, font)
@@ -66,14 +64,14 @@ class StrGraphics(_str: String,
     StrGraphics.initGraphics2D(g2d, font)
     val frc = g2d.getFontRenderContext
     val lm = font.getLineMetrics(str, frc)
-    new WrappedGlyphVector(generateGlyphVector(), attrmap, getNewlineCode, lm.getAscent)
+    new WrappedGlyphVector(generateGlyphVector(), params, getNewlineCode, lm.getAscent)
   }
 
   def processImage(): BufferedImage = {
     val v = getWrappedGlyphVector
     val processedVector = v.process()
     val bufimage = generateImage( processedVector )
-    val styler = new TextStyler(bufimage, processedVector, attrmap, strAttrib)
+    val styler = new TextStyler(bufimage, processedVector, params, strAttrib)
     styler.process()
   }
 
@@ -89,19 +87,17 @@ class StrGraphics(_str: String,
     def computeSize(v: WrappedGlyphVector) = {
       import scala.math.max
 
-      val hasAutoexp = attrmap.contains('autoexpand)
-      val hasRect = attrmap.contains('rect)
-      
-      val (w1, h1) = if (hasRect) {
-        val ARect(_, _, w, h) = attrmap('rect)
-        (w, h)
-      } else (0, 0)
+      val hasRect = params.rect.isDefined
+
+      val (w1, h1) = params.rect.fold((0, 0)) { r =>
+        (r.w, r.h)
+      }
 
       val Extractors.Rect2DALL(x, y, w2, h2) = v.getFixedWholeLogicalBounds
       
-      if (hasAutoexp || !hasRect) { // どちらか大きい方に拡大される
-        val (dx, dy) = attrmap.get('padding) collect {
-          case APadding(xp, yp) => (xp*2, yp*2)
+      if (params.autoExpand || !hasRect) { // どちらか大きい方に拡大される
+        val (dx, dy) = params.padding.map { p =>
+          (p.x*2, p.y*2)
         } getOrElse ((x*2, y + v.ascent.toInt))
         ( max(w1, w2 + dx - 1), max(h1, h2 + dy - 1) )
         

@@ -1,5 +1,4 @@
 package pictbliz
-package test
 
 class ColorUtilsSpec extends UnitSpec {
 

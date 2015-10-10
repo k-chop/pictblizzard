@@ -4,32 +4,24 @@ import java.awt.font.GlyphVector
 import java.awt.geom.{ Point2D, Rectangle2D }
 import scala.math.{ max, min }
 
-import scriptops.AttrMap
-import scriptops.Attrs._
+class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val ascent: Float) {
+  import Params._
 
-
-class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val ascent: Float) {
-
-  private[this] val rectAll: ARect =
-    attrmap.get('rect) collect {
-      case r: ARect => r
-    } getOrElse ARect(0,0,1,1)
+  private[this] val rectAll: Rect =
+    params.rect getOrElse Rect(0,0,1,1)
   
   private[this] lazy val codes = (0 until v.getNumGlyphs) map { i => (i, v.getGlyphCode(i)) }
   
   def self = v
 
   def process(): WrappedGlyphVector = {
-    def call(pname: Symbol, f: Attr => WrappedGlyphVector, guard: => Boolean = true) {
-      if (guard) attrmap.get(pname) foreach { f }
-    }
-    
+
     this.newlined()
 
-    call('interval, interval)
-    call('align,    align,   attrmap.contains('rect))
-    call('padding,  padding)
-    
+    params.interval foreach interval
+    params.rect foreach (_ => align(params.align))
+    params.padding foreach padding
+
     this
   }
 
@@ -52,12 +44,11 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     this
   }
 
-  private def interval(attr: Attr): WrappedGlyphVector = {
-    val AInterval(xparam, yparam) = attr
-    if (xparam > 0)
-      x_interval(xparam)
-    if (yparam > 0)
-      y_interval(yparam)
+  private def interval(in: Interval): WrappedGlyphVector = {
+    if (in.x > 0)
+      x_interval(in.x)
+    if (in.y > 0)
+      y_interval(in.y)
     this
   }
   
@@ -84,19 +75,18 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     }
   }
   
-  private def align(attr: Attr): WrappedGlyphVector = {
-    val AAlign(xparam, yparam) = attr
-    
-    val ARect(_, _, width, height) = rectAll
+  private def align(ali: Align): WrappedGlyphVector = {
 
-    if (xparam == 'right)
+    val Rect(_, _, width, height) = rectAll
+
+    if (ali.x == Align.Right)
       alignXRight(width)
-    else if (xparam == 'x_center)
+    else if (ali.x == Align.Center)
       alignXCenter(width)
 
-    if (yparam == 'bottom)
+    if (ali.y == Align.Bottom)
       alignYBottom(height)
-    else if (yparam == 'y_center)
+    else if (ali.y == Align.Center)
       alignYCenter(height)
     
     this
@@ -129,7 +119,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   }
 
   private def alignXCenter(width: Int) {
-    val ARect(_, _, w, h) = rectAll
+    val Rect(_, _, w, _) = rectAll
     def recur(lf: Int, nl: Int) {
       if (nl != -1) {
         val lineRect = getFixedLogicalBounds(lf, nl+1)
@@ -163,7 +153,7 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
   }
 
   private def alignYCenter(height: Int) {
-    val ARect(_, _, _, h) = rectAll
+    val Rect(_, _, _, h) = rectAll
     val fixedRect = getFixedLogicalBounds(0, v.getNumGlyphs)
     val diff = (h - fixedRect.getHeight) / 2
     
@@ -177,41 +167,39 @@ class WrappedGlyphVector(v: GlyphVector, attrmap: AttrMap, newlineCode: Int, val
     (codes.view drop from find { _._2 == newlineCode } getOrElse((-1,0)) )._1
   }
 
-  private def padding(attr: Attr): WrappedGlyphVector = {
+  private def padding(pad: Padding): WrappedGlyphVector = {
 
-    val APadding(xparam, yparam) = attr
-    
-    def callPaddings(xp: Symbol, yp: Symbol) {
-      if (xparam > 0) x_padding(xp, xparam)
-      if (yparam > 0) y_padding(yp, yparam)
+    def callPaddings(xp: Align.Horizontal, yp: Align.Vertical) {
+      if (pad.x > 0) x_padding(xp, pad.x)
+      if (pad.y > 0) y_padding(yp, pad.y)
     }
 
-    if (attrmap.contains('rect) && attrmap.contains('align)) {
-      val AAlign(hori, vert) = attrmap('align)
-      callPaddings(hori, vert)
-    } else if (attrmap.contains('rect)) {
-      callPaddings('left, 'top)
-    } else if (attrmap.contains('point)) {
-      callPaddings('left, 'top)
-    } else sys.error("なんという条件漏れ… : " + attrmap.toString)
+    if (params.rect.isDefined)
+      callPaddings(params.align.x, params.align.y)
+    else
+      callPaddings(Align.Left, Align.Top)
     
     this
   }
   
-  private def x_padding(dir: Symbol, p: Int) {
+  private def x_padding(dir: Align.Horizontal, p: Int) {
+    import Align._
+
     val diff = dir match {
-      case 'left => p
-      case 'right => -p
-      case 'x_center => 0
+      case Left => p
+      case Right => -p
+      case Center => 0
     }
     movex(0, v.getNumGlyphs, diff)
   }
   
-  private def y_padding(dir: Symbol, p: Int) {
+  private def y_padding(dir: Align.Vertical, p: Int) {
+    import Align._
+
     val diff = dir match {
-      case 'top => p
-      case 'bottom => -p
-      case 'y_center => 0
+      case Top => p
+      case Bottom => -p
+      case Center => 0
     }
     movey(0, v.getNumGlyphs, diff)
   }

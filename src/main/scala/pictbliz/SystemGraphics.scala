@@ -2,42 +2,36 @@ package pictbliz
 
 import java.awt.image.{ BufferedImage, AffineTransformOp }
 import java.awt.geom.AffineTransform
+import java.nio.file.Path
 
 import com.typesafe.scalalogging.LazyLogging
 
 object SystemGraphics {
+  import ext.FilePath._
 
-  // 見つからなかった場合どこに責任負わせんの
-  def fromPath(path: java.net.URI): SystemGraphics = {
-    new SystemGraphics(path)
-  }
-  def fromPath(path: String): SystemGraphics = {
-    new SystemGraphics(Resource.uri(path))
-  }
+  def make[T: ToPath](path: T): SystemGraphics =
+    new SystemGraphics(implicitly[ToPath[T]].toPath(path))
 
-  def default: SystemGraphics = {
-    fromPath(Resource.uri("no-v/systemrtp2000.png"))
-  }
+  def default: SystemGraphics =
+    make("testdata/no-v/systemrtp2000.png")
 }
 
-class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
+class SystemGraphics (path: Path) extends Texturable with LazyLogging {
 
   def length = 21
 
   val img: BufferedImage = {
-    import ext.PNG.refconvert._
-    import ext.PNG.autobuild._
 
-    val res = ext.PNG.read(path).asARGB
+    val res = ext.PNG.read(path, argb = true)
     
-    if (res.getWidth != 160 || res.getHeight != 80) // もっと適切な例外がある気がする
-      throw new IllegalArgumentException("システムグラフィックの画像サイズは160 x 80でなければなりません．")
+    if (res.getWidth != 160 || res.getHeight != 80)
+      throw new IllegalArgumentException("SystemGraphic's image size must be 160 x 80.")
     else
       res
   }
   
   lazy val pltezero: Int = {
-    val res = ext.PNG.transparentColor(path.getRawPath)
+    val res = ext.PNG.transparentColor(path)
     logger.trace(
       "%s\nこのファイルの透過色は, ARGBの順に%d,%d,%d,%dです." format (path,res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff)
     )
@@ -50,7 +44,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
   private val unit_h: Int = 16
   private val offset_y: Int = 48
   
-  def getTexture(w: Int, h: Int)(idx: Int = 0): BufferedImage = {
+  def getTexture(w: Int, h: Int, idx: Int = 0): BufferedImage = {
 
     if (idx < 0 || 20 < idx)
       throw new IllegalArgumentException("システムグラフィックのカラーインデックスの有効範囲は[0]から[20(影色)]までです．")
@@ -88,10 +82,13 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
     result
   }
 
-  def getSystemWindow(w: Int, h: Int, zoom: Boolean = false): BufferedImage = {
-    // ハードコードしすぎワロエナイ
+  def getShadowTexture(w: Int, h: Int): BufferedImage = getTexture(w, h, 20)
 
-    if (w < 16 || h < 16) throw new IllegalArgumentException("16x16以上じゃないと無理ですー！ (w: %d, h: %d)" format (w,h))
+  def getSystemWindow(_w: Int, _h: Int, zoom: Boolean = false): BufferedImage = {
+    // so many magic numbers lol
+
+    val w = math.max(_w, 16)
+    val h = math.max(_h, 16)
     
     var dest = ImageUtils.newImage(w, h)
 
@@ -109,7 +106,7 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
         if (x >= w) {
           drawTile(0, y + 32)
         } else if (y >= h) {
-          return
+          //return
         } else {
           g.drawImage(bg, null, x, y)
           drawTile(x + 32, y)
@@ -164,7 +161,10 @@ class SystemGraphics (path: java.net.URI) extends Texturable with LazyLogging {
     }
     
     g.dispose()
-    dest
+
+    if(_w < 16 || _h < 16) {
+      dest.getSubimage(0, 0, _w, _h)
+    } else dest
   }
   
 }

@@ -34,7 +34,7 @@ class ValueExpander(exs: ExValueMap) extends LazyLogging {
     val aas = if (cvsCache.contains(path))  {
       cvsCache(path)
     } else {
-      val reader = new CSVReader(new FileReader(Resource.str(path)))
+      val reader = new CSVReader(new FileReader(path))
       Stream.continually(reader.readNext()).takeWhile(_ != null).toArray
     }
     aas
@@ -77,7 +77,6 @@ class ValueExpander(exs: ExValueMap) extends LazyLogging {
   }
 
   def expandWithId(id: Int, k: Key, exv: ExValue, zerofillDigit: Int = 0): AValue = {
-    import scriptops.implicits.string2URI
 
     val c = cache.get(KV(id, k))
     if (k != 'id && c.isEmpty && checker.contains(k)) {
@@ -110,7 +109,7 @@ class ValueExpander(exs: ExValueMap) extends LazyLogging {
           cache += (KV(id, k) -> ret)
           ret
         case ExIcon(str, zfD) =>
-          val ret = Icon(extractSubStrs(id, str, zfD))
+          val ret = Icon(new java.net.URI(extractSubStrs(id, str, zfD)))
           cache += (KV(id, k) -> ret)
           ret
         case NullValue =>
