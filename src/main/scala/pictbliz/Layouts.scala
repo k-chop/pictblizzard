@@ -4,7 +4,11 @@ import scalaz.Endo
 
 object Layouts {
 
+  // type aliases
+
   type Id = String
+
+  type VMap = Map[Layouts.Id, Values.Value]
 
   case class WholeLayout(
       size: (Int, Int),
