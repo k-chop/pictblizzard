@@ -57,7 +57,7 @@ class InterpolatorSpec extends UnitSpec {
       val map = (begin to end-1) zip (begin+1 to end) map { case (k, v) =>
         k.toString -> Text(s"#{${ if (v == end) 1 else v}}")
       } toMap
-      val res = new Interpolator(map).interpolate(0)
+      val res = (new Interpolator(map) with DisableLogging).interpolate(0)
       res("1") should equal (CREText)
     }
 

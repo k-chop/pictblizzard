@@ -60,7 +60,7 @@ class Interpolator(target: Layouts.VMap, ids: Seq[Int] = Vector(0)) extends Lazy
     // if detect circular reference error, all values are convert to Values.Text with error msg.
     if (visited(key)) {
       val msg = "Circular Reference Error Occurred."
-      //logger.error(msg + s" id: $id, key: $key, value: $value")
+      logger.error(msg + s" id: $id, key: $key, value: $value")
       Text(msg)
     } else {
 
