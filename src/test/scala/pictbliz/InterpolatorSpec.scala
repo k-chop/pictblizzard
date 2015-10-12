@@ -82,6 +82,36 @@ class InterpolatorSpec extends UnitSpec {
       res("A") should equal (Text("B's path is path.png"))
     }
 
+    "lookup csv data" in {
+      val path = "testdata/lookuptest.csv"
+      val res = new Interpolator(
+        Map("name" -> CSV(path, column = 1),
+            "gender" -> CSV(path, column = 2),
+            "notes" -> CSV(path, column = 3),
+            "description" -> Text("#{name}: #{gender} (#{notes})")), Seq(0, 1)).iterator
+      val descs = res.map( _("description") ).toVector
+      descs(0) should equal (Text("tarou: otoko (ikemen)"))
+      descs(1) should equal (Text("jirou: otoko (neet)"))
+    }
+
+    "interpolate id with 'id~{num}' to zerofill" in {
+      val res = new Interpolator(
+        Map("len0" -> Text("#{id~0}"),
+            "len1" -> Text("#{id~1}"),
+            "len42" -> Text("#{id~42}"),
+            "drillIcon" -> Icon("drill#{id~4}.png"),
+            "lenInvalid" -> Text("#{id~~~~~~~~}"),
+            "refId" -> Text("#{id}")
+        )).interpolate(8)
+
+      res("len0") should equal (Text("8"))
+      res("len1") should equal (Text("8"))
+      res("len42") should equal (Text(("0"*41)+"8"))
+      res("drillIcon") should equal (Icon("drill0008.png"))
+      res("lenInvalid") should equal (Text("8"))
+      res("refId") should equal (Text("8"))
+    }
+
   }
 
 }

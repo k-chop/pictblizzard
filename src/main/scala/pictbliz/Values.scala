@@ -94,6 +94,12 @@ object Values {
     }
   }
 
+  // CSV will be used interpolation, and convert to Values.Text when rendering.
+  case class CSV(path: String, column: Int) extends Value {
+
+    // umm...
+    def render(params: Params): ImagePart = sys.error("huh?")
+  }
 
   // etc...
 }
