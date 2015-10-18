@@ -23,55 +23,59 @@ class TestSpec extends LazyLogging {
   def run() {
     testReuseLayout()
     //testOldSpec()
-    //csvRead()
+    csvRead()
     faceSpec()
     charaSpec()
     battleSpec()
   }
 
   def csvRead() {
-    val path = "item.csv"
-    val vmap: Array[ValueMap] = new ValueExpander(Map(
-      "id" -> ExRange(0 to 76 toArray),
-      "itemno" -> ExCSV(path, 0),
-      "name" -> ExCSV(path, 1),
-      "win" -> ExStr(""),
-      "t_price" -> ExCSV(path, 2), "t_desc" -> ExCSV(path, 3), "t_kind" -> ExCSV(path, 4), "t_atk" -> ExCSV(path, 6), "t_hit" -> ExCSV(path, 15),
-      "price" -> ExStr("#{t_price} \\c[4]G\\c[0]"),
-      "desc" -> ExStr("\\c[2]#{t_desc}\\c[0]"),
-      "misc" -> ExStr("攻撃#{t_atk}, 命中率:#{t_hit}, #{t_kind}武器"),
-      "filename" -> ExStr("#{itemno}-#{name}")
-    )).expand()
+    import Values._
+
+    val path = "testdata/item.csv"
+    val vmap: Layouts.VMap = Map(
+      "itemno" -> CSV(path, 0),
+      "name" -> CSV(path, 1),
+      "win" -> Window("testdata/no-v/system6.png"),
+      "t_price" -> CSV(path, 2), "t_desc" -> CSV(path, 3), "t_kind" -> CSV(path, 4), "t_atk" -> CSV(path, 6), "t_hit" -> CSV(path, 15),
+      "price" -> Text("#{t_price} \\c[4]G\\c[0]"),
+      "desc" -> Text("\\c[2]#{t_desc}\\c[0]"),
+      "misc" -> Text("攻撃#{t_atk}, 命中率:#{t_hit}, #{t_kind}武器"),
+      "filename" -> Text("#{itemno}-#{name}")
+    )
+    val interp = new Interpolator(vmap, ids = 0 to 76)
+
     val layout = WholeLayout(
       (320, 80),
       Seq(
         "win" -> PartLayout.ep(
           rect(0, 0, 320, 80) |+|
-          window("testdata/no-v/system6.png") |+|
           frontColor("testdata/no-v/system6.png")),
         "name" -> PartLayout.ep(
-          defaultStyle(style='bold, inWin=true) |+|
-          point(0, 0)),
+          point(0, 0) |+|
+          defaultStyle(style='bold, inWin=true)),
         "price" -> PartLayout.ep(
-          defaultStyle(inWin=true) |+|
           rect(160, 0, 150, 30) |+|
           align(Align.Right, Align.Top) |+|
-          hemming(UColor.code("#001300"), 1)),
+          interval(5, 5) |+|
+          hemming(UColor.code("#001300"), 1) |+|
+          defaultStyle(inWin=true)),
         "desc" -> PartLayout.ep(
-          defaultStyle(inWin=true) |+|
-          point(10, 18)),
+          point(10, 18) |+|
+          defaultStyle(inWin=true)),
         "misc" -> PartLayout.ep(
-          defaultStyle(size=12, inWin=true) |+|
           rect(10, 40, 310, 40) |+|
-          align(Align.Right, Align.Bottom))
+          align(Align.Right, Align.Bottom) |+|
+          defaultStyle(size=12, inWin=true))
       )
     )
     val gen = new Generator(layout)
-    /*vmap map { vm =>
+
+    interp.iterator.map { vm =>
       gen.genImage(vm)
     } foreach {
-      _.write(Resource.tempdir + "items/")
-    }*/
+      _.write(Resource.tempDir + "items/")
+    }
   }
 
   def faceSpec() {
