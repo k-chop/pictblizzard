@@ -11,8 +11,12 @@ object Values {
   type Renderer = Params => ImagePart
 
   trait Value {
-
     def render(params: Params): ImagePart
+  }
+
+  // This is Value but must be convert other Values while interpolation.
+  abstract class ConvertibleValue[T <: Value] extends Value {
+    def render(params: Params): ImagePart = sys.error("huh?")
   }
 
   case class Text(str: String) extends Value {
@@ -95,11 +99,7 @@ object Values {
   }
 
   // CSV will be used interpolation, and convert to Values.Text when rendering.
-  case class CSV(path: String, column: Int) extends Value {
-
-    // umm...
-    def render(params: Params): ImagePart = sys.error("huh?")
-  }
+  case class CSV(path: String, column: Int) extends ConvertibleValue[Text]
 
   // etc...
 }
