@@ -1,7 +1,5 @@
 package pictbliz
 
-import pictbliz.scriptops.Attrs._
-import scriptops.AttrMap
 import java.awt.geom.Rectangle2D
 
 class WrappedGlyphVectorSpec extends UnitSpec {

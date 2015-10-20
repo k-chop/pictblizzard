@@ -6,9 +6,6 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.annotation.tailrec
 
-import scriptops._
-import scriptops.Attrs._
-
 class TextStyler(val origimg: BufferedImage,
                   val glyphvec: WrappedGlyphVector,
                   val params: Params,

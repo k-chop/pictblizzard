@@ -1,8 +1,6 @@
 package pictbliz
 package scriptops
 
-import pictbliz.scriptops.Attrs._
-
 import scala.util.parsing.combinator.syntactical._
 import scala.collection.mutable
 
@@ -11,6 +9,7 @@ import java.io.File
 
 object Parser extends StandardTokenParsers {
   import NodeDefinition._
+  import Layouts._
 
   private[scriptops] implicit class StringConv(val s: String) extends AnyVal {
     def toURI: URI = new File(s).toURI
@@ -19,8 +18,8 @@ object Parser extends StandardTokenParsers {
   lexical.delimiters ++= List("(",")","{","}","+","-","*","/","=","$",".",",","@",":","..", "[", "]", "#")
   lexical.reserved += ("val", "layout", "values", "value", "with", "generate")
 
-  val layouts = mutable.Map.empty[String, LayoutUnit]
-  val valuemaps = mutable.Map.empty[String, ExValueMap]
+  val layouts = mutable.Map.empty[String, WholeLayout]
+  val valuemaps = mutable.Map.empty[String, VMap]
 
   lazy val all: Parser[List[Node]] = rep1(top)
   lazy val top: Parser[Node] = bind | gen

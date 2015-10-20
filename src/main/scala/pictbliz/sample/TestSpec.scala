@@ -2,7 +2,6 @@ package pictbliz
 package sample
 
 import com.typesafe.scalalogging.LazyLogging
-import scriptops.Attrs._
 import scala.language.postfixOps
 
 import Params._
