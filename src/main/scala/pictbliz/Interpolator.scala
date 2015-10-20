@@ -1,27 +1,13 @@
 package pictbliz
 
-import java.io.FileReader
-
-import com.opencsv.CSVReader
 import com.typesafe.scalalogging.LazyLogging
 
 import Values._
-
-import scala.collection.mutable
+import extractor._
 
 class Interpolator(target: Layouts.VMap, ids: Seq[Int] = Vector(0)) extends LazyLogging {
 
-  private[this] val csvCache = new mutable.WeakHashMap[String, Array[Array[String]]]
-
-  def csv(path: String): Array[Array[String]] = {
-    val aas = if (csvCache.contains(path))  {
-      csvCache(path)
-    } else {
-      val reader = new CSVReader(new FileReader(path))
-      Stream.continually(reader.readNext()).takeWhile(_ != null).toArray
-    }
-    aas
-  }
+  private[this] lazy val csv = new CSVExtractor
 
   def iterator = new Iterator[Layouts.VMap] {
     private[this] var idx = 0
@@ -109,7 +95,7 @@ class Interpolator(target: Layouts.VMap, ids: Seq[Int] = Vector(0)) extends Lazy
         case f @ FaceGraphic(str, _, _) => impl(f, str, s => f.copy(path = s))
         case c @ CharaGraphic(str, _, _) => impl(c, str, s => c.copy(path = s))
         case b @ BattleGraphic(str, _, _) => impl(b, str, s => b.copy(path = s))
-        case v @ CSV(path, column) => Text(csv(path)(id)(column))
+        case v @ CSV(path, column) => Text(csv.execute(path, CSVQuery(id, column)))
         case etc => etc
       }
     }
