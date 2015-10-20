@@ -86,6 +86,7 @@ class StrGraphics(_str: String,
 
     def computeSize(v: WrappedGlyphVector) = {
       import scala.math.max
+      import util.Rect2DConversion
 
       val hasRect = params.rect.isDefined
 
@@ -93,7 +94,7 @@ class StrGraphics(_str: String,
         (r.w, r.h)
       }
 
-      val Extractors.Rect2DALL(x, y, w2, h2) = v.getFixedWholeLogicalBounds
+      val (x, y, w2, h2) = v.getFixedWholeLogicalBounds.xywh
       
       if (params.autoExpand || !hasRect) { // どちらか大きい方に拡大される
         val (dx, dy) = params.padding.map { p =>

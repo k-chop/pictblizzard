@@ -2,6 +2,8 @@ package pictbliz
 
 import java.awt.geom.Rectangle2D
 
+import util.Rect2DConversion
+
 class WrappedGlyphVectorSpec extends UnitSpec {
 
   val isWindows = {
@@ -25,7 +27,7 @@ class WrappedGlyphVectorSpec extends UnitSpec {
     strG.dispose()
   }
 
-  def toTuple4(s: Rectangle2D) = Extractors.Rect2DALL.unapply(s).get
+  def toTuple4(s: Rectangle2D) = s.xywh
 
   "WrappedGlyphVector" should {
     "get fixedLogicalBounds correctly" in {

@@ -4,6 +4,8 @@ import java.awt.Color
 import java.awt.image.{DataBufferInt, BufferedImage}
 import com.typesafe.scalalogging.LazyLogging
 
+import util.Rect2DConversion
+
 import scala.annotation.tailrec
 
 class TextStyler(val origimg: BufferedImage,
@@ -41,7 +43,7 @@ class TextStyler(val origimg: BufferedImage,
     val maskimg = ImageUtils.copy(origimg)
     val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
     val g = targetimg.createGraphics
-    val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds
+    val (px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds.xywh
     val paintTex = colors.getShadowTexture(pw, ph)
     g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
     g.dispose()
@@ -51,6 +53,7 @@ class TextStyler(val origimg: BufferedImage,
   }
   // 色つける
   def colored(origimg: BufferedImage): BufferedImage = {
+
     val maskimg = ImageUtils.copy(origimg)
     val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
     val g = targetimg.createGraphics
@@ -66,7 +69,7 @@ class TextStyler(val origimg: BufferedImage,
         l match {
           case Nil =>
           case head :: rest =>
-            val Extractors.Rect2DALL(px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length)
+            val (px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length).xywh
             //if (debug) test += ((px, py, pw, ph))
             val paintTex = colors.getTexture(pw, ph, texIdx)
             g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
