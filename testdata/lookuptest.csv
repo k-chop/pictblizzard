@@ -1,3 +1,4 @@
-0,tarou,otoko,ikemen
-1,jirou,otoko,neet
-2,,,
+0,tarou,otoko,ikemen,
+1,jirou,otoko,neet,
+2,,,,
+3,"#{a}","#{b}","#{c}"

@@ -94,6 +94,20 @@ class InterpolatorSpec extends UnitSpec {
       descs(1) should equal (Text("jirou: otoko (neet)"))
     }
 
+    "lookup csv data with interpolate string" in {
+      val path = "testdata/lookuptest.csv"
+      val res = new Interpolator(
+        Map("i1" -> CSV(path, column = 1),
+            "i2" -> CSV(path, column = 2),
+            "i3" -> CSV(path, column = 3),
+            "a" -> Text("aaa"),
+            "b" -> Text("bbb"),
+            "c" -> Text("ccc"),
+            "all" -> Text("#{i1}#{i2}#{i3}"))).interpolate(3)
+
+      res("all") should equal (Text("aaabbbccc"))
+    }
+
     "interpolate id with 'id~{num}' to zerofill" in {
       val res = new Interpolator(
         Map("len0" -> Text("#{id~0}"),
