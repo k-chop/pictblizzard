@@ -1,6 +1,9 @@
 package pictbliz
 
+import java.awt.image.DataBufferInt
+
 import ImageUtils.ARGB
+import pictbliz.ext.PNG
 
 class ImageUtilsSpec extends UnitSpec {
 
@@ -100,7 +103,27 @@ class ImageUtilsSpec extends UnitSpec {
       a = 0x00002234
       b = alpha(a, 0xCA)
       b should equal (0xCA002234)
+    }
+  }
 
+  "synthesis" should {
+
+    "not produce pixel has invalid-alpha" in {
+      val mask = PNG.read("testdata/synthtest/mask.png", true, true)
+      val grad = PNG.read("testdata/synthtest/grad.png", true, true)
+
+      val res = ImageUtils.synthesis(mask, grad)
+      ImageResult("synthtest", res).write("temp/")
+      val i1 = res.getData.getDataBuffer.asInstanceOf[DataBufferInt].getData
+      var f = false
+      for(i <- i1) {
+        val ARGB(a, _, _, _) = i
+        if (a != 0xff) {
+          f = true
+          println(s"a: $a")
+        }
+      }
+      f should equal (false)
     }
   }
 
