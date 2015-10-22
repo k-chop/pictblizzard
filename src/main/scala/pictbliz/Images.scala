@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage
 
 import com.github.nscala_time.time.StaticDateTimeFormat
 
+import scala.util.Random
 import scalaz.Semigroup
 
 object Images {
@@ -53,7 +54,7 @@ case class ImagePart(pos: (Int, Int), image: BufferedImage) {
 
   private[this] final val fmt = StaticDateTimeFormat.forPattern("yyyyMMddHHmmssSSS")
 
-  def genRandomName: String = DateTime.now().toString(fmt) + util.Random.alphanumeric.take(6).mkString
+  def genRandomName: String = DateTime.now().toString(fmt) + Random.alphanumeric.take(6).mkString
 
   def trimPath(s: String): String = s.replaceAll("""\.png$""", "")
 
