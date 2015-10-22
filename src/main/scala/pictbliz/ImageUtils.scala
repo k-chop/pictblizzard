@@ -1,6 +1,6 @@
 package pictbliz
 
-import java.awt.image.{BufferedImage, DataBufferInt, DataBufferByte}
+import java.awt.image._
 
 object ImageUtils {
 
@@ -111,6 +111,85 @@ object ImageUtils {
         srcPixel(i) = 0x0
     }
     src
+  }
+
+  case class RawImage(pixelIdx: Array[Int], palette: Array[Int])
+
+  def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
+    require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
+      "source & target's image type should be 'TYPE_BYTE_INDEXED'")
+
+    val UNUSED = 16777215 // 0x00FFFFFF (alpha = 0)
+
+    val srcPixel    = src.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    val targetPixel = target.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    val srcCM = src.getColorModel.asInstanceOf[IndexColorModel]
+    val tagCM = target.getColorModel.asInstanceOf[IndexColorModel]
+
+    val raw = RawImage(Array.ofDim[Int](srcPixel.length), Array.ofDim[Int](srcCM.getMapSize))
+
+    // copy to RawImage and mark unused palette number
+    val used = new collection.mutable.BitSet
+    var i = 0
+    while(i < srcPixel.length) {
+      val palIdx = srcPixel(i) & 0xff
+      raw.pixelIdx(i) = palIdx
+      used += palIdx
+      i += 1
+    }
+
+    // copy palette to RawImage
+    i=0
+    while(i < srcCM.getMapSize) {
+      raw.palette(i) = srcCM.getRGB(i)
+      i += 1
+  }
+
+    // change unused palette to -1
+    i=0
+    while(i < raw.palette.length) {
+      if (!used(i)) raw.palette(i) = UNUSED
+      i += 1
+    }
+
+    // synthesis
+    i = 0
+    while(i < srcPixel.length) {
+      if (raw.palette(raw.pixelIdx(i)) == maskcolor) {
+        val palIdx = raw.palette.indexOf(tagCM.getRGB(targetPixel(i)))
+        if (palIdx != -1) {
+          raw.pixelIdx(i) = palIdx
+        } else {
+          val spIdx = raw.palette.indexOf(UNUSED)
+          if(spIdx == -1) sys.error("oh")
+          else {
+            raw.palette(spIdx) = tagCM.getRGB(targetPixel(i))
+          }
+          raw.pixelIdx(i) = spIdx
+        }
+      }
+      i += 1
+    }
+
+    // restore palette
+    i = 0
+    while(i < raw.palette.length) {
+      if (raw.palette(i) == UNUSED) raw.palette(i) = 0x00
+      i+=1
+    }
+
+    // create IndexColorModel and BufferedImage
+    val cm = new IndexColorModel(8, raw.palette.length, raw.palette, 0, true, 0,  DataBuffer.TYPE_BYTE)
+    val buf = new BufferedImage(src.getWidth, src.getHeight, src.getType, cm)
+
+    val pix = buf.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    var j = 0
+    while(j < pix.length) {
+      pix(j) = raw.pixelIdx(j).toByte
+      j += 1
+    }
+
+    buf
   }
   
   def synthesis(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
