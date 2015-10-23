@@ -1,7 +1,5 @@
 package pictbliz
 
-import java.awt.image.DataBufferInt
-
 import ImageUtils.ARGB
 import pictbliz.ext.PNG
 
@@ -109,6 +107,8 @@ class ImageUtilsSpec extends UnitSpec {
   "synthesis" should {
 
     "not produce pixel has invalid-alpha" in {
+      import TestUtils._
+
       val mask = PNG.read("testdata/synthtest/mask.png", false, false)
       val grad = PNG.read("testdata/synthtest/grad.png", false, false)
 
@@ -116,7 +116,7 @@ class ImageUtilsSpec extends UnitSpec {
       ImageResult("synthtest", res).write("temp/")
 
       // TODOOOOOOO: check each pixel that is not transparent is (res == grad)
-      true should equal (true)
+      assert(mask compare mask)
     }
   }
 
