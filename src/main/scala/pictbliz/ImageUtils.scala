@@ -2,6 +2,8 @@ package pictbliz
 
 import java.awt.image._
 
+import enrich.bufferedimage._
+
 object ImageUtils {
 
   object ARGB {
@@ -94,19 +96,19 @@ object ImageUtils {
       return src
     
     val dest = newImage(src.getWidth, src.getHeight)
-    val srcPixel = src.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
-    val destPixel = dest.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    val srcPixel = src.pixelsByte
+    val destPixel = dest.pixelsInt
     val cm = src.getColorModel
-    (0 until srcPixel.length) foreach { i =>
+    srcPixel.indices foreach { i =>
       destPixel(i) = 0xff000000 | 0x00ffffff & cm.getRGB(srcPixel(i))
     }
     dest
   }
   
   def enableAlpha(src: BufferedImage, transColor: Int): BufferedImage = {
-    val srcPixel = src.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    val srcPixel = src.pixelsInt
 
-    (0 until srcPixel.length) foreach { i =>
+    srcPixel.indices foreach { i =>
       if (srcPixel(i) == transColor)
         srcPixel(i) = 0x0
     }
@@ -116,7 +118,6 @@ object ImageUtils {
   def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
-    import enrich.bufferedimage._
 
     val srcPixel    = src.pixelsByte
     val targetPixel = target.pixelsByte
@@ -156,8 +157,8 @@ object ImageUtils {
     require(src.getType == BufferedImage.TYPE_INT_ARGB && target.getType == BufferedImage.TYPE_INT_ARGB,
         "source & target's image type should be 'TYPE_INT_ARGB'")
 
-    val srcPixel    = src.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
-    val targetPixel = target.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    val srcPixel    = src.pixelsInt
+    val targetPixel = target.pixelsInt
 
     for {
       idy <- 0 until src.getHeight
