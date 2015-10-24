@@ -113,8 +113,6 @@ object ImageUtils {
     src
   }
 
-  case class RawImage(pixelIdx: Array[Int], palette: Array[Int])
-
   def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
@@ -126,7 +124,7 @@ object ImageUtils {
     val srcCM = src.getColorModel.asInstanceOf[IndexColorModel]
     val tagCM = target.getColorModel.asInstanceOf[IndexColorModel]
 
-    val raw = RawImage(Array.ofDim[Int](srcPixel.length), Array.ofDim[Int](srcCM.getMapSize))
+    val raw = RawIndexColorImage(Array.ofDim[Int](srcPixel.length), Array.ofDim[Int](srcCM.getMapSize))
 
     // copy to RawImage and mark unused palette number
     val used = new collection.mutable.BitSet

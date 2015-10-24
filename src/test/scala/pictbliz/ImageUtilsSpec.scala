@@ -107,7 +107,7 @@ class ImageUtilsSpec extends UnitSpec {
   "synthesis" should {
 
     "not produce pixel has invalid-alpha" in {
-      import TestUtils._
+      import enrich.bufferedimage._
 
       val mask = PNG.read("testdata/synthtest/mask.png", false, false)
       val grad = PNG.read("testdata/synthtest/grad.png", false, false)
