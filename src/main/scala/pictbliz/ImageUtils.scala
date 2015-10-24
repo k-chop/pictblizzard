@@ -119,38 +119,34 @@ object ImageUtils {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
 
-    val srcPixel    = src.pixelsByte
     val targetPixel = target.pixelsByte
     val srcCM = src.indexColorModel
     val tagCM = target.indexColorModel
 
-    val raw = src.createRawIndexColorImage
+    val dest = src.createRawIndexColorImage
 
-    val used = raw.writePixelsWithMarkUsed(src)
-    raw.writePalette(srcCM)
-    raw.markUnusedPalette(used)
+    val used = dest.writePixelsWithMarkUsed(src)
+    dest.writePalette(srcCM)
+    dest.markUnusedPalette(used)
 
     // synthesis
-    var i = 0
-    while(i < srcPixel.length) {
-      if (raw.color(i) == maskcolor) {
-        val palIdx = raw.palette.indexOf(tagCM.getRGB(targetPixel(i)))
-        if (palIdx != -1) {
-          raw.pixelIdx(i) = palIdx
-        } else {
-          val spIdx = raw.palette.indexOf(RawIndexColorImage.UNUSED)
-          if(spIdx == -1) sys.error("oh")
-          else {
-            raw.palette(spIdx) = tagCM.getRGB(targetPixel(i))
+    dest.foreachWithIndex { i =>
+      if (dest.color(i) == maskcolor) {
+        val targetColor = tagCM.getRGB(targetPixel(i))
+        dest.findPalette(targetColor) match {
+          case Some(idx) => dest.pixels(i) = idx
+          case None => dest.findPalette(RawIndexColorImage.UNUSED) match {
+            case Some(spidx) =>
+              dest.palette(spidx) = targetColor
+              dest.pixels(i) = spidx
+            case None => sys.error("oh")
           }
-          raw.pixelIdx(i) = spIdx
         }
       }
-      i += 1
     }
 
-    raw.restoreUnusedPalette()
-    raw.toBufferedImage(src.getWidth)
+    dest.restoreUnusedPalette()
+    dest.toBufferedImage(src.getWidth)
   }
   
   def synthesis(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {

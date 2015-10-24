@@ -20,10 +20,15 @@ object RawIndexColorImage {
   }
 }
 
-case class RawIndexColorImage(pixelIdx: Array[Int], palette: Array[Int]) {
+case class RawIndexColorImage(pixels: Array[Int], palette: Array[Int]) {
   import RawIndexColorImage._
 
-  def color(idx: Int): Int = palette(pixelIdx(idx))
+  def color(idx: Int): Int = palette(pixels(idx))
+
+  def findPalette(target: Int): Option[Int] = {
+    val res = palette.indexOf(target)
+    if (res != -1) Some(res) else None
+  }
 
   // overwrite palette from IndexColorModel.
   def writePalette(src: IndexColorModel): Unit = {
@@ -34,11 +39,12 @@ case class RawIndexColorImage(pixelIdx: Array[Int], palette: Array[Int]) {
 
   def writePixels(src: BufferedImage): Unit = writePixels(src.pixelsByte)
 
+  // overwrite (int)pixels from (byte)pixels.
   def writePixels(srcPixel: Array[Byte]): Unit = {
     var i = 0
     while(i < srcPixel.length) {
       val idx = srcPixel(i) & 0xff // byte -> Int
-      pixelIdx(i) = idx
+      pixels(i) = idx
       i += 1
     }
   }
@@ -48,7 +54,7 @@ case class RawIndexColorImage(pixelIdx: Array[Int], palette: Array[Int]) {
     var i = 0
     while(i < srcPixel.length) {
       val idx = srcPixel(i) & 0xff // byte -> Int
-      pixelIdx(i) = idx
+      pixels(i) = idx
       used += idx
       i += 1
     }
@@ -73,15 +79,23 @@ case class RawIndexColorImage(pixelIdx: Array[Int], palette: Array[Int]) {
 
   def toBufferedImage(width: Int): BufferedImage = {
     val cm = new IndexColorModel(8, palette.length, palette, 0, true, 0,  DataBuffer.TYPE_BYTE)
-    val buf = new BufferedImage(width, pixelIdx.length / width, BufferedImage.TYPE_BYTE_INDEXED, cm)
+    val buf = new BufferedImage(width, pixels.length / width, BufferedImage.TYPE_BYTE_INDEXED, cm)
 
     val pix = buf.pixelsByte
     var i = 0
     while(i < pix.length) {
-      pix(i) = pixelIdx(i).toByte
+      pix(i) = pixels(i).toByte
       i += 1
     }
     buf
+  }
+
+  @inline final def foreachWithIndex[A](f: Int => A): Unit = {
+    var i = 0
+    while(i < pixels.length) {
+      f(i)
+      i += 1
+    }
   }
 
 }
