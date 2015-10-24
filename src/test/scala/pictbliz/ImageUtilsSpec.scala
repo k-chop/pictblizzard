@@ -106,8 +106,10 @@ class ImageUtilsSpec extends UnitSpec {
 
   "synthesis" should {
 
-    "not produce pixel has invalid-alpha" in {
+    "synthesize index-color image" in {
       import enrich.bufferedimage._
+
+      def isNotAlpha(i: Int) = ((i >> 24) & 0xff) != 0
 
       val mask = PNG.read("testdata/synthtest/mask.png", false, false)
       val grad = PNG.read("testdata/synthtest/grad.png", false, false)
@@ -115,8 +117,13 @@ class ImageUtilsSpec extends UnitSpec {
       val res = ImageUtils.synthesisIndexColor(mask, grad)
       ImageResult("synthtest", res).write("temp/")
 
-      // TODOOOOOOO: check each pixel that is not transparent is (res == grad)
-      assert(mask compare mask)
+      val resb = PNG.read("temp/synthtest.png", false, false)
+
+      // checking each pixel that is not transparent is (resb == grad)
+      val p = resb.forallPixel(grad)(isNotAlpha){
+        (r, g) => r == g
+      }
+      assert(p)
     }
   }
 

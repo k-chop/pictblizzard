@@ -53,21 +53,24 @@ final class RichBufferedImage(val self: BufferedImage) {
     }
   }
 
-  def compareEachPixel(that: BufferedImage)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean) = {
+  def forallPixel(that: BufferedImage)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
     require(self.getWidth == that.getWidth && self.getHeight == that.getHeight, "'compare' accept only same size")
     require(self.getType == that.getType, "'compareEachPixel' accept only same type")
 
     val selfPix = self.pixelsByte
-    val thatPix = self.pixelsByte
+    val thatPix = that.pixelsByte
     val selfCM = self.indexColorModel
     val thatCM = that.indexColorModel
 
-    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (idx < selfPix.length) ret
+    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (selfPix.length <= idx) ret
     else {
       val cs = selfCM.getRGB(selfPix(idx))
       if (withFilter(cs)) {
         val co = thatCM.getRGB(thatPix(idx))
-        if (!pred(cs, co)) false else rec(idx + 1, ret)
+        if (!pred(cs, co)) {
+          println(s"at $idx, $cs and $co do not satisfy predicate")
+          false
+        } else rec(idx + 1, ret)
       } else rec(idx + 1, ret)
     }
     rec()
