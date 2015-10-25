@@ -5,11 +5,8 @@ import java.awt.image._
 
 import scala.annotation.tailrec
 
-trait ToRichBufferedImage extends RichBufferedImageInstance
-
-abstract class RichBufferedImageInstance {
-
-  implicit def ToRichBufferedImage(self: BufferedImage): RichBufferedImage = new RichBufferedImage(self)
+private[enrich] trait ToRichBufferedImage {
+  implicit def toRichBufferedImage(self: BufferedImage): RichBufferedImage = new RichBufferedImage(self)
 }
 
 final class RichBufferedImage(val self: BufferedImage) {
@@ -68,7 +65,6 @@ final class RichBufferedImage(val self: BufferedImage) {
       if (withFilter(cs)) {
         val co = thatCM.getRGB(thatPix(idx))
         if (!pred(cs, co)) {
-          println(s"at $idx, $cs and $co do not satisfy predicate")
           false
         } else rec(idx + 1, ret)
       } else rec(idx + 1, ret)
