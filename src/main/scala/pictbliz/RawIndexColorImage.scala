@@ -25,10 +25,25 @@ case class RawIndexColorImage(pixels: Array[Int], palette: Array[Int]) {
 
   def color(idx: Int): Int = palette(pixels(idx))
 
+  def color_=(idx: Int, color: Int): Unit = {
+    findPalette(color) match {
+      case Some(pNum) => pixels(idx) = pNum
+      case None =>
+        markUnusedPalette()
+        findPalette(UNUSED) match {
+          case Some(eIdx) =>
+            palette(eIdx) = color
+            pixels(idx) = eIdx
+          case None => sys.error(s"There is no unused palette idx. color: $color")
+        }
+        restoreUnusedPalette()
+    }
+  }
+  
   def length = pixels.length
 
-  def findPalette(target: Int): Option[Int] = {
-    val res = palette.indexOf(target)
+  def findPalette(targetColor: Int): Option[Int] = {
+    val res = palette.indexOf(targetColor)
     if (res != -1) Some(res) else None
   }
 
@@ -50,7 +65,7 @@ case class RawIndexColorImage(pixels: Array[Int], palette: Array[Int]) {
       i += 1
     }
   }
-
+  
   def writePixelsWithMarkUsed(src: BufferedImage, used: mutable.BitSet = mutable.BitSet.empty): mutable.BitSet = {
     val srcPixel = src.pixelsByte
     var i = 0
@@ -61,6 +76,17 @@ case class RawIndexColorImage(pixels: Array[Int], palette: Array[Int]) {
       i += 1
     }
     used.result()
+  }
+  
+  def markUnusedPalette(): Unit = {
+    val used = mutable.BitSet.empty
+    var i = 0
+    while(i < pixels.length) {
+      val idx = pixels(i) & 0xff
+      used += idx
+      i += 1
+    }
+    markUnusedPalette(used)
   }
 
   def markUnusedPalette(used: mutable.BitSet): Unit = {
