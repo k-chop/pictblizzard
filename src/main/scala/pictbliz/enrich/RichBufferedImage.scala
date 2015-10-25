@@ -54,16 +54,14 @@ final class RichBufferedImage(val self: BufferedImage) {
     require(self.getWidth == that.getWidth && self.getHeight == that.getHeight, "'compare' accept only same size")
     require(self.getType == that.getType, "'compareEachPixel' accept only same type")
 
-    val selfPix = self.pixelsByte
-    val thatPix = that.pixelsByte
-    val selfCM = self.indexColorModel
-    val thatCM = that.indexColorModel
+    val selfRaw = RawIndexColorImage.fromBufferedImage(self)
+    val thatRaw = RawIndexColorImage.fromBufferedImage(that)
 
-    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (selfPix.length <= idx) ret
+    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (selfRaw.length <= idx) ret
     else {
-      val cs = selfCM.getRGB(selfPix(idx))
+      val cs = selfRaw.color(idx)
       if (withFilter(cs)) {
-        val co = thatCM.getRGB(thatPix(idx))
+        val co = thatRaw.color(idx)
         if (!pred(cs, co)) {
           false
         } else rec(idx + 1, ret)

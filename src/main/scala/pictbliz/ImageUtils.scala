@@ -119,9 +119,8 @@ object ImageUtils {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
 
-    val targetPixel = target.pixelsByte
+    val rawTarget = RawIndexColorImage.fromBufferedImage(target)
     val srcCM = src.indexColorModel
-    val tagCM = target.indexColorModel
 
     val dest = src.createRawIndexColorImage
 
@@ -132,7 +131,7 @@ object ImageUtils {
     // synthesis
     dest.foreachWithIndex { i =>
       if (dest.color(i) == maskcolor) {
-        val targetColor = tagCM.getRGB(targetPixel(i))
+        val targetColor = rawTarget.color(i)
         dest.findPalette(targetColor) match {
           case Some(idx) => dest.pixels(i) = idx
           case None => dest.findPalette(RawIndexColorImage.UNUSED) match {

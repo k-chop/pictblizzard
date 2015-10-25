@@ -25,6 +25,8 @@ case class RawIndexColorImage(pixels: Array[Int], palette: Array[Int]) {
 
   def color(idx: Int): Int = palette(pixels(idx))
 
+  def length = pixels.length
+
   def findPalette(target: Int): Option[Int] = {
     val res = palette.indexOf(target)
     if (res != -1) Some(res) else None
