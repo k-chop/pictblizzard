@@ -6,6 +6,7 @@ trait Enrichment {
 
   object bufferedimage extends ToRichBufferedImage
 
+  object packedcolor extends ToPackedColorInt
 
-  trait EnrichAll extends ToRichBufferedImage// with ...
+  trait EnrichAll extends ToRichBufferedImage with ToPackedColorInt
 }
