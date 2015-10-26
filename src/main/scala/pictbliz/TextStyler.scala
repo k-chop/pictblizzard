@@ -48,7 +48,7 @@ class TextStyler(val origimg: BufferedImage,
     g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
     g.dispose()
 
-    ImageUtils.synthesis(maskimg, targetimg)
+    ImageUtils.synthesisIndexColor(maskimg, targetimg)
 
   }
   // 色つける
@@ -82,12 +82,11 @@ class TextStyler(val origimg: BufferedImage,
     }    
     g.dispose()
     
-    ImageUtils.synthesis(maskimg, targetimg)
+    ImageUtils.synthesisIndexColor(maskimg, targetimg)
   }
 
   def hemmed(src: BufferedImage, hemcolor: UColor, hemSize: Int): BufferedImage = {
     import ImageUtils.{neighbor, alpha}
-
 
     val destimg = ImageUtils.extraSizeImage(src, hemSize)
     val d = ImageUtils.sameSizeImage(destimg)
@@ -95,34 +94,38 @@ class TextStyler(val origimg: BufferedImage,
       val g = destimg.createGraphics()
       g.drawImage(src, null, hemSize, hemSize)
     }
-    val da: Array[Int] = d.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
-    val dest: Array[Int] = destimg.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    //val da: Array[Int] = d.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    //val dest: Array[Int] = destimg.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
+    val da2 = RawIndexColorImage.fromBufferedImage(d)
+    val dest2 = RawIndexColorImage.fromBufferedImage(destimg)
 
     val w = destimg.getWidth
 
     @tailrec def traverse(n: Int, lim: Int) {
+      import enrich.packedcolor._
+
       if (n < lim) {
-        val a = neighbor(dest, n, w, default = 0)
-        val alp = dest(n) & 0xFF000000 >>> 24
+        val a = neighbor(dest2.pixels, n, w, default = 0)
+        val alp = dest2.color(n).a
         var maxalpha = 0
         var i = 0; val len = a.length
         while(i < len) {
-          val alphav = a(i) & 0xFF000000 >>> 24
+          val alphav = dest2.palette(a(i)).a
           if (alphav > maxalpha) maxalpha = alphav
           i += 1
         }
         //val ct_n = n+destimg.getWidth+1+(n/src.getWidth)*2
-        if (alp == 0 && maxalpha != 0) da(n) = alpha(hemcolor.rgb, maxalpha)
+        if (alp == 0 && maxalpha != 0) da2.setColor(n, alpha(hemcolor.rgb, maxalpha))
         if (0 < alp && alp < 255) {
           val s = alp / 255.0
           val newcolor = 0xFFFFFFFF//add(mul(dest(n), s), mul(hemcolor, 1-s))
-          da(n) = alpha(newcolor, 0xFF)
+          da2.setColor(n, alpha(newcolor, 0xFF))
         }
-        if (alp == 255) da(n) = dest(n)
+        if (alp == 255) da2.pixels(n) = dest2.pixels(n)
         traverse(n+1, lim)
       }
     }
-    traverse(0, dest.length)
+    traverse(0, dest2.length)
     d
   }
   

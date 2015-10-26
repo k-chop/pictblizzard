@@ -22,7 +22,7 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
 
   val img: BufferedImage = {
 
-    val res = ext.PNG.read(path, argb = true)
+    val res = ext.PNG.read(path, argb = false)
     
     if (res.getWidth != 160 || res.getHeight != 80)
       throw new IllegalArgumentException("SystemGraphic's image size must be 160 x 80.")
@@ -32,9 +32,7 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
   
   lazy val pltezero: Int = {
     val res = ext.PNG.transparentColor(path)
-    logger.trace(
-      "%s\nこのファイルの透過色は, ARGBの順に%d,%d,%d,%dです." format (path,res>>24&0xff,res>>16&0xff,res>>8&0xff,res&0xff)
-    )
+    logger.debug(s"$path: transparent color = ${res.toHexString}")
     res
   }
   
@@ -116,7 +114,7 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
       g.dispose()
     }
 
-    ImageUtils.enableAlpha(img, pltezero)
+    ImageUtils.enableAlphaIndexColor(img)
     
     val ltp = img.getSubimage(32, 0, 8, 8)
     val rtp = img.getSubimage(56, 0, 8, 8)
