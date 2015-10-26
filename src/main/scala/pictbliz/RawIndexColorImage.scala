@@ -25,7 +25,8 @@ case class RawIndexColorImage(pixels: Array[Int], palette: Array[Int]) {
 
   def color(idx: Int): Int = palette(pixels(idx))
 
-  def color_=(idx: Int, color: Int): Unit = {
+  // TODO: implement extending palette above 256!
+  def setColor(idx: Int, color: Int): Unit = {
     findPalette(color) match {
       case Some(pNum) => pixels(idx) = pNum
       case None =>

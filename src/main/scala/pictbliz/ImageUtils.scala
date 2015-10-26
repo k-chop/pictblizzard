@@ -74,7 +74,7 @@ object ImageUtils {
     }*/
   }
 
-  def newImage(w: Int, h: Int): BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+  def newImage(w: Int, h: Int, typ: Int = BufferedImage.TYPE_BYTE_INDEXED): BufferedImage = new BufferedImage(w, h, typ)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)
   
   def pile(src: BufferedImage, targets: BufferedImage*): BufferedImage = ???
@@ -115,6 +115,17 @@ object ImageUtils {
     src
   }
 
+  def enableAlphaIndexColor(src: BufferedImage, paletteIdx: Int = 0): BufferedImage = {
+    import enrich.packedcolor._
+
+    val raw = RawIndexColorImage.fromBufferedImage(src)
+
+    if (raw.palette(paletteIdx).a == 0xff) {
+      raw.palette(paletteIdx) = raw.palette(paletteIdx) & 0x00ffffff
+    }
+    raw.toBufferedImage(src.getWidth)
+  }
+
   def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
@@ -132,15 +143,7 @@ object ImageUtils {
     dest.foreachWithIndex { i =>
       if (dest.color(i) == maskcolor) {
         val targetColor = rawTarget.color(i)
-        dest.findPalette(targetColor) match {
-          case Some(idx) => dest.pixels(i) = idx
-          case None => dest.findPalette(RawIndexColorImage.UNUSED) match {
-            case Some(spidx) =>
-              dest.palette(spidx) = targetColor
-              dest.pixels(i) = spidx
-            case None => sys.error("oh")
-          }
-        }
+        dest.setColor(i, targetColor)
       }
     }
 
