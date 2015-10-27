@@ -13,4 +13,7 @@ final class PackedColorInt(val self: Int) {
   def g: Int = self >> 8 & 0xff
   def b: Int = self & 0xff
 
+  def argb: (Int, Int, Int, Int) = (a, r, g, b)
+  def rgb: (Int, Int, Int) = (r, g, b)
+
 }
