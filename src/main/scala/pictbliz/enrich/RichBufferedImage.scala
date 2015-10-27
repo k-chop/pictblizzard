@@ -20,7 +20,7 @@ final class RichBufferedImage(val self: BufferedImage) {
   def createDestinationRaw: RawIndexColorImage = {
     val pix = self.pixelsByte
     val cm = self.indexColorModel
-    RawIndexColorImage(Array.ofDim[Int](pix.length), Array.ofDim[Int](cm.getMapSize))
+    RawIndexColorImage.fromSize(pix.length, cm.getMapSize)
   }
 
   def indexColorModel: IndexColorModel = {
@@ -72,4 +72,5 @@ final class RichBufferedImage(val self: BufferedImage) {
     }
     rec()
   }
+
 }

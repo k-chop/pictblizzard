@@ -80,7 +80,7 @@ object ImageUtils {
 
     val dest = src.createDestinationRaw
 
-    val used = dest.writePixelsWithMarkUsed(src)
+    val used = dest.writePixelsWithMarkUsed(src.pixelsByte)
     dest.writePalette(srcCM)
     dest.markUnusedPalette(used)
 
@@ -92,7 +92,6 @@ object ImageUtils {
       }
     }
 
-    dest.restoreUnusedPalette()
     dest.toBufferedImage(src.getWidth)
   }
 
