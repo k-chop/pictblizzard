@@ -85,7 +85,7 @@ class TextStyler(val origimg: BufferedImage,
     ImageUtils.synthesisIndexColor(maskimg, targetimg)
   }
 
-  def hemmed(src: BufferedImage, hemcolor: UColor, hemSize: Int): BufferedImage = {
+  def hemmed(src: BufferedImage, hemColor: Int, hemSize: Int): BufferedImage = {
     import enrich.bufferedimage._
     import ImageUtils.{neighbor, alpha}
 
@@ -116,7 +116,7 @@ class TextStyler(val origimg: BufferedImage,
           i += 1
         }
         //val ct_n = n+destimg.getWidth+1+(n/src.getWidth)*2
-        if (alp == 0 && maxalpha != 0) da2.setColor(n, alpha(hemcolor.rgb, maxalpha))
+        if (alp == 0 && maxalpha != 0) da2.setColor(n, alpha(hemColor, maxalpha))
         if (0 < alp && alp < 255) {
           val s = alp / 255.0
           val newcolor = 0xFFFFFFFF//add(mul(dest(n), s), mul(hemcolor, 1-s))

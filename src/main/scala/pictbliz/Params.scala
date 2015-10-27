@@ -14,7 +14,7 @@ object Params extends ParamSetters {
 
   case class Font(name: String, style: Symbol, size: Int)
 
-  case class Hemming(color: UColor, size: Int)
+  case class Hemming(color: Int, size: Int)
 
   case class Interval(x: Int, y: Int)
 
@@ -58,7 +58,7 @@ sealed abstract class ParamSetters {
     Endo(_.copy(rect = Rect(x, y, w, h).some))
   def font(name: String, style: Symbol, size: Int): ParamSet =
     Endo(_.copy(font = Font(name, style, size).some))
-  def hemming(color: UColor, size: Int): ParamSet =
+  def hemming(color: Int, size: Int): ParamSet =
     Endo(_.copy(hemming = Hemming(color, size).some))
   def interval(x: Int, y: Int): ParamSet =
     Endo(_.copy(interval = Interval(x, y).some))

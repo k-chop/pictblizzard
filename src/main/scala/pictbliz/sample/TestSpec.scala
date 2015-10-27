@@ -57,7 +57,7 @@ class TestSpec extends LazyLogging {
           rect(160, 0, 150, 30) |+|
           align(Align.Right, Align.Top) |+|
           interval(5, 5) |+|
-          hemming(UColor.code("#001300"), 1) |+|
+          hemming(0xff001300, 1) |+|
           defaultStyle(inWin=true)),
         "desc" -> PartLayout.ep(
           point(10, 18) |+|

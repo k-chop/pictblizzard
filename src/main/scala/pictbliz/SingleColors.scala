@@ -2,6 +2,8 @@ package pictbliz
 
 import java.awt.Color
 
+import enrich.packedcolor._
+
 object SingleColors {
 
   lazy val default = {
@@ -11,10 +13,11 @@ object SingleColors {
 }
 
 class SingleColors(val color: Array[Color]) extends Texturable {
+
   def length = color.length
 
   def this(color: Color*) = this(color.toArray)
-  def this(colorNames: Array[String]) = this( colorNames.map { UColor.code(_).self } )
+  def this(color: Array[Int]) = this(color.map(_.asColor): Array[Color])
 
   def getTexture(w: Int, h: Int, idx: Int) = {
     require(idx < length)
