@@ -8,7 +8,7 @@ import enrich.bufferedimage._
 
 object RawIndexColorImage {
 
-  final val UNUSED = 0x00ffffff // (alpha = 0) is not appear with IndexColoredImage.
+  final val UNUSED = 0xaaffffff // (alpha = 170) is not appear in IndexColoredImage. Must be 0 or 255.
 
   def fromBufferedImage(buf: BufferedImage): RawIndexColorImage = {
     val pix = buf.pixelsByte
