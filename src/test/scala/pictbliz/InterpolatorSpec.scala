@@ -34,9 +34,9 @@ class InterpolatorSpec extends UnitSpec {
     }
 
     "detect circular reference error" in {
-      val res = new Interpolator(
+      val res = (new Interpolator(
         Map("A" -> Text("#{B}"),
-            "B" -> Text("#{A}"))).interpolate(0)
+            "B" -> Text("#{A}"))) with DisableLogging).interpolate(0)
 
       res("A") should equal (CREText)
       res("B") should equal (CREText)
