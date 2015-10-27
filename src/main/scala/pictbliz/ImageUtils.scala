@@ -63,7 +63,7 @@ object ImageUtils {
   def enableAlphaIndexColor(src: BufferedImage, paletteIdx: Int = 0): BufferedImage = {
     import enrich.packedcolor._
 
-    val raw = RawIndexColorImage.fromBufferedImage(src)
+    val raw = src.toRaw
 
     if (raw.palette(paletteIdx).a == 0xff) {
       raw.palette(paletteIdx) = raw.palette(paletteIdx) & 0x00ffffff
@@ -75,10 +75,10 @@ object ImageUtils {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
 
-    val rawTarget = RawIndexColorImage.fromBufferedImage(target)
+    val rawTarget = target.toRaw
     val srcCM = src.indexColorModel
 
-    val dest = src.createRawIndexColorImage
+    val dest = src.createDestinationRaw
 
     val used = dest.writePixelsWithMarkUsed(src)
     dest.writePalette(srcCM)

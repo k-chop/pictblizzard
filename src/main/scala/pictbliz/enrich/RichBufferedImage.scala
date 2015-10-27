@@ -13,8 +13,11 @@ final class RichBufferedImage(val self: BufferedImage) {
   import BufferedImage._
   import enrich.bufferedimage._
 
+  // alias
+  def toRaw: RawIndexColorImage = RawIndexColorImage.fromBufferedImage(self)
+
   // return 'empty' RawIndexColorImage that same size with self.
-  def createRawIndexColorImage: RawIndexColorImage = {
+  def createDestinationRaw: RawIndexColorImage = {
     val pix = self.pixelsByte
     val cm = self.indexColorModel
     RawIndexColorImage(Array.ofDim[Int](pix.length), Array.ofDim[Int](cm.getMapSize))
@@ -54,8 +57,8 @@ final class RichBufferedImage(val self: BufferedImage) {
     require(self.getWidth == that.getWidth && self.getHeight == that.getHeight, "'compare' accept only same size")
     require(self.getType == that.getType, "'compareEachPixel' accept only same type")
 
-    val selfRaw = RawIndexColorImage.fromBufferedImage(self)
-    val thatRaw = RawIndexColorImage.fromBufferedImage(that)
+    val selfRaw = self.toRaw
+    val thatRaw = that.toRaw
 
     @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (selfRaw.length <= idx) ret
     else {

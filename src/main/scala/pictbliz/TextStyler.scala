@@ -86,6 +86,7 @@ class TextStyler(val origimg: BufferedImage,
   }
 
   def hemmed(src: BufferedImage, hemcolor: UColor, hemSize: Int): BufferedImage = {
+    import enrich.bufferedimage._
     import ImageUtils.{neighbor, alpha}
 
     val destimg = ImageUtils.extraSizeImage(src, hemSize)
@@ -96,8 +97,8 @@ class TextStyler(val origimg: BufferedImage,
     }
     //val da: Array[Int] = d.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
     //val dest: Array[Int] = destimg.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
-    val da2 = RawIndexColorImage.fromBufferedImage(d)
-    val dest2 = RawIndexColorImage.fromBufferedImage(destimg)
+    val da2 = d.toRaw
+    val dest2 = destimg.toRaw
 
     val w = destimg.getWidth
 
