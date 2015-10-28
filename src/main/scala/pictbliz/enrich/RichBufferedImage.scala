@@ -23,6 +23,12 @@ final class RichBufferedImage(val self: BufferedImage) {
     RawIndexColorImage.fromSize(pix.length, cm.getMapSize)
   }
 
+  def drawImageIndexColor(that: BufferedImage, x: Int, y: Int): RawIndexColorImage = {
+    val raw = self.toRaw
+    raw.drawImage(self.getWidth, that.toRaw, that.getWidth, x, y)
+    raw
+  }
+
   def indexColorModel: IndexColorModel = {
     require(self.getType == TYPE_BYTE_INDEXED, s"IndexColorModel defined only TYPE_BYTE_INDEXED. type: ${self.getType}")
     self.getColorModel.asInstanceOf[IndexColorModel]

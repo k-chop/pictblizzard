@@ -37,6 +37,28 @@ object RawIndexColorImage {
 case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) {
   import RawIndexColorImage._
 
+  // Do not call directly, call from RichBufferedImage.drawImageIndexColor!
+  def drawImage(width: Int, that: RawIndexColorImage, thatWidth: Int, x: Int, y: Int): Unit = {
+    val height = pixels.length / width
+    val thatHeight = that.pixels.length / thatWidth
+
+    var i = 0
+    while(i < that.pixels.length) {
+      if (that.pixels(i) != 0) {
+        val dx = i % thatHeight
+        val dy = i / thatHeight
+        val sx = x + dx
+        val sy = y + dy
+        // bounds checking
+        if (0 <= sx && sx < width && 0 <= sy && sy < height) {
+          val idx = (sy * height) + sx
+          setColor(idx, that.color(i))
+        }
+      }
+      i += 1
+    }
+  }
+
   def color(idx: Int): Int = palette(pixels(idx))
 
   // TODO: implement extending palette above 256!
