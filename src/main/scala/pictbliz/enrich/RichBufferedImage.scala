@@ -13,11 +13,11 @@ final class RichBufferedImage(val self: BufferedImage) {
   import BufferedImage._
   import enrich.bufferedimage._
 
-  // alias
+  // return 'cloned' RawIndexColorImage.
   def toRaw: RawIndexColorImage = RawIndexColorImage.fromBufferedImage(self)
 
   // return 'empty' RawIndexColorImage that same size with self.
-  def createDestinationRaw: RawIndexColorImage = {
+  def createEmptyDestinationRaw: RawIndexColorImage = {
     val pix = self.pixelsByte
     val cm = self.indexColorModel
     RawIndexColorImage.fromSize(pix.length, cm.getMapSize)

@@ -76,13 +76,7 @@ object ImageUtils {
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
 
     val rawTarget = target.toRaw
-    val srcCM = src.indexColorModel
-
-    val dest = src.createDestinationRaw
-
-    val used = dest.writePixelsWithMarkUsed(src.pixelsByte)
-    dest.writePalette(srcCM)
-    dest.markUnusedPalette(used)
+    val dest = src.toRaw
 
     // synthesis
     dest.foreachWithIndex { i =>

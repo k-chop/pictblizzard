@@ -24,11 +24,11 @@ object RawIndexColorImage {
   }
 
   /* return empty RawIndexColorImage.
-     'empty' means its pixels filled index 0, and palette filled INIT_COLOR.
+     'empty' means its pixels filled index 0, and palette filled UNUSED except index-0(INIT_COLOR).
    */
   def fromSize(pixelSize: Int, paletteSize: Int): RawIndexColorImage = {
-    val raw = RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(INIT_COLOR))
-    raw.markUnusedPalette(mutable.BitSet(0))
+    val raw = RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(UNUSED))
+    raw.palette(0) = INIT_COLOR
     raw
   }
 
@@ -88,7 +88,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
     used.result()
   }
   
-  def markUnusedPalette(): Unit = {
+  private def markUnusedPalette(): Unit = {
     val used = mutable.BitSet.empty
     var i = 0
     while(i < pixels.length) {
@@ -99,7 +99,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
     markUnusedPalette(used)
   }
 
-  def markUnusedPalette(used: mutable.BitSet): Unit = {
+  private def markUnusedPalette(used: mutable.BitSet): Unit = {
     var i = 0
     while(i < palette.length) {
       if (!used(i)) palette(i) = UNUSED
@@ -107,7 +107,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
     }
   }
 
-  def restoreUnusedPalette(replaceColor: Int = INIT_COLOR): Unit = {
+  private def restoreUnusedPalette(replaceColor: Int = INIT_COLOR): Unit = {
     var i = 0
     while(i < palette.length) {
       if (palette(i) == UNUSED) palette(i) = replaceColor
@@ -118,6 +118,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
   def hasEmptyPalette: Boolean = palette.contains(UNUSED)
 
   def countEmptyPalette: Int = palette.count(_ == UNUSED)
+
+  def countPalette: Int = palette.length - countEmptyPalette
 
   def toBufferedImage(width: Int, replaceUnusedPaletteColor: Int = INIT_COLOR): BufferedImage = {
     restoreUnusedPalette(replaceUnusedPaletteColor)
