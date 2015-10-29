@@ -8,7 +8,7 @@ class RawIndexColorImageSpec extends UnitSpec {
 
   "RawIndexColorImage" should {
 
-    def rawFixture = RawIndexColorImage.fromSize(5, 0xff)
+    def rawFixture = RawIndexColorImage.fromSize(5, 0xff, 5)
 
     "create empty RawIndexColorImage from fromSize" in {
       val raw = rawFixture
@@ -48,7 +48,7 @@ class RawIndexColorImageSpec extends UnitSpec {
         val e = ext.PNG.read(s"testdata/drawtest/${prefix}Expect.png")
 
         val raw = l.drawImageIndexColor(r, x, y)
-        val buf = raw.toBufferedImage(l.getWidth)
+        val buf = raw.toBufferedImage()
         ImageResult(s"${prefix}Dest", buf).write("temp/")
 
         val res = ext.PNG.read(s"temp/${prefix}Dest.png")

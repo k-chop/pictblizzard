@@ -23,7 +23,7 @@ object Images {
     require(buf.getType == BufferedImage.TYPE_BYTE_INDEXED, "Images#clear accept only index-color")
     val raw = buf.toRaw
     raw.clear(color)
-    raw.toBufferedImage(buf.getWidth)
+    raw.toBufferedImage()
   }
 
   def findBeginPoint(params: Params, width: Int, height: Int): (Int, Int) = {
@@ -87,8 +87,8 @@ sealed abstract class ImagePartInstances {
         val dy = f2.pos._2 - f1.pos._2
 
         val raw = f1.image.toRaw
-        raw.drawImage(f1.image.getWidth, f2.image.toRaw, f2.image.getWidth, dx, dy)
-        val newTo = raw.toBufferedImage(f1.image.getWidth)
+        raw.drawImage(f2.image.toRaw, dx, dy)
+        val newTo = raw.toBufferedImage()
         f1.copy(image = newTo)
       }
     }

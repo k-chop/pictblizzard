@@ -20,22 +20,22 @@ final class RichBufferedImage(val self: BufferedImage) {
   def createEmptyDestinationRaw: RawIndexColorImage = {
     val pix = self.pixelsByte
     val cm = self.indexColorModel
-    RawIndexColorImage.fromSize(pix.length, cm.getMapSize)
+    RawIndexColorImage.fromSize(pix.length, cm.getMapSize, self.getWidth)
   }
 
   def drawImageIndexColor(that: BufferedImage, x: Int, y: Int): RawIndexColorImage = {
     val raw = self.toRaw
-    raw.drawImage(self.getWidth, that.toRaw, that.getWidth, x, y)
+    raw.drawImage(that.toRaw, x, y)
     raw
   }
 
   def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
     val that = self.toRaw
-    val raw = RawIndexColorImage.fromSize(w*h, 0xff)
+    val raw = RawIndexColorImage.fromSize(w*h, 0xff, w)
     raw.foreachWithIndex{ idx =>
       val gx = (idx % w) + x
       val gy = (idx / w) + y
-      val c = that.color(gy * self.getWidth + gx)
+      val c = that.color(gy * that.width + gx)
       raw.setColor(idx, c)
     }
     raw

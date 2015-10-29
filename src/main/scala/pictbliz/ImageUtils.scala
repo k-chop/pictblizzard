@@ -68,7 +68,7 @@ object ImageUtils {
     if (raw.palette(paletteIdx).a == 0xff) {
       raw.palette(paletteIdx) = raw.palette(paletteIdx) & 0x00ffffff
     }
-    raw.toBufferedImage(src.getWidth)
+    raw.toBufferedImage()
   }
 
   def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
@@ -86,7 +86,7 @@ object ImageUtils {
       }
     }
 
-    dest.toBufferedImage(src.getWidth)
+    dest.toBufferedImage()
   }
 
 }

@@ -15,7 +15,7 @@ object RawIndexColorImage {
   def fromBufferedImage(buf: BufferedImage): RawIndexColorImage = {
     val pix = buf.pixelsByte
     val cm = buf.indexColorModel
-    val raw = RawIndexColorImage(Array.ofDim[Int](pix.length), Array.ofDim[Int](cm.getMapSize))
+    val raw = RawIndexColorImage(Array.ofDim[Int](pix.length), Array.ofDim[Int](cm.getMapSize), buf.getWidth)
 
     val used = raw.writePixelsWithMarkUsed(pix)
     raw.writePalette(cm)
@@ -26,29 +26,28 @@ object RawIndexColorImage {
   /* return empty RawIndexColorImage.
      'empty' means its pixels filled index 0, and palette filled UNUSED except index-0(INIT_COLOR).
    */
-  def fromSize(pixelSize: Int, paletteSize: Int): RawIndexColorImage = {
-    val raw = RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(UNUSED))
+  def fromSize(pixelSize: Int, paletteSize: Int, width: Int): RawIndexColorImage = {
+    val raw = RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(UNUSED), width)
     raw.palette(0) = INIT_COLOR
     raw
   }
 
 }
 
-case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) {
+case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], width: Int) {
   import RawIndexColorImage._
 
-  // Do not call directly, call from RichBufferedImage.drawImageIndexColor!
-  def drawImage(width: Int, that: RawIndexColorImage, thatWidth: Int, x: Int, y: Int): Unit = {
+  def drawImage(that: RawIndexColorImage, x: Int, y: Int): Unit = {
     val height = pixels.length / width
-    val thatHeight = that.pixels.length / thatWidth
+    val thatHeight = that.pixels.length / that.width
 
     if (palette(0) == UNUSED) {palette(0) = that.palette(0); println("palette init")}
 
     var i = 0
     while(i < that.pixels.length) {
       if (that.pixels(i) != 0) {
-        val dx = i % thatWidth
-        val dy = i / thatWidth
+        val dx = i % that.width
+        val dy = i / that.width
         val sx = x + dx
         val sy = y + dy
         // bounds checking
@@ -84,6 +83,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
   }
   
   def length = pixels.length
+
+  def height = length / width
 
   def findPalette(targetColor: Int): Option[Int] = {
     val res = palette.indexOf(targetColor)
@@ -151,7 +152,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
 
   def countPalette: Int = palette.length - countEmptyPalette
 
-  def toBufferedImage(width: Int, replaceUnusedPaletteColor: Int = INIT_COLOR): BufferedImage = {
+  def toBufferedImage(replaceUnusedPaletteColor: Int = INIT_COLOR): BufferedImage = {
     restoreUnusedPalette(replaceUnusedPaletteColor)
 
     val cm = new IndexColorModel(8, palette.length, palette, 0, true, 0,  DataBuffer.TYPE_BYTE)
