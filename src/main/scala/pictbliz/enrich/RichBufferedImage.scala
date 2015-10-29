@@ -32,6 +32,7 @@ final class RichBufferedImage(val self: BufferedImage) {
   def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
     val that = self.toRaw
     val raw = RawIndexColorImage.fromSize(w*h, 0xff, w)
+    raw.palette(0) = that.palette(0)
     raw.foreachWithIndex{ idx =>
       val gx = (idx % w) + x
       val gy = (idx / w) + y

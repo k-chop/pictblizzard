@@ -5,6 +5,7 @@ import java.awt.image.{DataBuffer, IndexColorModel, BufferedImage}
 import scala.collection.mutable
 
 import enrich.bufferedimage._
+import enrich.packedcolor._
 
 object RawIndexColorImage {
 
@@ -24,12 +25,10 @@ object RawIndexColorImage {
   }
 
   /* return empty RawIndexColorImage.
-     'empty' means its pixels filled index 0, and palette filled UNUSED except index-0(INIT_COLOR).
+     'empty' means its pixels filled index 0, and palette filled UNUSED color.
    */
   def fromSize(pixelSize: Int, paletteSize: Int, width: Int): RawIndexColorImage = {
-    val raw = RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(UNUSED), width)
-    raw.palette(0) = INIT_COLOR
-    raw
+    RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(UNUSED), width)
   }
 
 }
@@ -41,7 +40,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     val height = pixels.length / width
     val thatHeight = that.pixels.length / that.width
 
-    if (palette(0) == UNUSED) {palette(0) = that.palette(0); println("palette init")}
+    // copying palette-0 (background color)
+    if (palette(0) == UNUSED) palette(0) = that.palette(0)
 
     var i = 0
     while(i < that.pixels.length) {
