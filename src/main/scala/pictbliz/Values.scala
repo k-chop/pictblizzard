@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage
 import scalaz.syntax.semigroup._
 
 import pictbliz.ext.PNG
+import enrich.bufferedimage._
 
 object Values {
   import Params._
@@ -86,15 +87,14 @@ object Values {
   case class Window(systemGraphicsPath: String) extends Value {
 
     def render(params: Params): ImagePart = {
+
       val sysg = SystemGraphics.make(systemGraphicsPath)
       val rect = params.rect.getOrElse(Rect(0, 0, 1, 1))
       val buf = ImageUtils.newImage(rect.w, rect.h)
 
       val systemWindow = sysg.getSystemWindow(rect.w, rect.h, zoom=true)
-      val g = buf.createGraphics
-      g.drawImage(systemWindow, null, 0, 0)
-      g.dispose()
-      ImagePart((rect.x, rect.y), buf)
+      val newTo = buf.drawImageIndexColor(systemWindow, 0, 0).toBufferedImage(buf.getWidth)
+      ImagePart((rect.x, rect.y), newTo)
     }
   }
 
