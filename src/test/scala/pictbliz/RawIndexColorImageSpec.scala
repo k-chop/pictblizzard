@@ -52,9 +52,8 @@ class RawIndexColorImageSpec extends UnitSpec {
         ImageResult(s"${prefix}Dest", buf).write("temp/")
 
         val res = ext.PNG.read(s"temp/${prefix}Dest.png")
-        res.testAllPixel(e)(_ => true){
-          // ignore alpha (palette index 0 issue)
-          (l, r) => l.rgb === r.rgb
+        res.testAllPixel(e)(index0AsAlpha = true)(_ => true){
+          (l, r) => l === r
         }
       }
 

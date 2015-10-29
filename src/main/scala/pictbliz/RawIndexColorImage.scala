@@ -61,7 +61,12 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
-  def color(idx: Int): Int = palette(pixels(idx))
+  @inline final def color(idx: Int, index0AsAlpha: Boolean = false): Int = {
+    val pIdx = pixels(idx)
+    val res = palette(pIdx)
+    if (index0AsAlpha && pIdx == 0) res & 0x00ffffff
+    else res
+  }
 
   // TODO: implement extending palette above 256!
   def setColor(idx: Int, color: Int): Unit = {
@@ -157,7 +162,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
   def toBufferedImage(replaceUnusedPaletteColor: Int = INIT_COLOR, transparent: Boolean = false): BufferedImage = {
     restoreUnusedPalette(replaceUnusedPaletteColor)
 
-    val cm = new IndexColorModel(8, palette.length, palette, 0, transparent, 0,  DataBuffer.TYPE_BYTE)
+    val cm = new IndexColorModel(8, palette.length, palette, 0, transparent, -1,  DataBuffer.TYPE_BYTE)
     val buf = new BufferedImage(width, pixels.length / width, BufferedImage.TYPE_BYTE_INDEXED, cm)
 
     val pix = buf.pixelsByte
@@ -177,12 +182,12 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
-  @inline final def testAllPixel(that: RawIndexColorImage)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
+  @inline final def testAllPixel(that: RawIndexColorImage)(index0AsAlpha: Boolean = false)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
     @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (length <= idx) ret
     else {
-      val cs = color(idx)
+      val cs = color(idx, index0AsAlpha)
       if (withFilter(cs)) {
-        val co = that.color(idx)
+        val co = that.color(idx, index0AsAlpha)
         if (!pred(cs, co)) {
           false
         } else rec(idx + 1, ret)
