@@ -22,7 +22,7 @@ class TestSpec extends LazyLogging {
   def run() {
     testReuseLayout()
     //testOldSpec()
-    csvRead()
+    //csvRead()
     faceSpec()
     charaSpec()
     battleSpec()

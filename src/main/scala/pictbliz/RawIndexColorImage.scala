@@ -42,6 +42,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
     val height = pixels.length / width
     val thatHeight = that.pixels.length / thatWidth
 
+    if (palette(0) == UNUSED) {palette(0) = that.palette(0); println("palette init")}
+
     var i = 0
     while(i < that.pixels.length) {
       if (that.pixels(i) != 0) {
@@ -130,7 +132,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
   private def markUnusedPalette(used: mutable.BitSet): Unit = {
     var i = 0
     while(i < palette.length) {
-      if (!used(i)) palette(i) = UNUSED
+      if (!used(i) && i != 0) palette(i) = UNUSED
       i += 1
     }
   }
