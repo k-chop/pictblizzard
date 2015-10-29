@@ -51,7 +51,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
         val sy = y + dy
         // bounds checking
         if (0 <= sx && sx < width && 0 <= sy && sy < height) {
-          val idx = (sy * height) + sx
+          //println(s"write: $sx, $sy")
+          val idx = (sy * width) + sx
           setColor(idx, that.color(i))
         }
       }
@@ -73,6 +74,11 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
           case None => sys.error(s"There is no unused palette idx. color: $color")
         }
     }
+  }
+
+  def clear(color: Int): Unit = {
+    palette(0) = color
+    foreachWithIndex(i => pixels(i) = 0)
   }
   
   def length = pixels.length
