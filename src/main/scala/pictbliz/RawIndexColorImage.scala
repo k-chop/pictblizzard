@@ -45,8 +45,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int]) 
     var i = 0
     while(i < that.pixels.length) {
       if (that.pixels(i) != 0) {
-        val dx = i % thatHeight
-        val dy = i / thatHeight
+        val dx = i % thatWidth
+        val dy = i / thatWidth
         val sx = x + dx
         val sy = y + dy
         // bounds checking
