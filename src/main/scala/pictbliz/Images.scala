@@ -1,6 +1,5 @@
 package pictbliz
 
-import java.awt.Color
 import java.awt.image.BufferedImage
 
 import com.github.nscala_time.time.StaticDateTimeFormat
@@ -15,15 +14,15 @@ object Images {
   final val origin = (0, 0)
 
   final def empty = ImageUtils.newImage(1, 1)
-  final def emptyPart = ImagePart(origin, empty)
+  final def emptyPart = ImagePart(origin, empty.toRaw)
   final def blank(width: Int, height: Int, bgColor: Int = RawIndexColorImage.UNUSED) =
     ImagePart(origin, clear(ImageUtils.newImage(width, height), bgColor))
 
-  def clear(buf: BufferedImage, color: Int): BufferedImage = {
+  def clear(buf: BufferedImage, color: Int): RawIndexColorImage = {
     require(buf.getType == BufferedImage.TYPE_BYTE_INDEXED, "Images#clear accept only index-color")
     val raw = buf.toRaw
     raw.clear(color)
-    raw.toBufferedImage()
+    raw
   }
 
   def findBeginPoint(params: Params, width: Int, height: Int): (Int, Int) = {
@@ -50,7 +49,7 @@ case class ImageResult(filename: String, image: BufferedImage) {
 
 }
 
-case class ImagePart(pos: (Int, Int), image: BufferedImage) {
+case class ImagePart(pos: (Int, Int), image: RawIndexColorImage) {
   import com.github.nscala_time.time.Imports._
 
   private[this] final val fmt = StaticDateTimeFormat.forPattern("yyyyMMddHHmmssSSS")
@@ -64,10 +63,10 @@ case class ImagePart(pos: (Int, Int), image: BufferedImage) {
       case Some(Values.Text(str)) => trimPath(str)
       case _ => genRandomName
     }
-    ImageResult(filename, image)
+    ImageResult(filename, image.toBufferedImage())
   }
 
-  def isEmpty = pos._1 == 0 && pos._2 == 0 && image.getWidth == 1 && image.getHeight == 1
+  def isEmpty = pos._1 == 0 && pos._2 == 0 && image.width == 1 && image.height == 1
 }
 
 object ImagePart extends ImagePartInstances
@@ -75,7 +74,6 @@ object ImagePart extends ImagePartInstances
 sealed abstract class ImagePartInstances {
 
   implicit val imagePartInstances: Semigroup[ImagePart] = new Semigroup[ImagePart] {
-    import enrich.bufferedimage._
 
     def append(f1: ImagePart, f2: => ImagePart): ImagePart = {
       if (f1.isEmpty)
@@ -86,10 +84,9 @@ sealed abstract class ImagePartInstances {
         val dx = f2.pos._1 - f1.pos._1
         val dy = f2.pos._2 - f1.pos._2
 
-        val raw = f1.image.toRaw
-        raw.drawImage(f2.image.toRaw, dx, dy)
-        val newTo = raw.toBufferedImage()
-        f1.copy(image = newTo)
+        val raw = f1.image
+        raw.drawImage(f2.image, dx, dy)
+        f1.copy(image = raw)
       }
     }
   }

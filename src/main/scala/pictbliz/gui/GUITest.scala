@@ -90,7 +90,7 @@ class RootModel extends Model {
       // 画像を生成してimgCacheに格納
       case _ =>
     }
-    imgCache.headOption.map { _.image }
+    imgCache.headOption.map { _.image.toBufferedImage() }
   }
 }
 

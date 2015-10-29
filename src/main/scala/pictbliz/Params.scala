@@ -84,7 +84,7 @@ sealed abstract class ParamSetters {
   def autoExpandSizeWith(ip: ImagePart): ParamSet = Endo( p =>
     if (p.autoExpand) {
       val (mx, my) = p.rect.collect{ case Rect(x, y, _, _) => (x, y) }.getOrElse((0, 0))
-      p.copy(rect = Rect(mx, my, ip.image.getWidth, ip.image.getHeight).some)
+      p.copy(rect = Rect(mx, my, ip.image.width, ip.image.height).some)
     } else p
   )
 

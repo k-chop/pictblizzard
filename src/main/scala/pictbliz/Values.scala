@@ -35,7 +35,7 @@ object Values {
       val res = strGraphics.processImage()
       strGraphics.dispose()
 
-      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
+      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res.toRaw)
     }
 
     def renderBackground: Renderer = { params =>
@@ -49,7 +49,7 @@ object Values {
   case class Icon(path: String) extends Value {
     def render(params: Params): ImagePart = {
       val res: BufferedImage = PNG.read(path)
-      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
+      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res.toRaw)
     }
   }
 
@@ -58,7 +58,7 @@ object Values {
       val image = PNG.read(path, transparent = transparent)
       val n = no
       val res = image.trim((n%4)*48, (n/4)*48, 48, 48) // for RPG Maker 200k
-      ImagePart(Images.findBeginPoint(params, 48, 48), res.toBufferedImage())
+      ImagePart(Images.findBeginPoint(params, 48, 48), res)
     }
   }
 
@@ -69,7 +69,7 @@ object Values {
       val (bx, by) = ((no%4)*72, (no/4)*128)
       val (sx, sy) = (act*24, dir*32)
       val res = image.trim(bx+sx, by+sy, 24, 32)
-      ImagePart(Images.findBeginPoint(params, 24, 32), res.toBufferedImage())
+      ImagePart(Images.findBeginPoint(params, 24, 32), res)
     }
   }
 
@@ -79,7 +79,7 @@ object Values {
     def render(params: Params): ImagePart = {
       val image = PNG.read(path, transparent = transparent)
       val res = image.trim(no%4*96, no/4*96, 96, 96)
-      ImagePart(Images.findBeginPoint(params, 96, 96), res.toBufferedImage())
+      ImagePart(Images.findBeginPoint(params, 96, 96), res)
     }
   }
 
@@ -93,7 +93,7 @@ object Values {
       val buf = ImageUtils.newImage(rect.w, rect.h)
 
       val systemWindow = sysg.getSystemWindow(rect.w, rect.h, zoom=true)
-      val newTo = buf.drawImageIndexColor(systemWindow, 0, 0).toBufferedImage()
+      val newTo = buf.drawImageIndexColor(systemWindow, 0, 0)
       ImagePart((rect.x, rect.y), newTo)
     }
   }
