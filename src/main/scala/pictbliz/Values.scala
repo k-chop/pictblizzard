@@ -57,8 +57,8 @@ object Values {
     def render(params: Params): ImagePart = {
       val image = PNG.read(path, transparent = transparent)
       val n = no
-      val res = image.getSubimage((n%4)*48, (n/4)*48, 48, 48)  // for rpg maker 2000k
-      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
+      val res = image.trim((n%4)*48, (n/4)*48, 48, 48) // for RPG Maker 200k
+      ImagePart(Images.findBeginPoint(params, 48, 48), res.toBufferedImage(48))
     }
   }
 
@@ -68,8 +68,8 @@ object Values {
       val image = PNG.read(path, transparent = transparent)
       val (bx, by) = ((no%4)*72, (no/4)*128)
       val (sx, sy) = (act*24, dir*32)
-      val res = image.getSubimage(bx+sx, by+sy, 24, 32)
-      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
+      val res = image.trim(bx+sx, by+sy, 24, 32)
+      ImagePart(Images.findBeginPoint(params, 24, 32), res.toBufferedImage(24))
     }
   }
 
@@ -78,8 +78,8 @@ object Values {
   case class BattleGraphic(path: String, no: Int, transparent: Boolean = true) extends Value {
     def render(params: Params): ImagePart = {
       val image = PNG.read(path, transparent = transparent)
-      val res = image.getSubimage(no%4*96, no/4*96, 96, 96)
-      ImagePart(Images.findBeginPoint(params, res.getWidth, res.getHeight), res)
+      val res = image.trim(no%4*96, no/4*96, 96, 96)
+      ImagePart(Images.findBeginPoint(params, 96, 96), res.toBufferedImage(96))
     }
   }
 
