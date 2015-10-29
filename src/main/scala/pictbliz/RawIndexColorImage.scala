@@ -2,6 +2,7 @@ package pictbliz
 
 import java.awt.image.{DataBuffer, IndexColorModel, BufferedImage}
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 import enrich.bufferedimage._
@@ -38,7 +39,6 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
 
   def drawImage(that: RawIndexColorImage, x: Int, y: Int): Unit = {
     val height = pixels.length / width
-    val thatHeight = that.pixels.length / that.width
 
     // copying palette-0 (background color)
     if (palette(0) == UNUSED) palette(0) = that.palette(0)
@@ -175,6 +175,20 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
       f(i)
       i += 1
     }
+  }
+
+  @inline final def testAllPixel(that: RawIndexColorImage)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
+    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (length <= idx) ret
+    else {
+      val cs = color(idx)
+      if (withFilter(cs)) {
+        val co = that.color(idx)
+        if (!pred(cs, co)) {
+          false
+        } else rec(idx + 1, ret)
+      } else rec(idx + 1, ret)
+    }
+    rec()
   }
 
 }

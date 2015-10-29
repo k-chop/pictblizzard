@@ -72,24 +72,14 @@ final class RichBufferedImage(val self: BufferedImage) {
     }
   }
 
-  def forallPixel(that: BufferedImage)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
+  def testAllPixel(that: BufferedImage)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
     require(self.getWidth == that.getWidth && self.getHeight == that.getHeight, "'compare' accept only same size")
     require(self.getType == that.getType, "'compareEachPixel' accept only same type")
 
     val selfRaw = self.toRaw
     val thatRaw = that.toRaw
-
-    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (selfRaw.length <= idx) ret
-    else {
-      val cs = selfRaw.color(idx)
-      if (withFilter(cs)) {
-        val co = thatRaw.color(idx)
-        if (!pred(cs, co)) {
-          false
-        } else rec(idx + 1, ret)
-      } else rec(idx + 1, ret)
-    }
-    rec()
+    
+    selfRaw.testAllPixel(thatRaw)(withFilter)(pred)
   }
 
 }

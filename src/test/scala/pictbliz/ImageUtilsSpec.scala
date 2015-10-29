@@ -80,7 +80,7 @@ class ImageUtilsSpec extends UnitSpec {
       val resb = PNG.read("temp/synthtest.png", false, false)
 
       // checking each pixel that is not transparent is (resb == grad)
-      val p = resb.forallPixel(grad)(isNotAlpha){
+      val p = resb.testAllPixel(grad)(isNotAlpha){
         (r, g) => r == g
       }
       assert(p)
