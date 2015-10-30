@@ -29,18 +29,7 @@ final class RichBufferedImage(val self: BufferedImage) {
     raw
   }
 
-  def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
-    val that = self.toRaw
-    val raw = RawIndexColorImage.fromSize(w*h, 0xff, w)
-    raw.palette(0) = that.palette(0)
-    raw.foreachWithIndex{ idx =>
-      val gx = (idx % w) + x
-      val gy = (idx / w) + y
-      val c = that.color(gy * that.width + gx)
-      raw.setColor(idx, c)
-    }
-    raw
-  }
+  def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = self.toRaw.trim(x, y, w, h)
 
   def indexColorModel: IndexColorModel = {
     require(self.getType == TYPE_BYTE_INDEXED, s"IndexColorModel defined only TYPE_BYTE_INDEXED. type: ${self.getType}")

@@ -61,6 +61,18 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
+  def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
+    val dest = RawIndexColorImage.fromSize(w*h, 0xff, w)
+    dest.palette(0) = palette(0)
+    dest.foreachWithIndex{ idx =>
+      val gx = (idx % w) + x
+      val gy = (idx / w) + y
+      val c = color(gy * width + gx)
+      dest.setColor(idx, c)
+    }
+    dest
+  }
+
   @inline final def color(idx: Int, index0AsAlpha: Boolean = false): Int = {
     val pIdx = pixels(idx)
     val res = palette(pIdx)
