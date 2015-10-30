@@ -136,17 +136,6 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     used.result()
   }
   
-  private def markUnusedPalette(): Unit = {
-    val used = mutable.BitSet.empty
-    var i = 0
-    while(i < pixels.length) {
-      val idx = pixels(i) & 0xff
-      used += idx
-      i += 1
-    }
-    markUnusedPalette(used)
-  }
-
   private def markUnusedPalette(used: mutable.BitSet): Unit = {
     var i = 0
     while(i < palette.length) {
