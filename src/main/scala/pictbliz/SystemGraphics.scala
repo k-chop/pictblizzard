@@ -1,7 +1,5 @@
 package pictbliz
 
-import java.awt.image.{ BufferedImage, AffineTransformOp }
-import java.awt.geom.AffineTransform
 import java.nio.file.Path
 
 import com.typesafe.scalalogging.LazyLogging
@@ -20,29 +18,24 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
 
   def length = 21
 
-  val img: BufferedImage = {
+  val img: RawIndexColorImage = {
+    import enrich.bufferedimage._
 
-    val res = ext.PNG.read(path, argb = false)
+    val res = ext.PNG.read(path).toRaw
     
-    if (res.getWidth != 160 || res.getHeight != 80)
+    if (res.width != 160 || res.height != 80)
       throw new IllegalArgumentException("SystemGraphic's image size must be 160 x 80.")
     else
       res
   }
-  
-  lazy val pltezero: Int = {
-    val res = ext.PNG.transparentColor(path)
-    logger.debug(s"$path: transparent color = ${res.toHexString}")
-    res
-  }
-  
+
   private val size_x: Int = 10
   private val size_y: Int = 2
   private val unit_w: Int = 16
   private val unit_h: Int = 16
   private val offset_y: Int = 48
   
-  def getTexture(w: Int, h: Int, idx: Int = 0): BufferedImage = {
+  def getTexture(w: Int, h: Int, idx: Int = 0): RawIndexColorImage = {
 
     if (idx < 0 || 20 < idx)
       throw new IllegalArgumentException("システムグラフィックのカラーインデックスの有効範囲は[0]から[20(影色)]までです．")
@@ -52,53 +45,41 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
     
     val subimg = {
       if (idx == 20) // 影色を指定
-        img.getSubimage(16, 32, unit_w, unit_h)
+        img.trimmed(16, 32, unit_w, unit_h)
       else
-        img.getSubimage(sx * unit_w, sy * unit_h + offset_y, unit_w, unit_h)
+        img.trimmed(sx * unit_w, sy * unit_h + offset_y, unit_w, unit_h)
     }
 
     val tiled = if (unit_h == h) {
       subimg
     } else {
-      var dst = ImageUtils.newImage(unit_w, h)
-      val at = new AffineTransform()
-      at.scale( 1.0, h.toDouble / unit_h )
-      //val scaleOp = new AffineTransformOp(at, null: java.awt.RenderingHints);
-      val scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
-      dst = scaleOp.filter(subimg, dst)
-      dst
+      // TODO: BILINEAR!!
+      subimg.fitted(unit_w, h)
     }
 
-    val result = ImageUtils.newImage(w, h)
-    val resg = result.createGraphics
+    val result = ImageUtils.newRawImage(w, h)
     var i = 0
     while(i <= w) {
-      resg.drawImage(tiled, null, i, 0)
+      result.drawImage(tiled, i, 0)
       i += unit_w
     }
-    resg.dispose()
     result
   }
 
-  def getShadowTexture(w: Int, h: Int): BufferedImage = getTexture(w, h, 20)
+  def getShadowTexture(w: Int, h: Int): RawIndexColorImage = getTexture(w, h, 20)
 
-  def getSystemWindow(_w: Int, _h: Int, zoom: Boolean = false): BufferedImage = {
+  def getSystemWindow(_w: Int, _h: Int, zoom: Boolean = false): RawIndexColorImage = {
     // so many magic numbers lol
 
     val w = math.max(_w, 16)
     val h = math.max(_h, 16)
     
-    var dest = ImageUtils.newImage(w, h)
+    val dest = ImageUtils.newRawImage(w, h)
 
-    val bg = img.getSubimage(0, 0, 32, 32)
+    val bg = img.trimmed(0, 0, 32, 32)
     if (zoom) {
-      val at = new AffineTransform()
-      at.scale(w / 32.0, h / 32.0)
-      val scaleOp = new AffineTransformOp(at, null: java.awt.RenderingHints)
-      dest = scaleOp.filter(bg, dest)
+      dest.drawImage(bg.fitted(w, h), 0, 0)
     } else {
-      val g = dest.createGraphics
-      
       @scala.annotation.tailrec
       def drawTile(x: Int, y: Int) {
         if (x >= w) {
@@ -106,62 +87,55 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
         } else if (y >= h) {
           //return
         } else {
-          g.drawImage(bg, null, x, y)
+          dest.drawImage(bg, x, y)
           drawTile(x + 32, y)
         }
       }
       drawTile(0, 0)
-      g.dispose()
     }
 
-    ImageUtils.enableAlphaIndexColor(img)
+    val ltp = img.trimmed(32, 0, 8, 8)
+    val rtp = img.trimmed(56, 0, 8, 8)
+    val lbp = img.trimmed(32,24, 8, 8)
+    val rbp = img.trimmed(56,24, 8, 8)
+    val tp =  img.trimmed(40, 0,16, 8)
+    val rp =  img.trimmed(56, 8, 8,16)
+    val lp =  img.trimmed(32, 8, 8,16)
+    val bp =  img.trimmed(40,24,16, 8)
+
+    dest.drawImage(ltp, 0, 0)
+    dest.drawImage(rtp, w-8, 0)
+    dest.drawImage(lbp, 0, h-8)
+    dest.drawImage(rbp, w-8, h-8)
     
-    val ltp = img.getSubimage(32, 0, 8, 8)
-    val rtp = img.getSubimage(56, 0, 8, 8)
-    val lbp = img.getSubimage(32,24, 8, 8)
-    val rbp = img.getSubimage(56,24, 8, 8)
-    val tp =  img.getSubimage(40, 0,16, 8)
-    val rp =  img.getSubimage(56, 8, 8,16)
-    val lp =  img.getSubimage(32, 8, 8,16)
-    val bp =  img.getSubimage(40,24,16, 8)
-
-    val g = dest.createGraphics
-
-    g.drawImage(ltp, null, 0, 0)
-    g.drawImage(rtp, null, w-8, 0)
-    g.drawImage(lbp, null, 0, h-8)
-    g.drawImage(rbp, null, w-8, h-8)
-    
-    var restx = w - 16
-    var drawx = 8
-    while(restx >= 16) {
-      g.drawImage(tp, null, drawx, 0)
-      g.drawImage(bp, null, drawx, h-8)
-      restx -= 16
-      drawx += 16
+    var restX = w - 16
+    var drawX = 8
+    while(restX >= 16) {
+      dest.drawImage(tp, drawX, 0)
+      dest.drawImage(bp, drawX, h-8)
+      restX -= 16
+      drawX += 16
     }
-    if (restx > 0) {
-      g.drawImage(tp.getSubimage(0, 0, restx, 8), null, drawx, 0)
-      g.drawImage(bp.getSubimage(0, 0, restx, 8), null, drawx, h-8)
+    if (restX > 0) {
+      dest.drawImage(tp.trimmed(0, 0, restX, 8), drawX, 0)
+      dest.drawImage(bp.trimmed(0, 0, restX, 8), drawX, h-8)
     }
 
-    var resty = h - 16
-    var drawy = 8
-    while(resty >= 16) {
-      g.drawImage(lp, null, 0, drawy)
-      g.drawImage(rp, null, w-8, drawy)
-      resty -= 16
-      drawy += 16
+    var restY = h - 16
+    var drawY = 8
+    while(restY >= 16) {
+      dest.drawImage(lp, 0, drawY)
+      dest.drawImage(rp, w-8, drawY)
+      restY -= 16
+      drawY += 16
     }
-    if (resty > 0) {
-      g.drawImage(lp.getSubimage(0, 0, 8, resty), null, 0, drawy)
-      g.drawImage(rp.getSubimage(0, 0, 8, resty), null, w-8, drawy)
+    if (restY > 0) {
+      dest.drawImage(lp.trimmed(0, 0, 8, restY), 0, drawY)
+      dest.drawImage(rp.trimmed(0, 0, 8, restY), w-8, drawY)
     }
-    
-    g.dispose()
 
     if(_w < 16 || _h < 16) {
-      dest.getSubimage(0, 0, _w, _h)
+      dest.trimmed(0, 0, _w, _h)
     } else dest
   }
   

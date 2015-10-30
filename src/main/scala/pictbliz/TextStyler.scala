@@ -1,7 +1,7 @@
 package pictbliz
 
 import java.awt.Color
-import java.awt.image.{DataBufferInt, BufferedImage}
+import java.awt.image.BufferedImage
 import com.typesafe.scalalogging.LazyLogging
 
 import util.Rect2DConversion
@@ -41,23 +41,20 @@ class TextStyler(val origimg: BufferedImage,
   def shadowed(): BufferedImage = {
 
     val maskimg = ImageUtils.copy(origimg)
-    val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
-    val g = targetimg.createGraphics
+    val targetimg = ImageUtils.newRawImage(maskimg.getWidth, maskimg.getHeight)
     val (px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds.xywh
     val paintTex = colors.getShadowTexture(pw, ph)
-    g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
-    g.dispose()
+    targetimg.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
 
-    ImageUtils.synthesisIndexColor(maskimg, targetimg)
+    ImageUtils.synthesisIndexColor(maskimg, targetimg.toBufferedImage())
 
   }
   // 色つける
   def colored(origimg: BufferedImage): BufferedImage = {
 
     val maskimg = ImageUtils.copy(origimg)
-    val targetimg = ImageUtils.newImage(maskimg.getWidth, maskimg.getHeight)
-    val g = targetimg.createGraphics
-  
+    val targetimg = ImageUtils.newRawImage(maskimg.getWidth, maskimg.getHeight)
+
     for (AttributeRange(begin, end, ctr) <- attrstr.iter) {
       val texIdx = ctr match {
         case CtrColor(idx) => idx
@@ -72,7 +69,7 @@ class TextStyler(val origimg: BufferedImage,
             val (px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length).xywh
             //if (debug) test += ((px, py, pw, ph))
             val paintTex = colors.getTexture(pw, ph, texIdx)
-            g.drawImage(paintTex, null, px, py + glyphvec.ascent.toInt)
+            targetimg.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
 
             drawEachLine(b + head.length + 1, rest)
         }
@@ -80,9 +77,8 @@ class TextStyler(val origimg: BufferedImage,
       val subs = attrstr.str.substring(begin, end)
       drawEachLine(begin, subs.split("\n").toList)
     }    
-    g.dispose()
-    
-    ImageUtils.synthesisIndexColor(maskimg, targetimg)
+
+    ImageUtils.synthesisIndexColor(maskimg, targetimg.toBufferedImage())
   }
 
   def hemmed(src: BufferedImage, hemColor: Int, hemSize: Int): BufferedImage = {

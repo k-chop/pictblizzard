@@ -20,7 +20,7 @@ final class RichBufferedImage(val self: BufferedImage) {
   def createEmptyDestinationRaw: RawIndexColorImage = {
     val pix = self.pixelsByte
     val cm = self.indexColorModel
-    RawIndexColorImage.fromSize(pix.length, cm.getMapSize, self.getWidth)
+    RawIndexColorImage.fromArraySize(pix.length, cm.getMapSize, self.getWidth)
   }
 
   def drawImageIndexColor(that: BufferedImage, x: Int, y: Int): RawIndexColorImage = {
@@ -29,7 +29,7 @@ final class RichBufferedImage(val self: BufferedImage) {
     raw
   }
 
-  def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = self.toRaw.trim(x, y, w, h)
+  def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = self.toRaw.trimmed(x, y, w, h)
 
   def indexColorModel: IndexColorModel = {
     require(self.getType == TYPE_BYTE_INDEXED, s"IndexColorModel defined only TYPE_BYTE_INDEXED. type: ${self.getType}")

@@ -8,7 +8,7 @@ class RawIndexColorImageSpec extends UnitSpec {
 
   "RawIndexColorImage" should {
 
-    def rawFixture = RawIndexColorImage.fromSize(5, 0xff, 5)
+    def rawFixture = RawIndexColorImage.fromArraySize(5, 0xff, 5)
 
     "create empty RawIndexColorImage from fromSize" in {
       val raw = rawFixture

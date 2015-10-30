@@ -19,18 +19,15 @@ class SingleColors(val color: Array[Color]) extends Texturable {
   def this(color: Color*) = this(color.toArray)
   def this(color: Array[Int]) = this(color.map(_.asColor): Array[Color])
 
-  def getTexture(w: Int, h: Int, idx: Int) = {
+  def getTexture(w: Int, h: Int, idx: Int): RawIndexColorImage = {
     require(idx < length)
 
-    val img = ImageUtils.newImage(w, h)
-    val g = img.createGraphics
-
-    g.setColor(color(idx))
-    g.fillRect(0, 0, w, h)
+    val img = ImageUtils.newRawImage(w, h)
+    img.fill(color(idx).getRGB)
     img
   }
 
   // Shadow color is last element of colors array.
-  def getShadowTexture(w: Int, h: Int) = getTexture(w, h, length - 1)
+  def getShadowTexture(w: Int, h: Int): RawIndexColorImage = getTexture(w, h, length - 1)
   
 }

@@ -90,11 +90,11 @@ object Values {
 
       val sysg = SystemGraphics.make(systemGraphicsPath)
       val rect = params.rect.getOrElse(Rect(0, 0, 1, 1))
-      val buf = ImageUtils.newImage(rect.w, rect.h)
+      val raw = ImageUtils.newRawImage(rect.w, rect.h)
 
       val systemWindow = sysg.getSystemWindow(rect.w, rect.h, zoom=true)
-      val newTo = buf.drawImageIndexColor(systemWindow, 0, 0)
-      ImagePart((rect.x, rect.y), newTo)
+      raw.drawImage(systemWindow, 0, 0)
+      ImagePart((rect.x, rect.y), raw)
     }
   }
 

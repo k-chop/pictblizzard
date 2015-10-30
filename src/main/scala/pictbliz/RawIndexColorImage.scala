@@ -28,9 +28,15 @@ object RawIndexColorImage {
   /* return empty RawIndexColorImage.
      'empty' means its pixels filled index 0, and palette filled UNUSED color.
    */
-  def fromSize(pixelSize: Int, paletteSize: Int, width: Int): RawIndexColorImage = {
+  def fromArraySize(pixelSize: Int, paletteSize: Int, width: Int): RawIndexColorImage = {
     RawIndexColorImage(Array.ofDim[Int](pixelSize), Array.fill(paletteSize)(UNUSED), width)
   }
+
+  def fromSize(width: Int, height: Int, paletteSize: Int = 0xff): RawIndexColorImage = {
+    RawIndexColorImage(Array.ofDim[Int](width*height), Array.fill(paletteSize)(UNUSED), width)
+  }
+
+  def fromSize(buf: BufferedImage): RawIndexColorImage = fromSize(buf.getWidth, buf.getHeight)
 
 }
 
@@ -61,13 +67,27 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
-  def trim(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
-    val dest = RawIndexColorImage.fromSize(w*h, 0xff, w)
+  def trimmed(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
+    val dest = RawIndexColorImage.fromSize(w, h)
     dest.palette(0) = palette(0)
     dest.foreachWithIndex{ idx =>
       val gx = (idx % w) + x
       val gy = (idx / w) + y
       val c = color(gy * width + gx)
+      dest.setColor(idx, c)
+    }
+    dest
+  }
+
+  def fitted(w: Int, h: Int): RawIndexColorImage = {
+    val dest = RawIndexColorImage.fromSize(w, h)
+    dest.palette(0) = palette(0)
+    dest.foreachWithIndex{ idx =>
+      val x = idx % w
+      val y = idx / w
+      val dx = (width * (x.toDouble / w)).toInt
+      val dy = (height * (y.toDouble / h)).toInt
+      val c = color(dy * width + dx)
       dest.setColor(idx, c)
     }
     dest
@@ -94,9 +114,18 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
+  // fill all with palette-0.
   def clear(color: Int): Unit = {
     palette(0) = color
-    foreachWithIndex(i => pixels(i) = 0)
+    fillPalette(1 until palette.length, UNUSED)
+    foreachWithIndex(pixels(_) = 0)
+  }
+
+  // fill color but protect palette-0.
+  def fill(color: Int): Unit = {
+    palette(1) = color
+    fillPalette(2 until palette.length, UNUSED)
+    foreachWithIndex(pixels(_) = 1)
   }
   
   def length = pixels.length
@@ -107,6 +136,8 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     val res = palette.indexOf(targetColor)
     if (res != -1) Some(res) else None
   }
+
+  def fillPalette(range: Seq[Int], color: Int): Unit = range.foreach { palette(_) = color }
 
   // overwrite palette from IndexColorModel.
   def writePalette(src: IndexColorModel): Unit = {
@@ -135,7 +166,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
     used.result()
   }
-  
+
   private def markUnusedPalette(used: mutable.BitSet): Unit = {
     var i = 0
     while(i < palette.length) {

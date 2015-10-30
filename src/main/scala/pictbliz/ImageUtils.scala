@@ -45,6 +45,8 @@ object ImageUtils {
     }*/
   }
 
+  def newRawImage(w: Int, h: Int) = RawIndexColorImage.fromSize(w, h)
+
   def newImage(w: Int, h: Int, typ: Int = BufferedImage.TYPE_BYTE_INDEXED): BufferedImage = new BufferedImage(w, h, typ)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)
 
@@ -58,17 +60,6 @@ object ImageUtils {
     val dest = sameSizeImage(src)
     dest.setData(src.getData)
     dest
-  }
-
-  def enableAlphaIndexColor(src: BufferedImage, paletteIdx: Int = 0): BufferedImage = {
-    import enrich.packedcolor._
-
-    val raw = src.toRaw
-
-    if (raw.palette(paletteIdx).a == 0xff) {
-      raw.palette(paletteIdx) = raw.palette(paletteIdx) & 0x00ffffff
-    }
-    raw.toBufferedImage()
   }
 
   def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
