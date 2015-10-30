@@ -67,7 +67,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
-  def synthesis(that: RawIndexColorImage, maskColor: Int): Unit = foreachWithIndex { i =>
+  def synthesis(that: RawIndexColorImage, maskColor: Int = 0xFFFFFFFF): Unit = foreachWithIndex { i =>
     if (color(i) == maskColor) {
       setColor(i, that.color(i))
     }

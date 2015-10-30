@@ -46,6 +46,8 @@ object ImageUtils {
   }
 
   def newRawImage(w: Int, h: Int) = RawIndexColorImage.fromSize(w, h)
+  def sameSizeRawImage(src: BufferedImage) = RawIndexColorImage.fromSize(src)
+  def extraSizeRawImage(src: BufferedImage, plus: Int) = newRawImage(src.getWidth+plus*2, src.getHeight+plus*2)
 
   def newImage(w: Int, h: Int, typ: Int = BufferedImage.TYPE_BYTE_INDEXED): BufferedImage = new BufferedImage(w, h, typ)
   def newImage(size: (Int, Int)): BufferedImage = newImage(size._1, size._2)

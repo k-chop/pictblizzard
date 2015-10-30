@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage
 import com.typesafe.scalalogging.LazyLogging
 
 import util.Rect2DConversion
+import enrich.all._
 
 import scala.annotation.tailrec
 
@@ -18,42 +19,39 @@ class TextStyler(val origimg: BufferedImage,
 
   def process(): BufferedImage = {
     // TODO: 陰もAttrMap見てありなし決める
-    val dest = ImageUtils.extraSizeImage(origimg, 0)
-    val s = shadowed()
-    val body: BufferedImage =
-      params.hemming.fold(colored(origimg)) { hem =>
+    val dest = ImageUtils.sameSizeRawImage(origimg)
+    val shadow = shadowed(origimg)
+    val body: RawIndexColorImage =
+      params.hemming.fold(colored(origimg.toRaw)) { hem =>
         colored( hemmed(origimg, hem.color, hem.size) )
       }
 
-    val g = dest.createGraphics
-    g.drawImage(s, null, 1, 1) // shadow offset = 1
-    g.drawImage(body, null, 0, 0)
-    g.dispose()
+    dest.drawImage(shadow, 1, 1) // shadow offset = 1
+    dest.drawImage(body, 0, 0)
 
     // TODO: ふちどりした場合、サイズと描画位置が変更されるのでParamsの更新する
+    //if (params.border) bordered(Color.white)
 
-    if (params.border) bordered(Color.white)
-
-    dest
+    dest.toBufferedImage()
   }
   
   // つける
-  def shadowed(): BufferedImage = {
+  def shadowed(src: BufferedImage): RawIndexColorImage = {
 
-    val maskimg = ImageUtils.copy(origimg)
-    val targetimg = ImageUtils.newRawImage(maskimg.getWidth, maskimg.getHeight)
+    val maskImg = src.toRaw
+    val targetImg = ImageUtils.newRawImage(maskImg.width, maskImg.height)
     val (px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds.xywh
     val paintTex = colors.getShadowTexture(pw, ph)
-    targetimg.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
+    targetImg.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
 
-    ImageUtils.synthesisIndexColor(maskimg, targetimg.toBufferedImage())
-
+    maskImg.synthesis(targetImg)
+    maskImg
   }
-  // 色つける
-  def colored(origimg: BufferedImage): BufferedImage = {
 
-    val maskimg = ImageUtils.copy(origimg)
-    val targetimg = ImageUtils.newRawImage(maskimg.getWidth, maskimg.getHeight)
+  // 色つける
+  def colored(src: RawIndexColorImage): RawIndexColorImage = {
+
+    val that = ImageUtils.newRawImage(src.width, src.height)
 
     for (AttributeRange(begin, end, ctr) <- attrstr.iter) {
       val texIdx = ctr match {
@@ -69,7 +67,7 @@ class TextStyler(val origimg: BufferedImage,
             val (px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length).xywh
             //if (debug) test += ((px, py, pw, ph))
             val paintTex = colors.getTexture(pw, ph, texIdx)
-            targetimg.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
+            that.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
 
             drawEachLine(b + head.length + 1, rest)
         }
@@ -78,25 +76,19 @@ class TextStyler(val origimg: BufferedImage,
       drawEachLine(begin, subs.split("\n").toList)
     }    
 
-    ImageUtils.synthesisIndexColor(maskimg, targetimg.toBufferedImage())
+    src.synthesis(that)
+    src
   }
 
-  def hemmed(src: BufferedImage, hemColor: Int, hemSize: Int): BufferedImage = {
-    import enrich.bufferedimage._
+  def hemmed(src: BufferedImage, hemColor: Int, hemSize: Int): RawIndexColorImage = {
     import ImageUtils.{neighbor, alpha}
 
-    val destimg = ImageUtils.extraSizeImage(src, hemSize)
-    val d = ImageUtils.sameSizeImage(destimg)
-    locally {
-      val g = destimg.createGraphics()
-      g.drawImage(src, null, hemSize, hemSize)
-    }
-    //val da: Array[Int] = d.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
-    //val dest: Array[Int] = destimg.getRaster.getDataBuffer.asInstanceOf[DataBufferInt].getData
-    val da2 = d.toRaw
-    val dest2 = destimg.toRaw
+    val dest2 = ImageUtils.extraSizeRawImage(src, hemSize)
+    val da2 = ImageUtils.newRawImage(dest2.width, dest2.height)
 
-    val w = destimg.getWidth
+    dest2.drawImage(src.toRaw, hemSize, hemSize)
+
+    val w = dest2.width
 
     @tailrec def traverse(n: Int, lim: Int) {
       import enrich.packedcolor._
@@ -111,7 +103,7 @@ class TextStyler(val origimg: BufferedImage,
           if (alphav > maxalpha) maxalpha = alphav
           i += 1
         }
-        //val ct_n = n+destimg.getWidth+1+(n/src.getWidth)*2
+
         if (alp == 0 && maxalpha != 0) da2.setColor(n, alpha(hemColor, maxalpha))
         if (0 < alp && alp < 255) {
           val s = alp / 255.0
@@ -123,7 +115,7 @@ class TextStyler(val origimg: BufferedImage,
       }
     }
     traverse(0, dest2.length)
-    d
+    da2
   }
   
   def bordered(c: Color): BufferedImage = {
@@ -132,6 +124,4 @@ class TextStyler(val origimg: BufferedImage,
     g2d.drawRect(0, 0, origimg.getWidth-1, origimg.getHeight-1)
     origimg
   }
-
-
 }
