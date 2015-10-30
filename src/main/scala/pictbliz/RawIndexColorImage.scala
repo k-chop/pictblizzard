@@ -67,6 +67,13 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     }
   }
 
+  def synthesis(that: RawIndexColorImage, maskColor: Int): Unit = foreachWithIndex { i =>
+    if (color(i) == maskColor) {
+      setColor(i, that.color(i))
+    }
+  }
+
+
   def trimmed(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
     val dest = RawIndexColorImage.fromSize(w, h)
     dest.palette(0) = palette(0)

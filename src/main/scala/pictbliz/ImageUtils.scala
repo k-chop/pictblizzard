@@ -62,20 +62,14 @@ object ImageUtils {
     dest
   }
 
-  def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskcolor: Int = 0xFFFFFFFF): BufferedImage = {
+  def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskColor: Int = 0xFFFFFFFF): BufferedImage = {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
 
     val rawTarget = target.toRaw
     val dest = src.toRaw
 
-    // synthesis
-    dest.foreachWithIndex { i =>
-      if (dest.color(i) == maskcolor) {
-        val targetColor = rawTarget.color(i)
-        dest.setColor(i, targetColor)
-      }
-    }
+    dest.synthesis(rawTarget, maskColor)
 
     dest.toBufferedImage()
   }
