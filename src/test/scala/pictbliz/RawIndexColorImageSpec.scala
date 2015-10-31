@@ -39,38 +39,24 @@ class RawIndexColorImageSpec extends UnitSpec with ImageSpec {
     "drawImage" when {
 
       "draw simple image" in {
-        implicit val testName = "draw"
-        testEqualityAllPixelWithDraw("t", 0, 0) shouldBe true
-        testEqualityAllPixelWithDraw("b", 0, 0) shouldBe true
-        testEqualityAllPixelWithDraw("c", 15, 15) shouldBe true
+        testDraw("t", 0, 0) shouldBe true
+        testDraw("b", 0, 0) shouldBe true
+        testDraw("c", 15, 15) shouldBe true
       }
     }
 
     "trimming" when {
 
       "equal trimmed whole image" in {
-        // :)
+        //testTrim("a", 0, 0, ) shouldBe true
       }
     }
 
     "synthesis" when {
 
       "synthesize index-color image" in {
-        def isNotAlpha(i: Int) = i.a != 0
 
-        val mask = PNG.read("testdata/synth/mask.png")
-        val grad = PNG.read("testdata/synth/grad.png")
-
-        val res = ImageUtils.synthesisIndexColor(mask, grad)
-        ImageResult("synth", res).write("temp/")
-
-        val resb = PNG.read("temp/synth.png")
-
-        // checking each pixel that is not transparent is (resb == grad)
-        val p = resb.testAllPixel(grad)(index0AsAlpha = true)(isNotAlpha){
-          (r, g) => r == g
-        }
-        assert(p)
+        testSynth("m") shouldBe true
       }
     }
 

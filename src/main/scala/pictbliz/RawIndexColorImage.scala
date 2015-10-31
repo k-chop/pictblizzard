@@ -241,4 +241,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
     rec()
   }
 
+  @inline final def equalAllPixel(that: RawIndexColorImage) =
+    testAllPixel(that)(index0AsAlpha = true)(_ => true)( (l, r) => l == r)
+
 }
