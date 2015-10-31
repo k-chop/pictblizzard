@@ -53,7 +53,7 @@ case class ImagePart(pos: (Int, Int), image: RawIndexColorImage) {
 
   def result(values: Map[Layouts.Id, Values.Value]): ImageResult = {
     val filename = values.get("filename") match {
-      case Some(Values.Text(str)) => ImagePart.trimPath(str)
+      case Some(Values.Text(str)) => ext.FilePath.trimPath(str)
       case _ => ImagePart.genRandomName
     }
     ImageResult(filename, image.toBufferedImage())
@@ -68,9 +68,6 @@ object ImagePart extends ImagePartInstances {
   private[this] final val fmt = StaticDateTimeFormat.forPattern("yyyyMMddHHmmssSSS")
 
   def genRandomName: String = DateTime.now().toString(fmt) + Random.alphanumeric.take(6).mkString
-
-  def trimPath(s: String): String = s.replaceAll("""\.png$""", "")
-
 }
 
 sealed abstract class ImagePartInstances {

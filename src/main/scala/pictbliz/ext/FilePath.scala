@@ -25,4 +25,6 @@ object FilePath {
     def toPath(from: Path) = from
   }
 
+  def trimPath(s: String): String = s.replaceAll("""\.png$""", "")
+
 }
