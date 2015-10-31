@@ -64,28 +64,4 @@ class ImageUtilsSpec extends UnitSpec {
     }
   }
 
-  "synthesis" should {
-
-    "synthesize index-color image" in {
-      import enrich.bufferedimage._
-      import enrich.packedcolor._
-
-      def isNotAlpha(i: Int) = i.a != 0
-
-      val mask = PNG.read("testdata/synthtest/mask.png", false, false)
-      val grad = PNG.read("testdata/synthtest/grad.png", false, false)
-
-      val res = ImageUtils.synthesisIndexColor(mask, grad)
-      ImageResult("synthtest", res).write("temp/")
-
-      val resb = PNG.read("temp/synthtest.png", false, false)
-
-      // checking each pixel that is not transparent is (resb == grad)
-      val p = resb.testAllPixel(grad)(index0AsAlpha = true)(isNotAlpha){
-        (r, g) => r == g
-      }
-      assert(p)
-    }
-  }
-
 }

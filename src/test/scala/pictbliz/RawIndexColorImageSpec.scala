@@ -1,10 +1,11 @@
 package pictbliz
 
 import RawIndexColorImage._
-import enrich.bufferedimage._
-import enrich.packedcolor._
 
-class RawIndexColorImageSpec extends UnitSpec {
+import enrich.all._
+import pictbliz.ext.PNG
+
+class RawIndexColorImageSpec extends UnitSpec with ImageSpec {
 
   "RawIndexColorImage" should {
 
@@ -37,30 +38,39 @@ class RawIndexColorImageSpec extends UnitSpec {
 
     "drawImage" when {
 
-      def testEqualityAllPixel
-      (
-          prefix: String,
-          x: Int = 0,
-          y: Int = 0
-      ): Boolean = {
-        val l = ext.PNG.read(s"testdata/drawtest/${prefix}1.png")
-        val r = ext.PNG.read(s"testdata/drawtest/${prefix}2.png")
-        val e = ext.PNG.read(s"testdata/drawtest/${prefix}Expect.png")
-
-        val raw = l.drawImageIndexColor(r, x, y)
-        val buf = raw.toBufferedImage()
-        ImageResult(s"${prefix}Dest", buf).write("temp/")
-
-        val res = ext.PNG.read(s"temp/${prefix}Dest.png")
-        res.testAllPixel(e)(index0AsAlpha = true)(_ => true){
-          (l, r) => l === r
-        }
-      }
-
       "draw simple image" in {
-        testEqualityAllPixel("t") shouldBe true
-        testEqualityAllPixel("b") shouldBe true
-        testEqualityAllPixel("c", 15, 15) shouldBe true
+        implicit val testName = "draw"
+        testEqualityAllPixelWithDraw("t", 0, 0) shouldBe true
+        testEqualityAllPixelWithDraw("b", 0, 0) shouldBe true
+        testEqualityAllPixelWithDraw("c", 15, 15) shouldBe true
+      }
+    }
+
+    "trimming" when {
+
+      "equal trimmed whole image" in {
+        // :)
+      }
+    }
+
+    "synthesis" when {
+
+      "synthesize index-color image" in {
+        def isNotAlpha(i: Int) = i.a != 0
+
+        val mask = PNG.read("testdata/synth/mask.png")
+        val grad = PNG.read("testdata/synth/grad.png")
+
+        val res = ImageUtils.synthesisIndexColor(mask, grad)
+        ImageResult("synth", res).write("temp/")
+
+        val resb = PNG.read("temp/synth.png")
+
+        // checking each pixel that is not transparent is (resb == grad)
+        val p = resb.testAllPixel(grad)(index0AsAlpha = true)(isNotAlpha){
+          (r, g) => r == g
+        }
+        assert(p)
       }
     }
 
