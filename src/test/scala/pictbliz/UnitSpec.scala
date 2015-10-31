@@ -2,60 +2,72 @@ package pictbliz
 
 import org.scalatest.{OptionValues, BeforeAndAfter, WordSpec, Matchers}
 
+import scala.annotation.tailrec
+
 abstract class UnitSpec extends WordSpec with Matchers with BeforeAndAfter with OptionValues
 
 trait ImageSpec {
+  this: UnitSpec =>
+
   import enrich.all._
+
   type Raw = RawIndexColorImage
-  type ImageOp = (Raw, Raw) => Raw
 
-  def testDraw(prefix: String, x: Int, y: Int): Boolean = {
-    val (result, expect, _) = testEqualityImages(prefix, { (l, r) =>
-      l.drawImage(r, x, y); l
-    })("draw")
-
-    result.equalAllPixel(expect)
+  def testDraw(l: String, r: String, e: String, x: Int, y: Int): Unit = {
+    val t = PixelTest("draw", l, r, e)
+    val res = t.test { import t._
+      left.drawImage(right, x, y); left
+    }
+    equalAllPixel(res, t.expect) shouldBe true
   }
 
-  def testSynth(prefix: String): Boolean = {
-    def isNotAlpha(i: Int) = i.a != 0
+  def testSynth(l: String, r: String): Unit = {
+    val t = PixelTest("synth", l, r)
+    val res = t.test { import t._
+      left.synthesis(right); left
+    }
+    testAllPixel(res, t.right)(index0AsAlpha = true)(_.a != 0){
+      (l, r) => l === r
+    } shouldBe true
+  }
 
-    val (result, _, (_, s)) = testEqualityImages(prefix, { (l, r) =>
-      l.synthesis(r); l
-    })("synth")
+  def testTrim(l: String, e: String, x: Int, y: Int, w: Int, h: Int): Unit = {
+    val t = PixelTest("trim", l, "", e)
+    val res = t.test { import t._
+      left.trimmed(x, y, w, h)
+    }
+    equalAllPixel(res, t.expect) shouldBe true
+  }
 
-    result.testAllPixel(s)(index0AsAlpha = true)(isNotAlpha){
-      (l, r) => l == r
+  @inline final def testAllPixel(self: Raw, that: Raw)(index0AsAlpha: Boolean = false)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
+    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (self.length <= idx) ret
+    else {
+      val cs = self.color(idx, index0AsAlpha)
+      if (withFilter(cs)) {
+        val co = that.color(idx, index0AsAlpha)
+        if (!pred(cs, co)) {
+          false
+        } else rec(idx + 1, ret)
+      } else rec(idx + 1, ret)
+    }
+    assert(self.pixels.length == that.pixels.length)
+    rec()
+  }
+
+  @inline final def equalAllPixel(self: Raw, that: Raw) =
+    testAllPixel(self, that)(index0AsAlpha = true)(_ => true)( (l, r) => { assert(l === r); l === r } )
+
+  case class PixelTest(testName: String, _left: String, _right: String = "", _expect: String = "") {
+    lazy val left = ext.PNG.read(s"testdata/$testName/${_left}.png").toRaw
+    lazy val right = ext.PNG.read(s"testdata/$testName/${_right}.png").toRaw
+    lazy val expect = ext.PNG.read(s"testdata/$testName/${_expect}.png").toRaw
+    lazy val result = ext.PNG.read(s"temp/$outputName.png").toRaw
+    private val outputName = s"$testName-${_left}-${_right}-${_expect}"
+    def test(f: => Raw): Raw = {
+      val out = f
+      ImageResult(outputName, out.toBufferedImage()).write("temp/")
+      ext.PNG.read(s"temp/$outputName.png").toRaw
     }
   }
 
-  def testTrim(prefix: String, x: Int, y: Int, w: Int, h: Int): Boolean = {
-    val (result, expect, _) = testEqualityImages(prefix, { (l, _) =>
-      l.trimmed(x, y, w, h)
-    })("trim")
-
-    result.equalAllPixel(expect)
-  }
-
-  case class PixelTest(prefix: String) {
-    def left = ???
-    def right = ???
-    def expect = ???
-    def outputName = ???
-  }
-  
-  def testEqualityImages(prefix: String, f: ImageOp)(implicit testName: String): (Raw, Raw, (Raw, Raw)) = {
-
-    val left = ext.PNG.read(s"testdata/$testName/${prefix}1.png").toRaw
-    val right = ext.PNG.read(s"testdata/$testName/${prefix}2.png").toRaw
-    val expect = ext.PNG.read(s"testdata/$testName/${prefix}Expect.png").toRaw
-    val outputName = s"$testName-${prefix}Dest"
-    
-    val out = f(left, right)
-    ImageResult(outputName, out.toBufferedImage()).write("temp/")
-    
-    val result = ext.PNG.read(s"temp/$outputName.png").toRaw
-
-    (result, expect, (left, right))
-  }
 }

@@ -3,7 +3,6 @@ package pictbliz
 import RawIndexColorImage._
 
 import enrich.all._
-import pictbliz.ext.PNG
 
 class RawIndexColorImageSpec extends UnitSpec with ImageSpec {
 
@@ -36,32 +35,29 @@ class RawIndexColorImageSpec extends UnitSpec with ImageSpec {
       raw.color(3) shouldEqual UNUSED
     }
 
-    "drawImage" when {
 
-      "draw simple image" in {
-        testDraw("t", 0, 0) shouldBe true
-        testDraw("b", 0, 0) shouldBe true
-        testDraw("c", 15, 15) shouldBe true
-      }
+    "draw simple image" in {
+      testDraw("t1", "t2", "tExpect", 0, 0)
+      testDraw("b1", "b2", "bExpect", 0, 0)
+      testDraw("c1", "c2", "cExpect", 15, 15)
     }
 
-    "trimming" when {
 
-      "equal trimmed whole image" in {
-        //testTrim("a", 0, 0, ) shouldBe true
-      }
+    "trim whole image" in {
+      testTrim("trimWhole", "trimWhole", 0, 0, 16, 24)
+    }
+    "trim whole over image" in {
+      testTrim("trimWhole", "trimWhole", 0, 0, Int.MaxValue, Int.MaxValue)
+      testTrim("trimWhole", "trimFail", 0, 0, Int.MinValue, Int.MinValue)
+    }
+    "trim part image" in {
+      testTrim("trimWhole", "trimmed2", 6, 14, 10, 8)
     }
 
-    "synthesis" when {
-
-      "synthesize index-color image" in {
-
-        testSynth("m") shouldBe true
-      }
+    "synthesize index-color image" in {
+      testSynth("m1", "m2")
     }
 
   }
-
-
 
 }

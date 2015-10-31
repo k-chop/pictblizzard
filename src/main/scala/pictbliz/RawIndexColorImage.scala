@@ -74,7 +74,12 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
   }
 
 
-  def trimmed(x: Int, y: Int, w: Int, h: Int): RawIndexColorImage = {
+  def trimmed(_x: Int, _y: Int, _w: Int, _h: Int): RawIndexColorImage = {
+    import math._
+    val x = max(min(_x, width-1), 0)
+    val y = max(min(_y, height-1), 0)
+    val w = max(min(_w, width - x), 1)
+    val h = max(min(_h, height - y), 1)
     val dest = RawIndexColorImage.fromSize(w, h)
     dest.palette(0) = palette(0)
     dest.foreachWithIndex{ idx =>
@@ -226,22 +231,5 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
       i += 1
     }
   }
-
-  @inline final def testAllPixel(that: RawIndexColorImage)(index0AsAlpha: Boolean = false)(withFilter: Int => Boolean)(pred: (Int, Int) => Boolean): Boolean = {
-    @tailrec def rec(idx: Int = 0, ret: Boolean = true): Boolean = if (length <= idx) ret
-    else {
-      val cs = color(idx, index0AsAlpha)
-      if (withFilter(cs)) {
-        val co = that.color(idx, index0AsAlpha)
-        if (!pred(cs, co)) {
-          false
-        } else rec(idx + 1, ret)
-      } else rec(idx + 1, ret)
-    }
-    rec()
-  }
-
-  @inline final def equalAllPixel(that: RawIndexColorImage) =
-    testAllPixel(that)(index0AsAlpha = true)(_ => true)( (l, r) => l == r)
 
 }
