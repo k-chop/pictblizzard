@@ -102,9 +102,13 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
 
   @inline final def color(idx: Int, index0AsAlpha: Boolean = false): Int = {
     val pIdx = pixels(idx)
-    val res = palette(pIdx)
-    if (index0AsAlpha && pIdx == 0) res & 0x00ffffff
-    else res
+    if (index0AsAlpha) paletteA(pIdx) else palette(pIdx)
+  }
+
+  // palette access with filter treating idx-0 as alpha.
+  @inline final def paletteA(idx: Int): Int = {
+    val res = palette(idx)
+    if (idx == 0) res & 0x00ffffff else res
   }
 
   // TODO: implement extending palette above 256!
