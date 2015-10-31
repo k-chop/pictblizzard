@@ -54,10 +54,10 @@ class TestSpec extends LazyLogging {
           point(0, 0) |+|
           defaultStyle(style='bold, inWin=true)),
         "price" -> PartLayout.ep(
-          rect(160, 0, 150, 30) |+|
+          rect(200, 0, 120, 30) |+|
           align(Align.Right, Align.Top) |+|
-          interval(5, 5) |+|
-          hemming(0xff001300, 1) |+|
+          interval(2, 2) |+|
+          hemming(0xff003100, 1) |+|
           defaultStyle(inWin=true)),
         "desc" -> PartLayout.ep(
           point(10, 18) |+|
