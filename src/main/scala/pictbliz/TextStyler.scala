@@ -85,32 +85,31 @@ class TextStyler(val origimg: BufferedImage,
 
     val dest2 = ImageUtils.extraSizeRawImage(src, hemSize)
     val da2 = ImageUtils.newRawImage(dest2.width, dest2.height)
+    da2.clear(0xff000000)
 
     dest2.drawImage(src.toRaw, hemSize, hemSize)
-
-    val w = dest2.width
 
     @tailrec def traverse(n: Int, lim: Int) {
       import enrich.packedcolor._
 
       if (n < lim) {
-        val a = neighbor(dest2.pixels, n, w, default = 0)
-        val alp = dest2.color(n).a
-        var maxalpha = 0
+        val a = neighbor(dest2.pixels, n, dest2.width, default = 0)
+        val alp = dest2.color(n, true).a
+        var maxAlpha = 0
         var i = 0; val len = a.length
         while(i < len) {
-          val alphav = dest2.palette(a(i)).a
-          if (alphav > maxalpha) maxalpha = alphav
+          val alphaV = dest2.paletteA(a(i)).a
+          if (alphaV > maxAlpha) maxAlpha = alphaV
           i += 1
         }
 
-        if (alp == 0 && maxalpha != 0) da2.setColor(n, alpha(hemColor, maxalpha))
+        if (alp == 0 && maxAlpha != 0) da2.setColor(n, alpha(hemColor, maxAlpha))
         if (0 < alp && alp < 255) {
           val s = alp / 255.0
-          val newcolor = 0xFFFFFFFF//add(mul(dest(n), s), mul(hemcolor, 1-s))
-          da2.setColor(n, alpha(newcolor, 0xFF))
+          val newColor = 0xFFFFFFFF//add(mul(dest(n), s), mul(hemcolor, 1-s))
+          da2.setColor(n, alpha(newColor, 0xFF))
         }
-        if (alp == 255) da2.pixels(n) = dest2.pixels(n)
+        if (alp == 255) da2.setColor(n, dest2.color(n))
         traverse(n+1, lim)
       }
     }
