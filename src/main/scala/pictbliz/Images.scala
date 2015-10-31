@@ -50,6 +50,19 @@ case class ImageResult(filename: String, image: BufferedImage) {
 }
 
 case class ImagePart(pos: (Int, Int), image: RawIndexColorImage) {
+
+  def result(values: Map[Layouts.Id, Values.Value]): ImageResult = {
+    val filename = values.get("filename") match {
+      case Some(Values.Text(str)) => ImagePart.trimPath(str)
+      case _ => ImagePart.genRandomName
+    }
+    ImageResult(filename, image.toBufferedImage())
+  }
+
+  def isEmpty = pos._1 == 0 && pos._2 == 0 && image.width == 1 && image.height == 1
+}
+
+object ImagePart extends ImagePartInstances {
   import com.github.nscala_time.time.Imports._
 
   private[this] final val fmt = StaticDateTimeFormat.forPattern("yyyyMMddHHmmssSSS")
@@ -58,18 +71,7 @@ case class ImagePart(pos: (Int, Int), image: RawIndexColorImage) {
 
   def trimPath(s: String): String = s.replaceAll("""\.png$""", "")
 
-  def result(values: Map[Layouts.Id, Values.Value]): ImageResult = {
-    val filename = values.get("filename") match {
-      case Some(Values.Text(str)) => trimPath(str)
-      case _ => genRandomName
-    }
-    ImageResult(filename, image.toBufferedImage())
-  }
-
-  def isEmpty = pos._1 == 0 && pos._2 == 0 && image.width == 1 && image.height == 1
 }
-
-object ImagePart extends ImagePartInstances
 
 sealed abstract class ImagePartInstances {
 

@@ -36,8 +36,8 @@ object PNG extends LazyLogging {
    * @param path 書き出し先のパス
    * @param name ファイル名
    */
-  def write(img: BufferedImage, path: Path, name: String) {
-    val filePath = path.resolve(s"$name.png")
+  def write[T: ToPath](img: BufferedImage, path: T, name: String) {
+    val filePath = implicitly[ToPath[T]].toPath(path).resolve(s"$name.png")
     logger.trace(s"write to ${filePath.toString} ...")
     Option(filePath.getParent) foreach { Files.createDirectories(_) }
     ImageIO.write(img, "png", filePath.toFile)

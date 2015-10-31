@@ -64,6 +64,9 @@ object ImageUtils {
     dest
   }
 
+  def debugOutput(src: RawIndexColorImage)(implicit tag: String): RawIndexColorImage = { debugOutput(src.toBufferedImage())(tag); src }
+  def debugOutput(src: BufferedImage)(implicit tag: String): BufferedImage = { ext.PNG.write(src, "temp/", s"$tag-"+ImagePart.genRandomName); src}
+
   def synthesisIndexColor(src: BufferedImage, target: BufferedImage, maskColor: Int = 0xFFFFFFFF): BufferedImage = {
     require(src.getType == BufferedImage.TYPE_BYTE_INDEXED && target.getType == BufferedImage.TYPE_BYTE_INDEXED,
       "source & target's image type should be 'TYPE_BYTE_INDEXED'")
