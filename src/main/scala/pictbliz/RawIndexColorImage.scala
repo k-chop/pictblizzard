@@ -183,7 +183,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
   }
 
   // convert each color in palette to creating BufferedImage.
-  private def restoreUnusedPalette(replaceColor: Int = INIT_COLOR): Unit = {
+  private def restoreUnusedPalette(palette: Array[Int], replaceColor: Int = INIT_COLOR): Unit = {
     var i = 0
     while(i < palette.length) {
       if (palette(i) == UNUSED) palette(i) = 0xff000000 | replaceColor
@@ -199,9 +199,10 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
   def countPalette: Int = palette.length - countEmptyPalette
 
   def toBufferedImage(replaceUnusedPaletteColor: Int = INIT_COLOR, transparent: Boolean = false): BufferedImage = {
-    restoreUnusedPalette(replaceUnusedPaletteColor)
+    val destP = { val a = Array.ofDim[Int](palette.length); Array.copy(palette, 0, a, 0, palette.length); a }
+    restoreUnusedPalette(destP, replaceUnusedPaletteColor)
 
-    val cm = new IndexColorModel(8, palette.length, palette, 0, transparent, -1,  DataBuffer.TYPE_BYTE)
+    val cm = new IndexColorModel(8, destP.length, destP, 0, transparent, -1,  DataBuffer.TYPE_BYTE)
     val buf = new BufferedImage(width, pixels.length / width, BufferedImage.TYPE_BYTE_INDEXED, cm)
 
     val pix = buf.pixelsByte
@@ -210,6 +211,7 @@ case class RawIndexColorImage private (pixels: Array[Int], palette: Array[Int], 
       pix(i) = pixels(i).toByte
       i += 1
     }
+
     buf
   }
 
