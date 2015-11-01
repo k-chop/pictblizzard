@@ -21,10 +21,10 @@ trait ImageSpec {
     equalAllPixel(res, t.expect) shouldBe true
   }
 
-  def testSynth(l: String, r: String): Unit = {
+  def testSynth(l: String, r: String, maskColor: Int = 0xFFFFFFFF): Unit = {
     val t = PixelTest("synth", l, r)
     val res = t.test { import t._
-      left.synthesis(right); left
+      left.synthesis(right, maskColor); left
     }
     testAllPixel(res, t.right)(index0AsAlpha = true)(_.a != 0){
       (l, r) => l === r

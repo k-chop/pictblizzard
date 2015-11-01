@@ -56,6 +56,7 @@ class RawIndexColorImageSpec extends UnitSpec with ImageSpec {
 
     "synthesize index-color image" in {
       testSynth("m1", "m2")
+      testSynth("n1", "n2", 0xffff00ff)
     }
 
   }
