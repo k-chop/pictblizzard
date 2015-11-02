@@ -8,14 +8,13 @@ import com.typesafe.scalalogging.LazyLogging
 
 object StrGraphics extends LazyLogging {
 
-  val DEFAULT_FONT = new Font("ＭＳ ゴシック", Font.PLAIN, 12)
+  val DEFAULT_FONT = new Font("MS Gothic", Font.PLAIN, 12)
 
   def initGraphics2D(g: Graphics2D, font: Font) {
     import java.awt.RenderingHints._
-    // アンチエイリアス。設定によって変更可能にするかも。その場合AttrMapを読んで変える。
-    // VALUE_TEXT_ANTIALIAS_GASP = ビットマップがあるならアンチなしでそれ使う。
-    // VALUE_TEXT_ANTIALIAS_ON   = 常にアンチエイリアスかける
-    // VALUE_TEXT_ANTIALIAS_OFF  = 常にアンチエイリアス無効
+    // VALUE_TEXT_ANTIALIAS_GASP = If bitmap exists, use them.
+    // VALUE_TEXT_ANTIALIAS_ON   = always enable antialias.
+    // VALUE_TEXT_ANTIALIAS_OFF  = always disable antialias.
     g.setRenderingHint(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_OFF)
     g.setColor(Color.white)
     g.setFont(font)
@@ -27,14 +26,13 @@ object StrGraphics extends LazyLogging {
       case 'bold => Font.BOLD
       case 'italic => Font.ITALIC
       case 'bolditalic => Font.BOLD | Font.ITALIC
-      case n => logger.warn("不明なフォントスタイルです: "+n+"\nデフォルトのスタイルを使用します."); Font.PLAIN
+      case n => logger.warn("Undefined font style detected: "+n+", Use default style."); Font.PLAIN
     }
 
     val font = params.font map { font =>
       val Params.Font(name, style, pt) = font
       new Font(name, extractStyle(style), pt)
     } getOrElse {
-      //logger.warning("フォント設定が見つかりません。デフォルトフォントを使用します。")
       DEFAULT_FONT
     }
 
@@ -80,7 +78,7 @@ class StrGraphics(_str: String,
   }
 
   /** 
-  * GlyphVectorの中身をBufferedImageに書き出して返す。
+  * Return BufferedImage that output of GlyphVector.
   */ 
   def generateImage(v: WrappedGlyphVector): BufferedImage = {
 
@@ -96,15 +94,15 @@ class StrGraphics(_str: String,
 
       val (x, y, w2, h2) = v.getFixedWholeLogicalBounds.xywh
       
-      if (params.autoExpand || !hasRect) { // どちらか大きい方に拡大される
+      if (params.autoExpand || !hasRect) { // Image size will match larger one.
         val (dx, dy) = params.padding.map { p =>
           (p.x*2, p.y*2)
         } getOrElse ((x*2, y + v.ascent.toInt))
         ( max(w1, w2 + dx - 1), max(h1, h2 + dy - 1) )
         
-      } else if (hasRect) // rectの定義そのまま
+      } else if (hasRect)
         (w1, h1)
-      else sys.error("えっ")
+      else sys.error("Huh?")
    	}
 
     val (w, h) = computeSize(v)
