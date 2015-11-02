@@ -30,15 +30,15 @@ class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val a
     (1 until v.getNumGlyphs) foreach { idx =>
       if (v.getGlyphCode(idx - 1) == newlineCode) { // 改行
         val rect = v.getGlyphLogicalBounds(lineLeaderIdx).getBounds
-        val oldpos = v.getGlyphPosition(lineLeaderIdx)
-        val newpos = new Point2D.Double(oldpos.getX, oldpos.getY + rect.getHeight)
-        v.setGlyphPosition(idx, newpos)
+        val oldPos = v.getGlyphPosition(lineLeaderIdx)
+        val newPos = new Point2D.Double(oldPos.getX, oldPos.getY + rect.getHeight)
+        v.setGlyphPosition(idx, newPos)
         lineLeaderIdx = idx
       } else { // 前の文字の次に設置
         val rect = v.getGlyphLogicalBounds(idx - 1).getBounds
-        val oldpos = v.getGlyphPosition(idx - 1)
-        val newpos = new Point2D.Double(rect.getWidth + oldpos.getX, oldpos.getY)
-        v.setGlyphPosition(idx, newpos)
+        val oldPos = v.getGlyphPosition(idx - 1)
+        val newPos = new Point2D.Double(rect.getWidth + oldPos.getX, oldPos.getY)
+        v.setGlyphPosition(idx, newPos)
       }
     }
     this
@@ -56,9 +56,9 @@ class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val a
     (1 until v.getNumGlyphs) foreach { idx =>
       if (v.getGlyphCode(idx - 1) != newlineCode) { // 前が改行の場合移動する必要なし
         val rect = v.getGlyphLogicalBounds(idx - 1).getBounds
-        val oldpos = v.getGlyphPosition(idx)
-        val newpos = new Point2D.Double(rect.getWidth + p + rect.getX, oldpos.getY)
-        v.setGlyphPosition(idx, newpos)
+        val oldPos = v.getGlyphPosition(idx)
+        val newPos = new Point2D.Double(rect.getWidth + p + rect.getX, oldPos.getY)
+        v.setGlyphPosition(idx, newPos)
       }
     }
   }
@@ -69,9 +69,9 @@ class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val a
     (1 until v.getNumGlyphs) foreach { idx =>
       if (v.getGlyphCode(idx - 1) == newlineCode)
         nlcount += 1
-      val oldpos = v.getGlyphPosition(idx)
-      val newpos = new Point2D.Double(oldpos.getX, oldpos.getY + (p * nlcount))
-      v.setGlyphPosition(idx, newpos)
+      val oldPos = v.getGlyphPosition(idx)
+      val newPos = new Point2D.Double(oldPos.getX, oldPos.getY + (p * nlcount))
+      v.setGlyphPosition(idx, newPos)
     }
   }
   
@@ -94,9 +94,9 @@ class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val a
 
   private def movex(begin: Int, end: Int, diffx: Double) {
     (begin until end) foreach { idx =>
-      val oldpos = v.getGlyphPosition(idx)
-      val newpos = new Point2D.Double(oldpos.getX + diffx, oldpos.getY)
-      v.setGlyphPosition(idx, newpos)        
+      val oldPos = v.getGlyphPosition(idx)
+      val newPos = new Point2D.Double(oldPos.getX + diffx, oldPos.getY)
+      v.setGlyphPosition(idx, newPos)
     }
   }
   
@@ -138,9 +138,9 @@ class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val a
 
   private def movey(begin: Int, end: Int, diffy: Double) {
     (begin until end) foreach { idx =>
-      val oldpos = v.getGlyphPosition(idx)
-      val newpos = new Point2D.Double(oldpos.getX, oldpos.getY + diffy)
-      v.setGlyphPosition(idx, newpos)        
+      val oldPos = v.getGlyphPosition(idx)
+      val newPos = new Point2D.Double(oldPos.getX, oldPos.getY + diffy)
+      v.setGlyphPosition(idx, newPos)
     }
   }
   
@@ -169,15 +169,15 @@ class WrappedGlyphVector(v: GlyphVector, params: Params, newlineCode: Int, val a
 
   private def padding(pad: Padding): WrappedGlyphVector = {
 
-    def callPaddings(xp: Align.Horizontal, yp: Align.Vertical) {
+    def callPadding(xp: Align.Horizontal, yp: Align.Vertical) {
       if (pad.x > 0) x_padding(xp, pad.x)
       if (pad.y > 0) y_padding(yp, pad.y)
     }
 
     if (params.rect.isDefined)
-      callPaddings(params.align.x, params.align.y)
+      callPadding(params.align.x, params.align.y)
     else
-      callPaddings(Align.Left, Align.Top)
+      callPadding(Align.Left, Align.Top)
     
     this
   }
