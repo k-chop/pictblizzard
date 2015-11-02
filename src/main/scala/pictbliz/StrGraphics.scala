@@ -68,8 +68,8 @@ class StrGraphics(_str: String,
   def processImage(): BufferedImage = {
     val v = getWrappedGlyphVector
     val processedVector = v.process()
-    val bufimage = generateImage( processedVector )
-    val styler = new TextStyler(bufimage, processedVector, params, strAttrib)
+    val bufImage = generateImage( processedVector )
+    val styler = new TextStyler(bufImage, processedVector, params, strAttrib)
     styler.process()
   }
 

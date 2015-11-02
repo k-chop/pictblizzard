@@ -9,21 +9,21 @@ import enrich.all._
 
 import scala.annotation.tailrec
 
-class TextStyler(val origimg: BufferedImage,
-                  val glyphvec: WrappedGlyphVector,
+class TextStyler(val origImg: BufferedImage,
+                  val glyphVec: WrappedGlyphVector,
                   val params: Params,
-                  val attrstr: AttributedText) extends LazyLogging
+                  val attrStr: AttributedText) extends LazyLogging
 {
   var colors: Texturable = params.frontColor
   //var test = scala.collection.mutable.ArrayBuffer.empty[(Int, Int, Int, Int)]
 
   def process(): BufferedImage = {
     // TODO: 陰もAttrMap見てありなし決める
-    val dest = ImageUtils.sameSizeRawImage(origimg)
-    val shadow = shadowed(origimg)
+    val dest = ImageUtils.sameSizeRawImage(origImg)
+    val shadow = shadowed(origImg)
     val body: RawIndexColorImage =
-      params.hemming.fold(colored(origimg.toRaw)) { hem =>
-        colored( hemmed(origimg, hem.color, hem.size) )
+      params.hemming.fold(colored(origImg.toRaw)) { hem =>
+        colored( hemmed(origImg, hem.color, hem.size) )
       }
 
     dest.drawImage(shadow, 1, 1) // shadow offset = 1
@@ -40,9 +40,9 @@ class TextStyler(val origimg: BufferedImage,
 
     val maskImg = src.toRaw
     val targetImg = ImageUtils.newRawImage(maskImg.width, maskImg.height)
-    val (px, py, pw, ph) = glyphvec.getFixedWholeLogicalBounds.xywh
+    val (px, py, pw, ph) = glyphVec.getFixedWholeLogicalBounds.xywh
     val paintTex = colors.getShadowTexture(pw, ph)
-    targetImg.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
+    targetImg.drawImage(paintTex, px, py + glyphVec.ascent.toInt)
 
     maskImg.synthesis(targetImg)
     maskImg
@@ -53,7 +53,7 @@ class TextStyler(val origimg: BufferedImage,
 
     val that = ImageUtils.newRawImage(src.width, src.height)
 
-    for (AttributeRange(begin, end, ctr) <- attrstr.iter) {
+    for (AttributeRange(begin, end, ctr) <- attrStr.iter) {
       val texIdx = ctr match {
         case CtrColor(idx) => idx
         case CtrNop => 0
@@ -64,15 +64,15 @@ class TextStyler(val origimg: BufferedImage,
         l match {
           case Nil =>
           case head :: rest =>
-            val (px, py, pw, ph) = glyphvec.getFixedLogicalBounds(b, b + head.length).xywh
+            val (px, py, pw, ph) = glyphVec.getFixedLogicalBounds(b, b + head.length).xywh
             //if (debug) test += ((px, py, pw, ph))
             val paintTex = colors.getTexture(pw, ph, texIdx)
-            that.drawImage(paintTex, px, py + glyphvec.ascent.toInt)
+            that.drawImage(paintTex, px, py + glyphVec.ascent.toInt)
 
             drawEachLine(b + head.length + 1, rest)
         }
       }
-      val subs = attrstr.str.substring(begin, end)
+      val subs = attrStr.str.substring(begin, end)
       drawEachLine(begin, subs.split("\n").toList)
     }    
 
@@ -118,9 +118,9 @@ class TextStyler(val origimg: BufferedImage,
   }
   
   def bordered(c: Color): BufferedImage = {
-    val g2d = origimg.createGraphics
+    val g2d = origImg.createGraphics
     g2d.setPaint(c)
-    g2d.drawRect(0, 0, origimg.getWidth-1, origimg.getHeight-1)
-    origimg
+    g2d.drawRect(0, 0, origImg.getWidth-1, origImg.getHeight-1)
+    origImg
   }
 }
