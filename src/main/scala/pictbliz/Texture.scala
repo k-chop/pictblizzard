@@ -15,21 +15,21 @@ class Texture(path: java.net.URI) extends Texturable with LazyLogging {
 
   lazy val img: RawIndexColorImage = ext.PNG.read(new java.io.File(path)).toRaw
 
-  val size_x: Int = img.width / Texture.base_x
-  val size_y: Int = img.height / Texture.base_y
+  val size_x: Int = math.max(img.width / Texture.base_x, 1)
+  val size_y: Int = math.max(img.height / Texture.base_y, 1)
 
   def length = size_x * size_y
 
   def getTexture(w: Int, h: Int, idx: Int = 0): RawIndexColorImage = {
 
     if (idx < length) {
-      val msg = "ファイル[%s]のテクスチャNo指定可能範囲は%dですが, %dが指定されました." format (path.toString, length, idx)
+      val msg = s"texture file [${path.toString}] accept only texture-index 0-$length. idx: $idx"
       logger.error(msg)
       throw new IllegalArgumentException(msg)
     }
 
     val sx = idx % size_x
-    val sy = idx / size_x // size_x > 1をどっかで保証すれ
+    val sy = idx / size_x
     val (bx, by) = Texture.base_xy
     val subimg = img.trimmed(sx * bx, sy * by, bx, by)
 

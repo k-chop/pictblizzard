@@ -36,15 +36,13 @@ class SystemGraphics (path: Path) extends Texturable with LazyLogging {
   private val offset_y: Int = 48
   
   def getTexture(w: Int, h: Int, idx: Int = 0): RawIndexColorImage = {
+    require(0 <= idx && idx <= 20, "SystemGraphics accepts only ColorIndex 0-20.")
 
-    if (idx < 0 || 20 < idx)
-      throw new IllegalArgumentException("システムグラフィックのカラーインデックスの有効範囲は[0]から[20(影色)]までです．")
-    
     val sx = idx % size_x
     val sy = idx / size_x
     
     val subimg = {
-      if (idx == 20) // 影色を指定
+      if (idx == 20) // shadow color
         img.trimmed(16, 32, unit_w, unit_h)
       else
         img.trimmed(sx * unit_w, sy * unit_h + offset_y, unit_w, unit_h)
