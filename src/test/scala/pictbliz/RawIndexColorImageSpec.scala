@@ -52,6 +52,7 @@ class RawIndexColorImageSpec extends UnitSpec with ImageSpec {
     }
     "trim part image" in {
       testTrim("trimWhole", "trimmed2", 6, 14, 10, 8)
+      testTrim("trimWhole", "trimmed", 8, 16, 8, 8)
     }
 
     "synthesize index-color image" in {
