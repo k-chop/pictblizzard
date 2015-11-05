@@ -101,5 +101,7 @@ object Values {
   // CSV will be used interpolation, and convert to Values.Text when rendering.
   case class CSV(path: String, column: Int) extends ConvertibleValue[Text]
 
+  case class Tkool2kDB(path: String, category: String, args: Seq[String]) extends ConvertibleValue[Text]
+
   // etc...
 }
