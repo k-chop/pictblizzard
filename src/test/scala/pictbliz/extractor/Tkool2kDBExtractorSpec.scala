@@ -25,5 +25,17 @@ class Tkool2kDBExtractorSpec extends UnitSpec {
       int2ber(ber2int(ByteArray(0xff, 0xae, 0x7f))) shouldEqual ByteArray(0xff, 0xae, 0x7f)
       int2ber(ber2int(ByteArray(0xff, 0xff, 0xff, 0x7f))) shouldEqual ByteArray(0xff, 0xff, 0xff, 0x7f)
     }
+
+    "read DB file as ByteBuffer" in {
+
+      val buf = asByteBuffer("testdata/no-v/RPG_RT.ldb")
+      buf.position() shouldEqual 0
+      buf.limit() shouldEqual 190974
+      buf.capacity() shouldEqual 190974
+
+      val ba = Array.ofDim[Byte](0x0C)
+      buf.get(ba, 0, 0x0c)
+      ba shouldEqual ByteArray(0x0B, 0x4c, 0x63, 0x66, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x73, 0x65)
+    }
   }
 }
