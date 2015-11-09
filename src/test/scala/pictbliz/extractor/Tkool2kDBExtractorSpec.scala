@@ -1,6 +1,8 @@
 package pictbliz
 package extractor
 
+import java.nio.ByteBuffer
+
 class Tkool2kDBExtractorSpec extends UnitSpec {
   import Tkool2kDBExtractor._
   import scala.collection.breakOut
@@ -36,6 +38,21 @@ class Tkool2kDBExtractorSpec extends UnitSpec {
       val ba = Array.ofDim[Byte](0x0C)
       buf.get(ba, 0, 0x0c)
       ba shouldEqual ByteArray(0x0B, 0x4c, 0x63, 0x66, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x73, 0x65)
+
+      buf.get(ba, 0, 1)
+      ba(0) shouldEqual 0x0B
+
+    }
+
+    "nextBer" in {
+
+      val ba = ByteBuffer.wrap(ByteArray(0xff, 0xff, 0x00, 0xff, 0xfa, 0x1c, 0xee, 0x3f))
+      nextBer(ba) shouldEqual 2097024
+      ba.position shouldEqual 3
+      nextBer(ba) shouldEqual 2096412
+      ba.position shouldEqual 6
+      nextBer(ba) shouldEqual 14143
+      ba.position shouldEqual ba.limit
     }
   }
 }

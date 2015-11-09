@@ -50,6 +50,21 @@ object Tkool2kDBExtractor {
     ch.close()
     buf
   }
+
+  // consume Byte as BER integer and return converted int from ber.
+  def nextBer(buf: ByteBuffer): Long = {
+    @tailrec def rec(acc: Long): Long = {
+      val i = buf.get(buf.position) & 0xff
+      if (i < 128) {
+        buf.position(buf.position + 1)
+        acc * 128 + i
+      } else {
+        buf.position(buf.position + 1)
+        rec(acc * 128 + (i - 128))
+      }
+    }
+    rec(0L)
+  }
 }
 
 class Tkool2kDBExtractor extends Extractor[Tkool2kDB, Tkool2kDBQuery] {
