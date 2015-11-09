@@ -1,11 +1,7 @@
 package pictbliz
 package extractor
 
-import java.io.FileInputStream
 import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
-
-import pictbliz.ext.FilePath.ToPath
 
 import scala.annotation.tailrec
 
@@ -54,6 +50,8 @@ object Tkool2kDBExtractor {
     }
     rec(0L)
   }
+
+  def nextBerInt(buf: ByteBuffer): Int = nextBer(buf).toInt
 }
 
 class Tkool2kDBExtractor extends Extractor[Tkool2kDB, Tkool2kDBQuery] {

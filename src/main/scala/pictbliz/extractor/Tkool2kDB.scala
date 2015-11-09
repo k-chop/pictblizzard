@@ -1,8 +1,10 @@
 package pictbliz.extractor
 
 import java.io.FileInputStream
-import java.nio.ByteBuffer
+import java.nio.{Buffer, ByteBuffer}
 import java.nio.channels.FileChannel
+
+import scala.collection.mutable
 
 import pictbliz.ext.FilePath.ToPath
 
@@ -15,9 +17,46 @@ case class DBArray2(position: Int, length: Int) extends DBArray
 case class DBArray1(position: Int, length: Int) extends DBArray
 
 object Tkool2kDB {
+  import Tkool2kDBExtractor._
+
+  implicit class RichByteBuffer(val self: ByteBuffer) extends AnyVal {
+    def skip(step: Int): Buffer = self.position(self.position + step)
+  }
 
   def fromFile[T: ToPath](path: T): Tkool2kDB = {
-    ??? //val buf = asByteBuffer(path)
+    def f2(a: (Int, Int)) = DBArray2(a._1, a._2)
+    def f1(a: (Int, Int)) = DBArray1(a._1, a._2)
+
+    val buf = asByteBuffer(path)
+    buf.skip(nextBerInt(buf)) // skip header
+    val acc = mutable.ArrayBuilder.make[(Int, Int)]
+
+    while(buf.position < buf.limit) {
+      val arrayNumber = nextBerInt(buf)
+      val pos = buf.position
+      val length = nextBerInt(buf)
+      acc += ((pos, length))
+      buf.skip(length)
+    }
+    val a = acc.result()
+
+    Tkool2kDB(
+      heroes = f2(a(0)),
+      skills = f2(a(1)),
+      items = f2(a(2)),
+      monsters = f2(a(3)),
+      monsterGroups = f2(a(4)),
+      terrains = f2(a(5)),
+      attributes = f2(a(6)),
+      conditions = f2(a(7)),
+      animations = f2(a(8)),
+      tileSets = f2(a(9)),
+      vocabulary = f1(a(10)),
+      systemSettings = f1(a(11)),
+      switches = f2(a(12)),
+      variables = f2(a(13)),
+      commonEvents = f2(a(14))
+    )
   }
 
   def asByteBuffer[T: ToPath](path: T): ByteBuffer = {
