@@ -97,7 +97,7 @@ class Interpolator(target: Layouts.VMap, ids: Seq[Int] = Vector(0)) extends Lazy
         case c @ CharaGraphic(str, _, _) => impl(c, str, s => c.copy(path = s))
         case b @ BattleGraphic(str, _, _) => impl(b, str, s => b.copy(path = s))
         case v @ CSV(path, column) => Text(csv.execute(path, CSVQuery(id, column)))
-        case d @ Tkool2kDB(path, category, args) => Text(db2k.execute(path, Tkool2kDBQuery(category, args)))
+        case d @ Values.Tkool2kDB(path, category, args) => Text(db2k.execute(path, Tkool2kDBQuery(category, args)))
         case etc => etc
       }
     }

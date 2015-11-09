@@ -5,7 +5,6 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
-import Values._
 import pictbliz.ext.FilePath.ToPath
 
 import scala.annotation.tailrec
@@ -39,16 +38,6 @@ object Tkool2kDBExtractor {
     val ret = Array.ofDim[Byte](len)
     Array.copy(buf, BUF_LEN - len, ret, 0, len)
     ret
-  }
-
-  def asByteBuffer[T: ToPath](path: T): ByteBuffer = {
-    val ch = new FileInputStream(implicitly[ToPath[T]].toPath(path).toFile).getChannel
-    val size = ch.size()
-    val buf = if (size < Int.MaxValue) {
-      ch.map(FileChannel.MapMode.READ_ONLY, 0, size)
-    } else sys.error(s"wow, too big file! filename: $path, size: $size")
-    ch.close()
-    buf
   }
 
   // consume Byte as BER integer and return converted int from ber.

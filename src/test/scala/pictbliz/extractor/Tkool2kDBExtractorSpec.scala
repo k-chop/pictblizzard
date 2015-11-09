@@ -30,7 +30,7 @@ class Tkool2kDBExtractorSpec extends UnitSpec {
 
     "read DB file as ByteBuffer" in {
 
-      val buf = asByteBuffer("testdata/no-v/RPG_RT.ldb")
+      val buf = Tkool2kDB.asByteBuffer("testdata/no-v/RPG_RT.ldb")
       buf.position() shouldEqual 0
       buf.limit() shouldEqual 190974
       buf.capacity() shouldEqual 190974
@@ -39,9 +39,13 @@ class Tkool2kDBExtractorSpec extends UnitSpec {
       buf.get(ba, 0, 0x0c)
       ba shouldEqual ByteArray(0x0B, 0x4c, 0x63, 0x66, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x73, 0x65)
 
-      buf.get(ba, 0, 1)
-      ba(0) shouldEqual 0x0B
-
+      nextBer(buf) shouldEqual 0x0B
+      nextBer(buf) shouldEqual 5941
+      buf.position(buf.position + 5941)
+      nextBer(buf) shouldEqual 0x0C
+      nextBer(buf) shouldEqual 14146
+      buf.position(buf.position + 14146)
+      nextBer(buf) shouldEqual 0x0D
     }
 
     "nextBer" in {
