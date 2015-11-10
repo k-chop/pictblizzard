@@ -2,6 +2,7 @@ package pictbliz
 package extractor
 
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 import Tkool2kDB.RichByteBuffer
 
@@ -51,6 +52,17 @@ object Tkool2kDBExtractor {
       }
     }
     rec(0L)
+  }
+
+  def nextStr(buf: ByteBuffer, length: Int): String = {
+    val t = Array.ofDim[Byte](length)
+    buf.get(t)
+    new String(t, Charset.forName("Windows-31j"))
+  }
+
+  def nextStr(buf: ByteBuffer): String = {
+    val len = nextBer(buf).toInt
+    nextStr(buf, len)
   }
 
   def nextBerInt(buf: ByteBuffer): Int = nextBer(buf).toInt

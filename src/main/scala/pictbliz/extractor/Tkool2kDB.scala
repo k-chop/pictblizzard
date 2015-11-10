@@ -34,14 +34,17 @@ object Tkool2kDB {
 
     while(buf.position < buf.limit) {
       val arrayNumber = nextBerInt(buf)
-      val pos = buf.position
       val length = nextBerInt(buf)
+      val pos = buf.position
       acc += ((pos, length))
       buf.forward(length)
     }
     val a = acc.result()
 
+    buf.position(0)
+
     Tkool2kDB(
+      bytes = buf,
       heroes = f2(a(0)),
       skills = f2(a(1)),
       items = f2(a(2)),
@@ -72,6 +75,7 @@ object Tkool2kDB {
 }
 
 case class Tkool2kDB(
+    bytes: ByteBuffer,
     heroes: DBArray2,
     skills: DBArray2,
     items: DBArray2,
