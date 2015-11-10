@@ -20,7 +20,8 @@ object Tkool2kDB {
   import Tkool2kDBExtractor._
 
   implicit class RichByteBuffer(val self: ByteBuffer) extends AnyVal {
-    def skip(step: Int): Buffer = self.position(self.position + step)
+    def forward(step: Int): Buffer = self.position(self.position + step)
+    def back(step: Int): Buffer = forward(-step)
   }
 
   def fromFile[T: ToPath](path: T): Tkool2kDB = {
@@ -28,7 +29,7 @@ object Tkool2kDB {
     def f1(a: (Int, Int)) = DBArray1(a._1, a._2)
 
     val buf = asByteBuffer(path)
-    buf.skip(nextBerInt(buf)) // skip header
+    buf.forward(nextBerInt(buf)) // skip header
     val acc = mutable.ArrayBuilder.make[(Int, Int)]
 
     while(buf.position < buf.limit) {
@@ -36,7 +37,7 @@ object Tkool2kDB {
       val pos = buf.position
       val length = nextBerInt(buf)
       acc += ((pos, length))
-      buf.skip(length)
+      buf.forward(length)
     }
     val a = acc.result()
 

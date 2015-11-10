@@ -3,6 +3,8 @@ package extractor
 
 import java.nio.ByteBuffer
 
+import Tkool2kDB.RichByteBuffer
+
 import scala.annotation.tailrec
 
 object Tkool2kDBExtractor {
@@ -41,10 +43,10 @@ object Tkool2kDBExtractor {
     @tailrec def rec(acc: Long): Long = {
       val i = buf.get(buf.position) & 0xff
       if (i < 128) {
-        buf.position(buf.position + 1)
+        buf.forward(1)
         acc * 128 + i
       } else {
-        buf.position(buf.position + 1)
+        buf.forward(1)
         rec(acc * 128 + (i - 128))
       }
     }
