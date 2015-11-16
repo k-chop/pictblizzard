@@ -4,6 +4,7 @@ import java.io.FileInputStream
 import java.nio.{Buffer, ByteBuffer}
 import java.nio.channels.FileChannel
 
+import scala.collection.immutable.LongMap
 import scala.collection.mutable
 
 import pictbliz.ext.FilePath.ToPath
@@ -94,13 +95,30 @@ case class Tkool2kDB(
     commonEvents: DBArray2
 ) {
 
-
   // seek bytes to beginning of section
   def seek(section: DBArray): this.type = seek(section.position)
 
   def seek(newPos: Int): this.type = {
     bytes.position(newPos)
     this
+  }
+
+  // test
+  def makeVocabularyIndices(): mutable.LongMap[Int] = {
+    import Tkool2kDBExtractor._
+    import Tkool2kDB.RichByteBuffer
+
+    val acc = mutable.LongMap.withDefault(_ => -1)
+    seek(vocabulary)
+    while(bytes.position < vocabulary.position + vocabulary.length) {
+      val arrIdx = nextBer(bytes)
+      acc += (arrIdx, bytes.position)
+      val strLen = nextBerInt(bytes)
+      bytes.forward(strLen)
+    }
+    bytes.position(0)
+
+    acc
   }
 
 }

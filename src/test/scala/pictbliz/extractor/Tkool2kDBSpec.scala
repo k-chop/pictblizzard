@@ -17,6 +17,13 @@ class Tkool2kDBSpec extends UnitSpec {
       nextBer(buf) shouldEqual 1
       nextStr(buf) shouldEqual "が出現！"
 
+      val vocabIndices = db.makeVocabularyIndices()
+      vocabIndices.size shouldEqual 121
+      db.seek(vocabIndices(0x01))
+      nextStr(buf) shouldEqual "が出現！"
+      db.seek(vocabIndices(0x97))
+      nextStr(buf) shouldEqual "終了してよろしいですか？"
+      vocabIndices(0x91) shouldEqual -1 // 0x91 is empty entry
     }
 
   }
