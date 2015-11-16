@@ -13,7 +13,7 @@ class Tkool2kDBSpec extends UnitSpec {
       val buf = db.bytes
 
       db.heroes.position shouldEqual 15
-      buf.position(db.vocabulary.position)
+      db.seek(db.vocabulary)
       nextBer(buf) shouldEqual 1
       nextStr(buf) shouldEqual "が出現！"
 

@@ -72,6 +72,7 @@ object Tkool2kDB {
     ch.close()
     buf
   }
+
 }
 
 case class Tkool2kDB(
@@ -92,6 +93,15 @@ case class Tkool2kDB(
     variables: DBArray2,
     commonEvents: DBArray2
 ) {
-  
+
+
+  // seek bytes to beginning of section
+  def seek(section: DBArray): this.type = seek(section.position)
+
+  def seek(newPos: Int): this.type = {
+    bytes.position(newPos)
+    this
+  }
+
 }
 
