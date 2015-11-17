@@ -95,7 +95,6 @@ case class Tkool2kDB(
     variables: DBArray2,
     commonEvents: DBArray2
 ) {
-  import Tkool2kDBExtractor._
   import Tkool2kDB.RichByteBuffer
 
   // seek bytes to beginning of section
@@ -112,9 +111,9 @@ case class Tkool2kDB(
     val acc = mutable.LongMap.withDefault(_ => -1)
     seek(section)
     while(bytes.position < section.position + section.length) {
-      val arrIdx = nextBer(bytes)
+      val arrIdx = nextBer()
       acc += (arrIdx, bytes.position)
-      val datLen = nextBerInt(bytes)
+      val datLen = nextBerInt()
       bytes.forward(datLen)
     }
 
@@ -126,10 +125,10 @@ case class Tkool2kDB(
     seek(start)
 
     @tailrec def rec(len: Int = 0): Int = {
-      val arrIdx = nextBer(bytes)
+      val arrIdx = nextBer()
       if (arrIdx == 0) len else {
         acc += (arrIdx, bytes.position)
-        val datLen = nextBerInt(bytes)
+        val datLen = nextBerInt()
         bytes.forward(datLen)
         rec(len + 1)
       }
@@ -143,18 +142,22 @@ case class Tkool2kDB(
 
     val acc = mutable.LongMap.withDefault(_ => -1)
     seek(section)
-    nextBer(bytes) // skip element length
+    nextBer() // skip element length
     while(bytes.position < section.position + section.length) {
-      val arrIdx = nextBer(bytes)
+      val arrIdx = nextBer()
       acc += (arrIdx, bytes.position)
 
-      while(nextBer(bytes) != 0) { // index-0 is end of array.
-        val childDatLen = nextBerInt(bytes)
+      while(nextBer() != 0) { // index-0 is end of array.
+        val childDatLen = nextBerInt()
         bytes.forward(childDatLen)
       }
     }
 
     acc
   }
+
+  def nextBer(): Long = Tkool2kDBExtractor.nextBer(bytes)
+  def nextBerInt(): Int = Tkool2kDBExtractor.nextBerInt(bytes)
+  def nextStr(): String = Tkool2kDBExtractor.nextStr(bytes)
 }
 
