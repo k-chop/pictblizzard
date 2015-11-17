@@ -96,14 +96,14 @@ case class Tkool2kDB(
 ) {
 
   // seek bytes to beginning of section
-  def seek(section: DBArray): this.type = seek(section.position)
+  def seek(section: DBArray): Tkool2kDB = seek(section.position)
 
-  def seek(newPos: Int): this.type = {
+  def seek(newPos: Int): Tkool2kDB = {
     bytes.position(newPos)
     this
   }
 
-  // test
+  // calculate and return byte positions from indices.
   def makeIndices(section: DBArray): mutable.LongMap[Int] = {
     import Tkool2kDBExtractor._
     import Tkool2kDB.RichByteBuffer
@@ -116,7 +116,6 @@ case class Tkool2kDB(
       val strLen = nextBerInt(bytes)
       bytes.forward(strLen)
     }
-
 
     acc
   }
