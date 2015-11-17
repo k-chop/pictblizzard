@@ -4,6 +4,7 @@ import java.io.FileInputStream
 import java.nio.{Buffer, ByteBuffer}
 import java.nio.channels.FileChannel
 
+import scala.annotation.tailrec
 import scala.collection.immutable.LongMap
 import scala.collection.mutable
 
@@ -34,7 +35,7 @@ object Tkool2kDB {
     val acc = mutable.ArrayBuilder.make[(Int, Int)]
 
     while(buf.position < buf.limit) {
-      val arrayNumber = nextBerInt(buf)
+      nextBerInt(buf) // skip ArrayNumber
       val length = nextBerInt(buf)
       val pos = buf.position
       acc += ((pos, length))
@@ -94,6 +95,8 @@ case class Tkool2kDB(
     variables: DBArray2,
     commonEvents: DBArray2
 ) {
+  import Tkool2kDBExtractor._
+  import Tkool2kDB.RichByteBuffer
 
   // seek bytes to beginning of section
   def seek(section: DBArray): Tkool2kDB = seek(section.position)
@@ -103,18 +106,52 @@ case class Tkool2kDB(
     this
   }
 
-  // calculate and return byte positions from indices.
-  def makeIndices(section: DBArray): mutable.LongMap[Int] = {
-    import Tkool2kDBExtractor._
-    import Tkool2kDB.RichByteBuffer
+  // calculate and return byte positions from indices. (for DBArray1)
+  def makeIndices1(section: DBArray): mutable.LongMap[Int] = {
 
     val acc = mutable.LongMap.withDefault(_ => -1)
     seek(section)
     while(bytes.position < section.position + section.length) {
       val arrIdx = nextBer(bytes)
       acc += (arrIdx, bytes.position)
-      val strLen = nextBerInt(bytes)
-      bytes.forward(strLen)
+      val datLen = nextBerInt(bytes)
+      bytes.forward(datLen)
+    }
+
+    acc
+  }
+
+  def makeIndices1(start: Int): mutable.LongMap[Int] = {
+    val acc = mutable.LongMap.withDefault(_ => -1)
+    seek(start)
+
+    @tailrec def rec(len: Int = 0): Int = {
+      val arrIdx = nextBer(bytes)
+      if (arrIdx == 0) len else {
+        acc += (arrIdx, bytes.position)
+        val datLen = nextBerInt(bytes)
+        bytes.forward(datLen)
+        rec(len + 1)
+      }
+    }
+
+    rec()
+    acc
+  }
+
+  def makeIndices2(section: DBArray): mutable.LongMap[Int] = {
+
+    val acc = mutable.LongMap.withDefault(_ => -1)
+    seek(section)
+    nextBer(bytes) // skip element length
+    while(bytes.position < section.position + section.length) {
+      val arrIdx = nextBer(bytes)
+      acc += (arrIdx, bytes.position)
+
+      while(nextBer(bytes) != 0) { // index-0 is end of array.
+        val childDatLen = nextBerInt(bytes)
+        bytes.forward(childDatLen)
+      }
     }
 
     acc
