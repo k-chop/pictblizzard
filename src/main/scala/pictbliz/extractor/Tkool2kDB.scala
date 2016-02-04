@@ -25,21 +25,21 @@ object Tkool2kDB {
 
     val buf = asByteBuffer(path)
     buf.forward(nextBerInt(buf)) // skip header
-    val acc = mutable.ArrayBuilder.make[(Int, Int)]
+    val acc = mutable.ArrayBuilder.make[Int]
 
     while(buf.position < buf.limit) {
       nextBerInt(buf) // skip ArrayNumber
       val length = nextBerInt(buf)
       val pos = buf.position
-      acc += ((pos, length))
+      acc += pos
       buf.forward(length)
     }
     val a = acc.result()
 
     buf.position(0)
 
-    def f2(a: (Int, Int)) = new DBArray2(buf, a._1, a._2)
-    def f1(a: (Int, Int)) = new DBArray1(buf, a._1, a._2)
+    def f2(a: Int) = new DBArray2(buf, a)
+    def f1(a: Int) = new DBArray1(buf, a)
 
     Tkool2kDB(
       bytes = buf,

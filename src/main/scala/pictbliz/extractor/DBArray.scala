@@ -10,7 +10,6 @@ sealed trait DBArray {
 
   val byteRef: ByteBuffer
   val position: Int
-  val length: Int
   val indices: mutable.LongMap[Int]
 
   def asString(index: Int): Option[String] = {
@@ -29,9 +28,9 @@ sealed trait DBArray {
     } else None
   }
 
-  def asArray1(index: Int): DBArray1 = new DBArray1(byteRef, indices(index), -1)
+  def asArray1(index: Int): DBArray1 = new DBArray1(byteRef, indices(index))
 
-  def asArray2(index: Int): DBArray2 = new DBArray2(byteRef, indices(index), -1)
+  def asArray2(index: Int): DBArray2 = new DBArray2(byteRef, indices(index))
 
   def makeIndices1(section: DBArray): mutable.LongMap[Int] = makeIndices1(section.position)
 
@@ -79,12 +78,12 @@ sealed trait DBArray {
   }
 }
 
-case class DBArray2(byteRef: ByteBuffer, position: Int, length: Int) extends DBArray {
+case class DBArray2(byteRef: ByteBuffer, position: Int) extends DBArray {
 
   val indices = makeIndices2(this)
 }
 
-case class DBArray1(byteRef: ByteBuffer, position: Int, length: Int) extends DBArray {
+case class DBArray1(byteRef: ByteBuffer, position: Int) extends DBArray {
 
   val indices = makeIndices1(this)
 }
