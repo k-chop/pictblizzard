@@ -12,20 +12,20 @@ sealed trait DBArray {
   val position: Int
   val indices: mutable.LongMap[Int]
 
-  def asString(index: Int): Option[String] = {
-    val pos = indices(index)
-    if (pos != -1) {
-      byteRef.position(pos)
-      Some( byteRef.nextStr() )
-    } else None
+  def asStringOption(index: Int): Option[String] =
+    if (indices.contains(index)) Some(asString(index)) else None
+
+  def asString(index: Int): String = {
+    byteRef.position(indices(index))
+    byteRef.nextStr()
   }
 
-  def asInt(index: Int): Option[Int] = {
-    val pos = indices(index)
-    if (pos != -1) {
-      byteRef.position(pos)
-      Some( byteRef.nextBerInt() )
-    } else None
+  def asIntOption(index: Int): Option[Int] =
+    if (indices.contains(index)) Some(asInt(index)) else None
+
+  def asInt(index: Int): Int = {
+    byteRef.position(indices(index))
+    byteRef.nextBerInt()
   }
 
   def asArray1(index: Int): DBArray1 = new DBArray1(byteRef, indices(index))
