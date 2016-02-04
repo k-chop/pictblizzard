@@ -11,12 +11,56 @@ import scala.collection.mutable
 import pictbliz.ext.FilePath.ToPath
 
 sealed trait DBArray {
+  val byteRef: ByteBuffer
   val position: Int
   val length: Int
+  val indices: mutable.LongMap[Int]
 }
 
-case class DBArray2(position: Int, length: Int) extends DBArray
-case class DBArray1(position: Int, length: Int) extends DBArray
+case class DBArray2(byteRef: ByteBuffer, position: Int, length: Int) extends DBArray {
+
+  val indices = makeIndices2()
+
+  def makeIndices2(): mutable.LongMap[Int] = {
+    import Tkool2kDB.RichByteBuffer
+
+    val acc = mutable.LongMap.withDefault(_ => -1)
+    byteRef.position(position)
+    byteRef.nextBer() // skip element length
+    while(byteRef.position < position + length) {
+      val arrIdx = byteRef.nextBer()
+      acc += (arrIdx, byteRef.position)
+
+      while(byteRef.nextBer() != 0) { // index-0 is end of array.
+      val childDatLen = byteRef.nextBerInt()
+        byteRef.forward(childDatLen)
+      }
+    }
+
+    acc
+  }
+}
+
+case class DBArray1(byteRef: ByteBuffer, position: Int, length: Int) extends DBArray {
+
+  val indices = makeIndices1()
+
+  // calculate and return byte positions from indices.
+  private[this] def makeIndices1(): mutable.LongMap[Int] = {
+    import Tkool2kDB.RichByteBuffer
+
+    val acc = mutable.LongMap.withDefault(_ => -1)
+    byteRef.position(position)
+    while(byteRef.position < position + length) {
+      val arrIdx = byteRef.nextBer()
+      acc += (arrIdx, byteRef.position)
+      val datLen = byteRef.nextBerInt()
+      byteRef.forward(datLen)
+    }
+
+    acc
+  }
+}
 
 object Tkool2kDB {
   import Tkool2kDBExtractor._
@@ -24,11 +68,12 @@ object Tkool2kDB {
   implicit class RichByteBuffer(val self: ByteBuffer) extends AnyVal {
     def forward(step: Int): Buffer = self.position(self.position + step)
     def back(step: Int): Buffer = forward(-step)
+    def nextBer(): Long = Tkool2kDBExtractor.nextBer(self)
+    def nextBerInt(): Int = Tkool2kDBExtractor.nextBerInt(self)
+    def nextStr(): String = Tkool2kDBExtractor.nextStr(self)
   }
 
   def fromFile[T: ToPath](path: T): Tkool2kDB = {
-    def f2(a: (Int, Int)) = DBArray2(a._1, a._2)
-    def f1(a: (Int, Int)) = DBArray1(a._1, a._2)
 
     val buf = asByteBuffer(path)
     buf.forward(nextBerInt(buf)) // skip header
@@ -44,6 +89,9 @@ object Tkool2kDB {
     val a = acc.result()
 
     buf.position(0)
+
+    def f2(a: (Int, Int)) = new DBArray2(buf, a._1, a._2)
+    def f1(a: (Int, Int)) = new DBArray1(buf, a._1, a._2)
 
     Tkool2kDB(
       bytes = buf,
