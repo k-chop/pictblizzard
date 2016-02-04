@@ -176,9 +176,7 @@ case class Tkool2kDB(
   }
 
   // calculate and return byte positions from indices. (for DBArray1)
-  def makeIndices1(section: DBArray): mutable.LongMap[Int] = {
-    makeIndices1(section.position)
-  }
+  def makeIndices1(section: DBArray): mutable.LongMap[Int] = makeIndices1(section.position)
 
   def makeIndices1(start: Int): mutable.LongMap[Int] = {
     val acc = mutable.LongMap.withDefault(_ => -1)
@@ -198,21 +196,28 @@ case class Tkool2kDB(
     acc
   }
 
-  def makeIndices2(section: DBArray): mutable.LongMap[Int] = {
+  def makeIndices2(section: DBArray): mutable.LongMap[Int] = makeIndices2(section.position)
+
+  def makeIndices2(start: Int): mutable.LongMap[Int] = {
 
     val acc = mutable.LongMap.withDefault(_ => -1)
-    seek(section)
-    nextBer() // skip element length
-    while(bytes.position < section.position + section.length) {
-      val arrIdx = nextBer()
-      acc += (arrIdx, bytes.position)
+    bytes.position(start)
+    val elementLength = nextBer()
 
-      while(nextBer() != 0) { // index-0 is end of array.
-        val childDatLen = nextBerInt()
-        bytes.forward(childDatLen)
+    @tailrec def rec(len: Int = 0): Int = {
+      if (elementLength <= len) len else {
+        val arrIdx = nextBer()
+        acc += (arrIdx, bytes.position)
+
+        while(nextBer() != 0) { // index-0 is end of array.
+          val childDatLen = nextBerInt()
+          bytes.forward(childDatLen)
+        }
+        rec(len + 1)
       }
     }
 
+    rec()
     acc
   }
 
