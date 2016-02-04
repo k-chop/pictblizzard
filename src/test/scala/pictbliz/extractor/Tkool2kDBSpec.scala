@@ -16,7 +16,7 @@ class Tkool2kDBSpec extends UnitSpec {
       db.nextStr() shouldEqual "が出現！"
 
       val vocabIndices = db.makeIndices1(db.vocabulary)
-      vocabIndices.size shouldEqual 121
+      vocabIndices.size shouldEqual 120
       db.seek(vocabIndices(0x01))
       db.nextStr() shouldEqual "が出現！"
       db.seek(vocabIndices(0x97))

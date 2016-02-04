@@ -15,6 +15,26 @@ sealed trait DBArray {
   val position: Int
   val length: Int
   val indices: mutable.LongMap[Int]
+
+  def makeIndices1(start: Int): mutable.LongMap[Int] = {
+    import Tkool2kDB.RichByteBuffer
+
+    val acc = mutable.LongMap.withDefault(_ => -1)
+    byteRef.position(start)
+
+    @tailrec def rec(len: Int = 0): Int = {
+      val arrIdx = byteRef.nextBer()
+      if (arrIdx == 0) len else {
+        acc += (arrIdx, byteRef.position)
+        val datLen = byteRef.nextBerInt()
+        byteRef.forward(datLen)
+        rec(len + 1)
+      }
+    }
+
+    rec()
+    acc
+  }
 }
 
 case class DBArray2(byteRef: ByteBuffer, position: Int, length: Int) extends DBArray {
@@ -39,6 +59,8 @@ case class DBArray2(byteRef: ByteBuffer, position: Int, length: Int) extends DBA
 
     acc
   }
+
+
 }
 
 case class DBArray1(byteRef: ByteBuffer, position: Int, length: Int) extends DBArray {
@@ -155,17 +177,7 @@ case class Tkool2kDB(
 
   // calculate and return byte positions from indices. (for DBArray1)
   def makeIndices1(section: DBArray): mutable.LongMap[Int] = {
-
-    val acc = mutable.LongMap.withDefault(_ => -1)
-    seek(section)
-    while(bytes.position < section.position + section.length) {
-      val arrIdx = nextBer()
-      acc += (arrIdx, bytes.position)
-      val datLen = nextBerInt()
-      bytes.forward(datLen)
-    }
-
-    acc
+    makeIndices1(section.position)
   }
 
   def makeIndices1(start: Int): mutable.LongMap[Int] = {
