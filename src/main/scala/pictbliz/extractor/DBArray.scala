@@ -5,12 +5,40 @@ import java.nio.ByteBuffer
 import scala.annotation.tailrec
 import scala.collection.mutable
 
+private[extractor] case class QueryResult(byte: ByteBuffer, position: Int, isSafe: Boolean) {
+  self =>
+  import Tkool2kDB.RichByteBuffer
+
+  def asString(): String = {
+    byte.position(position)
+    byte.nextStr()
+  }
+  def asInt(): Int = {
+    byte.position(position)
+    byte.nextBerInt()
+  }
+  def asArray1(): DBArray1 = new DBArray1(byte, position)
+  def asArray2(): DBArray2 = new DBArray2(byte, position)
+
+  // Return result wrapped with option.
+  object opt {
+
+    def asString(): Option[String] = if (isSafe) Some(self.asString()) else None
+    def asInt(): Option[Int] = if (isSafe) Some(self.asInt()) else None
+    def asArray1(): Option[DBArray1] = if (isSafe) Some(self.asArray1()) else None
+    def asArray2(): Option[DBArray2] = if (isSafe) Some(self.asArray2()) else None
+
+  }
+}
+
 sealed trait DBArray {
   import Tkool2kDB.RichByteBuffer
 
   val byteRef: ByteBuffer
   val position: Int
   val indices: mutable.LongMap[Int]
+
+  def apply(index: Int) = QueryResult(byteRef, indices(index), indices.contains(index))
 
   def asStringOption(index: Int): Option[String] =
     if (indices.contains(index)) Some(asString(index)) else None
