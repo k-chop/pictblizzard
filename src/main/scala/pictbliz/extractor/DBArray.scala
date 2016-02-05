@@ -40,26 +40,6 @@ sealed trait DBArray {
 
   def apply(index: Int) = QueryResult(byteRef, indices(index), indices.contains(index))
 
-  def asStringOption(index: Int): Option[String] =
-    if (indices.contains(index)) Some(asString(index)) else None
-
-  def asString(index: Int): String = {
-    byteRef.position(indices(index))
-    byteRef.nextStr()
-  }
-
-  def asIntOption(index: Int): Option[Int] =
-    if (indices.contains(index)) Some(asInt(index)) else None
-
-  def asInt(index: Int): Int = {
-    byteRef.position(indices(index))
-    byteRef.nextBerInt()
-  }
-
-  def asArray1(index: Int): DBArray1 = new DBArray1(byteRef, indices(index))
-
-  def asArray2(index: Int): DBArray2 = new DBArray2(byteRef, indices(index))
-
   def makeIndices1(section: DBArray): mutable.LongMap[Int] = makeIndices1(section.position)
 
   def makeIndices1(start: Int): mutable.LongMap[Int] = {
