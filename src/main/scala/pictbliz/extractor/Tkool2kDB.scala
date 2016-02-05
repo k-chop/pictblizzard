@@ -25,48 +25,50 @@ object Tkool2kDB {
 
     val buf = asByteBuffer(path)
     buf.forward(nextBerInt(buf)) // skip header
-    val acc = mutable.ArrayBuilder.make[Int]
+    val builder = Map.newBuilder[Int, Int]
 
     while(buf.position < buf.limit) {
-      nextBerInt(buf) // skip ArrayNumber
+      val rootArrayNumber = nextBerInt(buf)
       val length = nextBerInt(buf)
       val pos = buf.position
-      acc += pos
+      builder += rootArrayNumber -> pos
       buf.forward(length)
     }
-    val a = acc.result()
+    val mappos = builder.result()
 
     buf.position(0)
 
-    def f2(a: Int) = new DBArray2(buf, a)
-    def f1(a: Int) = new DBArray1(buf, a)
+    def f2(i: Int) = new DBArray2(buf, mappos(i))
+    def f1(i: Int) = new DBArray1(buf, mappos(i))
 
     Tkool2kDB(
       bytes = buf,
-      heroes = f2(a(0)),
-      skills = f2(a(1)),
-      items = f2(a(2)),
-      monsters = f2(a(3)),
-      monsterGroups = f2(a(4)),
-      terrains = f2(a(5)),
-      attributes = f2(a(6)),
-      conditions = f2(a(7)),
-      animations = f2(a(8)),
-      tileSets = f2(a(9)),
-      vocabulary = f1(a(10)),
-      systemSettings = f1(a(11)),
-      switches = f2(a(12)),
-      variables = f2(a(13)),
-      commonEvents = f2(a(14))
+      heroes         = f2(0x0B),
+      skills         = f2(0x0C),
+      items          = f2(0x0D),
+      monsters       = f2(0x0E),
+      monsterGroups  = f2(0x0F),
+      terrains       = f2(0x10),
+      attributes     = f2(0x11),
+      conditions     = f2(0x12),
+      animations     = f2(0x13),
+      tileSets       = f2(0x14),
+      vocabulary     = f1(0x15),
+      systemSettings = f1(0x16),
+      switches       = f2(0x17),
+      variables      = f2(0x18),
+      commonEvents   = f2(0x19)
     )
   }
 
   def asByteBuffer[T: ToPath](path: T): ByteBuffer = {
+
     val ch = new FileInputStream(implicitly[ToPath[T]].toPath(path).toFile).getChannel
     val size = ch.size()
     val buf = if (size < Int.MaxValue) {
       ch.map(FileChannel.MapMode.READ_ONLY, 0, size)
     } else sys.error(s"wow, too big file! filename: $path, size: $size")
+
     ch.close()
     buf
   }
