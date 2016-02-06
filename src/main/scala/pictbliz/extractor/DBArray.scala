@@ -21,6 +21,9 @@ private[extractor] case class QueryResult(byte: ByteBuffer, position: Int, isSaf
   def asArray1(): DBArray1 = new DBArray1(byte, position, isChild)
   def asArray2(): DBArray2 = new DBArray2(byte, position)
 
+  def asArray1At(index: Int): QueryResult = new DBArray1(byte, position, isChild).at(index)
+  def asArray2At(index: Int): QueryResult = new DBArray2(byte, position).at(index)
+
   // Return result wrapped with option.
   object opt {
 
@@ -40,6 +43,8 @@ sealed trait DBArray {
   val indices: mutable.LongMap[Int]
 
   def apply(index: Int): QueryResult
+
+  def at(index: Int): QueryResult = apply(index)
 
   def makeIndices1(section: DBArray, isChild: Boolean): mutable.LongMap[Int] = makeIndices1(section.position, isChild)
 

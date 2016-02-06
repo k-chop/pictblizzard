@@ -30,6 +30,13 @@ class Tkool2kDBSpec extends UnitSpec {
       atThree(0x01).asInt() shouldEqual 4
       atThree(0x02).asInt() shouldEqual 36
 
+      val at = db.heroes(0x01).asArray1().at(0x3f).asArray2().at(3).asArray1()
+      at(0x01).asInt() shouldEqual 4
+      at(0x02).asInt() shouldEqual 36
+
+      val at2 = db.heroes(0x01).asArray1At(0x3f).asArray2At(3).asArray1()
+      at2(0x01).asInt() shouldEqual 4
+      at2(0x02).asInt() shouldEqual 36
     }
   }
 }
