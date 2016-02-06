@@ -21,18 +21,15 @@ class Tkool2kDBSpec extends UnitSpec {
 
       db.skills.indices.size shouldEqual 128
 
-      println("aaaaaaaegfteaegaegasg")
       val skillDetail = db.skills(127).asArray1()
       skillDetail(0x02).opt.asString().value shouldEqual "敵全体に無属性のダメージを与える。"
 
-      println("aaaaaaaaaaaaaaaaaa")
-      val hero1Details = db.heroes(0x01).asArray1()//.asArray1()(0x01).asInt shouldEqual 4
-      println("bbbbbbbbbbbbbbbbbb")
-      val bb = hero1Details(0x3f).asArray2()
-      println(bb.indices)
-      //println(bb(1).asArray1()(0x01).asInt())
-      println(bb(3).asArray1()(0x02).asInt())
-    }
+      val hero1Details = db.heroes(0x01).asArray1()
+      val learnSkillPerLevel = hero1Details(0x3f).asArray2()
+      val atThree = learnSkillPerLevel(3).asArray1()
+      atThree(0x01).asInt() shouldEqual 4
+      atThree(0x02).asInt() shouldEqual 36
 
+    }
   }
 }

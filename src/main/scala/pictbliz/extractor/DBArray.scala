@@ -47,12 +47,11 @@ sealed trait DBArray {
     val acc = mutable.LongMap.withDefault(_ => -1)
     byteRef.position(start)
     if (!isChild) { // when create indices as child of 2-dim array, it has no data length.
-      println("arr1 data length: " + byteRef.nextBer()) // skip data length
+      byteRef.nextBer()
     }
 
     @tailrec def rec(len: Int = 0): Int = {
       val arrIdx = byteRef.nextBer()
-      println(s"detect array number [$arrIdx]")
       if (arrIdx == 0) len else {
         acc += (arrIdx, byteRef.position)
         val datLen = byteRef.nextBerInt()
@@ -71,14 +70,12 @@ sealed trait DBArray {
 
     val acc = mutable.LongMap.withDefault(_ => -1)
     byteRef.position(start)
-    println("arr2 data length = "+byteRef.nextBer()) // skip data length
+    byteRef.nextBer() // skip data length
     val elementLength = byteRef.nextBer()
-    println(s"arr2 element length = $elementLength")
 
     @tailrec def rec(len: Int = 0): Int = {
       if (elementLength <= len) len else {
         val arrIdx = byteRef.nextBer()
-        println(s"arr2, idx = $arrIdx")
         if (arrIdx == 0) len else {
           acc +=(arrIdx, byteRef.position)
 
