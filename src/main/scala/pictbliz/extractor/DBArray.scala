@@ -44,10 +44,12 @@ sealed trait DBArray {
   def makeIndices1(section: DBArray, isChild: Boolean): mutable.LongMap[Int] = makeIndices1(section.position, isChild)
 
   def makeIndices1(start: Int, isChild: Boolean): mutable.LongMap[Int] = {
+
     val acc = mutable.LongMap.withDefault(_ => -1)
     byteRef.position(start)
+
     if (!isChild) { // when create indices as child of 2-dim array, it has no data length.
-      byteRef.nextBer()
+      byteRef.nextBer() // normally skip data length.
     }
 
     @tailrec def rec(len: Int = 0): Int = {
@@ -75,8 +77,10 @@ sealed trait DBArray {
 
     @tailrec def rec(len: Int = 0): Int = {
       if (elementLength <= len) len else {
+
         val arrIdx = byteRef.nextBer()
         if (arrIdx == 0) len else {
+
           acc +=(arrIdx, byteRef.position)
 
           while (byteRef.nextBer() != 0) {
