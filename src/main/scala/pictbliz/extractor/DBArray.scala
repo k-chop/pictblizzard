@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-private[extractor] case class QueryResult(byte: ByteBuffer, position: Int, isSafe: Boolean) {
+private[extractor] case class QueryResult(byte: ByteBuffer, position: Int, isSafe: Boolean, isChild: Boolean) {
   self =>
   import Tkool2kDB.RichByteBuffer
 
@@ -15,9 +15,10 @@ private[extractor] case class QueryResult(byte: ByteBuffer, position: Int, isSaf
   }
   def asInt(): Int = {
     byte.position(position)
+    byte.nextBer() // skip data length
     byte.nextBerInt()
   }
-  def asArray1(): DBArray1 = new DBArray1(byte, position)
+  def asArray1(): DBArray1 = new DBArray1(byte, position, isChild)
   def asArray2(): DBArray2 = new DBArray2(byte, position)
 
   // Return result wrapped with option.
@@ -38,16 +39,20 @@ sealed trait DBArray {
   val position: Int
   val indices: mutable.LongMap[Int]
 
-  def apply(index: Int) = QueryResult(byteRef, indices(index), indices.contains(index))
+  def apply(index: Int): QueryResult
 
-  def makeIndices1(section: DBArray): mutable.LongMap[Int] = makeIndices1(section.position)
+  def makeIndices1(section: DBArray, isChild: Boolean): mutable.LongMap[Int] = makeIndices1(section.position, isChild)
 
-  def makeIndices1(start: Int): mutable.LongMap[Int] = {
+  def makeIndices1(start: Int, isChild: Boolean): mutable.LongMap[Int] = {
     val acc = mutable.LongMap.withDefault(_ => -1)
     byteRef.position(start)
+    if (!isChild) { // when create indices as child of 2-dim array, it has no data length.
+      println("arr1 data length: " + byteRef.nextBer()) // skip data length
+    }
 
     @tailrec def rec(len: Int = 0): Int = {
       val arrIdx = byteRef.nextBer()
+      println(s"detect array number [$arrIdx]")
       if (arrIdx == 0) len else {
         acc += (arrIdx, byteRef.position)
         val datLen = byteRef.nextBerInt()
@@ -66,18 +71,24 @@ sealed trait DBArray {
 
     val acc = mutable.LongMap.withDefault(_ => -1)
     byteRef.position(start)
+    println("arr2 data length = "+byteRef.nextBer()) // skip data length
     val elementLength = byteRef.nextBer()
+    println(s"arr2 element length = $elementLength")
 
     @tailrec def rec(len: Int = 0): Int = {
       if (elementLength <= len) len else {
         val arrIdx = byteRef.nextBer()
-        acc += (arrIdx, byteRef.position)
+        println(s"arr2, idx = $arrIdx")
+        if (arrIdx == 0) len else {
+          acc +=(arrIdx, byteRef.position)
 
-        while(byteRef.nextBer() != 0) { // index-0 is end of array.
-        val childDatLen = byteRef.nextBerInt()
-          byteRef.forward(childDatLen)
+          while (byteRef.nextBer() != 0) {
+            // index-0 is end of array.
+            val childDatLen = byteRef.nextBerInt()
+            byteRef.forward(childDatLen)
+          }
+          rec(len + 1)
         }
-        rec(len + 1)
       }
     }
 
@@ -88,10 +99,12 @@ sealed trait DBArray {
 
 case class DBArray2(byteRef: ByteBuffer, position: Int) extends DBArray {
 
+  def apply(index: Int) = QueryResult(byteRef, indices(index), indices.contains(index), isChild = true)
   val indices = makeIndices2(this)
 }
 
-case class DBArray1(byteRef: ByteBuffer, position: Int) extends DBArray {
+case class DBArray1(byteRef: ByteBuffer, position: Int, isChild: Boolean = false) extends DBArray {
 
-  val indices = makeIndices1(this)
+  def apply(index: Int) = QueryResult(byteRef, indices(index), indices.contains(index), isChild = false)
+  val indices = makeIndices1(this, isChild)
 }

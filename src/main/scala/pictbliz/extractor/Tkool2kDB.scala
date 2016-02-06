@@ -29,9 +29,9 @@ object Tkool2kDB {
 
     while(buf.position < buf.limit) {
       val rootArrayNumber = nextBerInt(buf)
-      val length = nextBerInt(buf)
       val pos = buf.position
       builder += rootArrayNumber -> pos
+      val length = nextBerInt(buf)
       buf.forward(length)
     }
     val mappos = builder.result()
