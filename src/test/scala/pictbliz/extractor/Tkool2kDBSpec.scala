@@ -43,6 +43,10 @@ class Tkool2kDBSpec extends UnitSpec {
 
       val va = new VocabularyAccessor(db.vocabulary)
       va.get("ニューゲーム") shouldEqual "ニューゲーム"
+
+      val sa = new SkillAccessor(db.skills)
+      sa.get(1, "名前") shouldEqual "毒攻撃"
+      sa.get(36, "基本効果量") shouldEqual "30"
     }
 
   }
