@@ -25,7 +25,7 @@ class SkillAccessor(src: DBArray2) extends Accessor {
     "基本効果量" -> e(0x18, DInt, "0")
   )
 
-  def get(index: Int, keyword: String, args: Array[String] = Array.empty[String]): String = {
+  def get(index: Int, keyword: String, args: Seq[String] = Seq.empty[String]): String = {
     val ed = map(keyword)
     val res = src(index).asArray1At(ed.index)
 

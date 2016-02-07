@@ -70,7 +70,16 @@ object Tkool2kDBExtractor {
 
 class Tkool2kDBExtractor extends Extractor[Tkool2kDB, Tkool2kDBQuery] {
 
-  override def execute(path: String, query: Tkool2kDBQuery): String = "not implemented"
+  override def execute(path: String, query: Tkool2kDBQuery): String = {
+
+    val db = Tkool2kDB.fromFile("testdata/no-v/RPG_RT.ldb")
+
+    query.category match {
+      case "skill" =>
+        new SkillAccessor(db.skills).get(query.args.head.toInt, query.args(1), query.args.drop(2))
+      case _ => ""
+    }
+  }
 }
 
 case class Tkool2kDBQuery(category: String, args: Seq[String]) extends Query[Tkool2kDB]
