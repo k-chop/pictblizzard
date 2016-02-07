@@ -5,9 +5,9 @@ class Tkool2kDBSpec extends UnitSpec {
 
   "Tkool2kDB" should {
 
-    "build from RPG_RT.ldb" in {
+    val db = Tkool2kDB.fromFile("testdata/no-v/RPG_RT.ldb")
 
-      val db = Tkool2kDB.fromFile("testdata/no-v/RPG_RT.ldb")
+    "build from RPG_RT.ldb" in {
 
       db.heroes.position shouldEqual 13
       db.vocabulary(0x01).opt.asString().value shouldBe "が出現！"
@@ -38,5 +38,12 @@ class Tkool2kDBSpec extends UnitSpec {
       at2(0x01).asInt() shouldEqual 4
       at2(0x02).asInt() shouldEqual 36
     }
+
+    "access with keyword" in {
+
+      val va = new VocabularyAccessor(db.vocabulary)
+      va.get("ニューゲーム") shouldEqual "ニューゲーム"
+    }
+
   }
 }
