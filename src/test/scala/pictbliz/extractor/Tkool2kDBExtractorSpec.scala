@@ -7,6 +7,8 @@ class Tkool2kDBExtractorSpec extends UnitSpec {
   import Tkool2kDBExtractor._
   import scala.collection.breakOut
 
+  val path = "testdata/no-v/RPG_RT.ldb"
+
   object ByteArray {
     def apply(self: Int*): Array[Byte] = self.map(_.toByte)(breakOut)
   }
@@ -58,6 +60,12 @@ class Tkool2kDBExtractorSpec extends UnitSpec {
       ba.position shouldEqual 6
       nextBer(ba) shouldEqual 14143
       ba.position shouldEqual ba.limit
+    }
+
+    "read value from query" in {
+
+      val ex = new Tkool2kDBExtractor
+      ex.execute(path, Tkool2kDBQuery("skill", Seq("1", "失敗時メッセージ"))) shouldEqual "は攻撃をかわした！"
     }
   }
 }

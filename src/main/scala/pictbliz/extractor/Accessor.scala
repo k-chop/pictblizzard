@@ -1,52 +1,123 @@
 package pictbliz.extractor
 
 
-sealed trait DataType
-case object DInt extends DataType
-case object DStr extends DataType
-case object DFlag extends DataType
-case object DArray1d extends DataType
-case object DArray2d extends DataType
+sealed trait EntryDetail[T] {
+  val default: T
+}
+case class EntryDetailInt(default: Int) extends EntryDetail[Int]
+case class EntryDetailString(default: String) extends EntryDetail[String]
+case class EntryDetailMappedInt(default: Int, map: Map[Int, String]) extends EntryDetail[Int]
+case class EntryDetailReference(default: Int, newArgs: String, process: Int => String) extends EntryDetail[Int]
+case class EntryDetailFlag(default: Boolean) extends EntryDetail[Boolean]
+case class EntryDetailArray1d(default: String) extends EntryDetail[String]
+case class EntryDetailArray2d(default: String) extends EntryDetail[String]
 
-private[extractor] case class EntryDetail(index: Int, dataType: DataType, default: String)
+sealed trait AccessResult {
+  def result: String
+}
+case class Result(str: String) extends AccessResult {
+  def result = str
+}
+case class Reference(newArgs: Seq[String]) extends AccessResult {
+  def result = newArgs.mkString(" ")
+}
 
 trait Accessor {
-  // mapping that keyword to EntryDetail. TODO: Load from mapping files!
-  val map: Map[String, EntryDetail]
+  // TODO: Load from mapping files!
+  // mapping that keyword to index.
+  val keymap: Map[String, Int]
+  // mapping that index to EntryDetail.
+  val indexmap: Map[Int, EntryDetail[_]]
 
   // alias
-  def e(index: Int, dataType: DataType, default: String) = EntryDetail(index, dataType, default)
+  def str(default: String) = EntryDetailString(default)
+  def int(default: Int) = EntryDetailInt(default)
+  def mint(default: Int, map: Map[Int, String]) = EntryDetailMappedInt(default, map)
+  def ref(default: Int, args: String, process: Int => String) = EntryDetailReference(default, args, process)
+  def flag(default: Boolean) = EntryDetailFlag(default)
 }
 
 class SkillAccessor(src: DBArray2) extends Accessor {
 
-  val map: Map[String, EntryDetail] = Map(
-    "名前"      -> e(0x01, DStr, ""),
-    "基本効果量" -> e(0x18, DInt, "0")
+  val keymap: Map[String, Int] = Map(
+    "名前"            -> 0x01,
+    "説明"            -> 0x02,
+    "使用時メッセージ1" -> 0x03,
+    "使用時メッセージ2" -> 0x04,
+    "失敗時メッセージ"  -> 0x07,
+    "基本効果量"       -> 0x18
   )
 
-  def get(index: Int, keyword: String, args: Seq[String] = Seq.empty[String]): String = {
-    val ed = map(keyword)
-    val res = src(index).asArray1At(ed.index)
+  val indexmap: Map[Int, EntryDetail[_]] = Map(
+    0x01 -> str(""),
+    0x02 -> str(""),
+    0x03 -> str(""),
+    0x04 -> str(""),
+    0x07 -> ref(0, "vocabulary #{ref}", i => s"${0x18 + i}"),
+    0x18 -> int(0)
+  )
 
-    val r = ed.dataType match {
-      case DStr => res.opt.asString()
-      case DInt => res.opt.asInt().map(_.toString)
-      case _ => res.opt.asString()
+  def get(index: Int, index2: Int, args: String*): AccessResult = {
+    val ed = indexmap(index2)
+    val res = src(index).asArray1At(index2)
+
+    ed match {
+      case EntryDetailString(default) =>
+        val r = res.opt.asString().getOrElse(default)
+        Result(r)
+      case EntryDetailInt(default) =>
+        val r = res.opt.asInt().getOrElse(default).toString
+        Result(r)
+      case EntryDetailReference(default, newArg, process) =>
+        val i = res.opt.asInt().getOrElse(default)
+        val n = newArg.replace("#{ref}", process(i))
+        Reference(n.split(" "))
+      case _ =>
+        val r = res.opt.asString().getOrElse("")
+        Result(r)
     }
-    r.getOrElse(ed.default)
   }
+
+  def get(index: Int, keyword: String, args: String*): AccessResult =
+    get(index, keymap(keyword), args: _*)
+
 }
 
 class VocabularyAccessor(src: DBArray1) extends Accessor {
 
-  val map: Map[String, EntryDetail] = Map(
-    "ニューゲーム"   -> e(0x72, DStr, ""),
-    "コンティニュー" -> e(0x73, DStr, ""),
-    "シャットダウン" -> e(0x75, DStr, "")
+  val keymap: Map[String, Int] = Map(
+    "特殊技能失敗A" -> 0x18,
+    "特殊技能失敗B" -> 0x19,
+    "特殊技能失敗C" -> 0x1A,
+    "物理攻撃回避"  -> 0x1B,
+    "ニューゲーム"   -> 0x72,
+    "コンティニュー" -> 0x73,
+    "シャットダウン" -> 0x75
+  )
+  val indexmap: Map[Int, EntryDetail[_]] = Map(
+    0x18 -> str(""),
+    0x19 -> str(""),
+    0x1A -> str(""),
+    0x1B -> str(""),
+    0x72 -> str(""),
+    0x73 -> str(""),
+    0x75 -> str("")
   )
 
-  def get(keyword: String): String =
-    src.at(map(keyword).index).opt.asString().getOrElse(map(keyword).default)
+  def get(index: Int): AccessResult = {
+    val default = indexmap(index) match {
+      case EntryDetailString(d) => d
+      case _ => ""
+    }
+    val s = src.at(index).opt.asString().getOrElse(default)
+    Result(s)
+  }
+
+  def get(keyword: String): AccessResult = {
+    if (keyword.forall(_.isDigit)) // this is bad...
+      get(keyword.toInt)
+    else
+      get(keymap(keyword))
+  }
 
 }

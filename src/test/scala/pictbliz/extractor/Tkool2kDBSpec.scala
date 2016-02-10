@@ -5,7 +5,8 @@ class Tkool2kDBSpec extends UnitSpec {
 
   "Tkool2kDB" should {
 
-    val db = Tkool2kDB.fromFile("testdata/no-v/RPG_RT.ldb")
+    val path = "testdata/no-v/RPG_RT.ldb"
+    val db = Tkool2kDB.fromFile(path)
 
     "build from RPG_RT.ldb" in {
 
@@ -39,14 +40,14 @@ class Tkool2kDBSpec extends UnitSpec {
       at2(0x02).asInt() shouldEqual 36
     }
 
-    "access with keyword" in {
+    "access with keyword (simple test)" in {
 
       val va = new VocabularyAccessor(db.vocabulary)
-      va.get("ニューゲーム") shouldEqual "ニューゲーム"
+      va.get("ニューゲーム").result shouldEqual "ニューゲーム"
 
       val sa = new SkillAccessor(db.skills)
-      sa.get(1, "名前") shouldEqual "毒攻撃"
-      sa.get(36, "基本効果量") shouldEqual "30"
+      sa.get(1, "名前").result shouldEqual "毒攻撃"
+      sa.get(36, "基本効果量").result shouldEqual "30"
     }
 
   }
