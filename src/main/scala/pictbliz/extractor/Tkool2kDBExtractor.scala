@@ -73,10 +73,16 @@ class Tkool2kDBExtractor extends Extractor[Tkool2kDB, Tkool2kDBQuery] {
   override def execute(path: String, query: Tkool2kDBQuery): String = {
 
     val db = Tkool2kDB.fromFile(path)
+    val args = query.args
 
     query.category match {
-      case "skill" =>
-        new SkillAccessor(db.skills).get(query.args.head.toInt, query.args(1), query.args.drop(2))
+      case "skill" => // args = ["<array number>", "<keyword>", "<rest>"... ],
+                      // if <keyword> has child, <rest> = repeat("<child array number>", "<keyword>")
+        new SkillAccessor(db.skills).get(args.head.toInt, args(1), args.drop(2))
+
+      case "vocabulary" => // args = ["<keyword>"]
+        new VocabularyAccessor(db.vocabulary).get(args.head)
+
       case _ => ""
     }
   }
