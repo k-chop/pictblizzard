@@ -72,7 +72,7 @@ class Tkool2kDBExtractor extends Extractor[Tkool2kDB, Tkool2kDBQuery] {
 
   override def execute(path: String, query: Tkool2kDBQuery): String = {
 
-    val db = Tkool2kDB.fromFile("testdata/no-v/RPG_RT.ldb")
+    val db = Tkool2kDB.fromFile(path)
 
     query.category match {
       case "skill" =>
