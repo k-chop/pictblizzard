@@ -2,6 +2,7 @@ package pictbliz
 package sample
 
 import com.typesafe.scalalogging.LazyLogging
+import pictbliz.Values.Tkool2kDB
 import scala.language.postfixOps
 
 import Params._
@@ -17,7 +18,7 @@ class TestSpec extends LazyLogging {
       else
         font(fontName, style, size)
 
-  @inline def r(i: Int) = scala.util.Random.nextInt(i)
+  @inline def r(i: Int): Int = scala.util.Random.nextInt(i)
 
   def run() {
     testReuseLayout()
@@ -26,9 +27,38 @@ class TestSpec extends LazyLogging {
     faceSpec()
     charaSpec()
     battleSpec()
+    dbRead()
   }
 
-  def csvRead() {
+  def dbRead(): Unit = {
+    import Values._
+
+    val path = "testdata/no-v/RPG_RT.ldb"
+    val vmap: Layouts.VMap = Map(
+      "a" -> Tkool2kDB(path, "vocabulary", "ニューゲーム"),
+      "filename" -> Text("a")
+    )
+    val interp = new Interpolator(vmap)
+
+    val layout = WholeLayout(
+      (320, 240),
+      Seq(
+        "a" -> PartLayout.ep(
+          point(0, 0) |+|
+          defaultStyle()
+        )
+      )
+    )
+    val gen = new Generator(layout)
+    interp.iterator.map{ vm =>
+      gen.genImage(vm)
+    } foreach {
+      _.write(Resource.tempDir + "db/")
+    }
+
+  }
+
+  def csvRead(): Unit = {
     import Values._
 
     val path = "testdata/item.csv"
@@ -77,7 +107,7 @@ class TestSpec extends LazyLogging {
     }
   }
 
-  def faceSpec() {
+  def faceSpec(): Unit = {
     import Values._
 
     val layout = WholeLayout(
@@ -105,7 +135,7 @@ class TestSpec extends LazyLogging {
     gen.genImage(vm).write(Resource.tempDir)
   }
 
-  def charaSpec() {
+  def charaSpec(): Unit = {
     import Values._
 
     val layout = WholeLayout(
@@ -125,7 +155,7 @@ class TestSpec extends LazyLogging {
     gen.genImage(vm).write(Resource.tempDir)
   }
 
-  def battleSpec() {
+  def battleSpec(): Unit = {
     import Values._
 
     val layout = WholeLayout(
@@ -145,7 +175,7 @@ class TestSpec extends LazyLogging {
     gen.genImage(vm).write(Resource.tempDir)
   }
 
-  def testReuseLayout() {
+  def testReuseLayout(): Unit = {
     import Values._
 
     val lay = WholeLayout(
@@ -226,7 +256,7 @@ class TestSpec extends LazyLogging {
     }
   }
 
-  def testOldSpec() {
+  def testOldSpec(): Unit = {
     import Values._
 
     val layout = WholeLayout(
