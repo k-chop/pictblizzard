@@ -35,6 +35,7 @@ trait Accessor {
   def mint(default: Int, map: Map[Int, String]) = EntryDetailMappedInt(default, map)
   def ref(default: Int, args: String, process: Int => String) = EntryDetailReference(default, args, process)
   def flag(default: Boolean) = EntryDetailFlag(default)
+  def arr1() = EntryDetailArray1d("")
 }
 
 class SkillAccessor(src: DBArray2) extends Accessor {
@@ -72,9 +73,20 @@ class SkillAccessor(src: DBArray2) extends Accessor {
         val i = res.opt.asInt().getOrElse(default)
         val n = newArg.replace("#{ref}", process(i))
         Reference(n.split(" "))
+      case EntryDetailArray1d(_) =>
+        getChilds(index2, res.asArray1(), args.head.toInt)
       case _ =>
         val r = res.opt.asString().getOrElse("")
         Result(r)
+    }
+  }
+
+  def getChilds(idx: Int, arr: DBArray1, childIdx: Int): AccessResult = {
+    val qr = arr.at(childIdx)
+    idx match {
+      case 0x2A =>
+      case 0x2C =>
+      case 0x10 =>
     }
   }
 
